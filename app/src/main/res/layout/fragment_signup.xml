@@ -1,0 +1,91 @@
+<RelativeLayout android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <RelativeLayout
+        android:id="@+id/containerLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/toolbar"
+        android:layout_margin="36dp">
+
+        <TextView
+            android:id="@+id/signup_title"
+            style="@style/LabelStyle"
+            android:layout_marginTop="0dp"
+            android:text="Sign up"
+            android:textColor="@color/orange" />
+
+        <TextView
+            android:id="@+id/signup_welcome_msg"
+            style="@style/LabelStyle"
+            android:layout_below="@id/signup_title"
+            android:layout_marginTop="16dp"
+            android:text="Hello there! \nWelcome to you" />
+
+        <EditText
+            android:id="@+id/et_full_name_singup"
+            style="@style/EditTextStyle"
+            android:layout_below="@id/signup_welcome_msg"
+            android:layout_marginTop="16dp"
+            android:hint="Full Name"
+            android:textSize="16sp"
+            android:inputType="textEmailAddress" />
+
+        <EditText
+            android:id="@+id/et_email_address_signup"
+            style="@style/EditTextStyle"
+            android:layout_below="@id/et_full_name_singup"
+            android:layout_marginTop="16dp"
+            android:hint="Email Address"
+            android:textSize="16sp"
+            android:inputType="textEmailAddress" />
+
+        <EditText
+            android:id="@+id/et_password_signup"
+            style="@style/EditTextStyle"
+            android:layout_below="@id/et_email_address_signup"
+            android:layout_marginTop="16dp"
+            android:hint="Password"
+            android:textSize="16sp"
+            android:inputType="textPassword" />
+
+        <Button
+            android:id="@+id/btn_signup"
+            style="@style/SolidButtonStyle"
+            android:layout_width="match_parent"
+            android:layout_below="@id/et_password_signup"
+            android:layout_marginTop="20dp"
+            android:textSize="16sp"
+            android:text="Signup" />
+
+
+
+        <RelativeLayout
+            android:id="@+id/login_nav"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/btn_signup"
+            android:layout_marginTop="30dp"
+            android:gravity="center">
+
+            <TextView
+                android:id="@+id/have_account"
+                style="@style/LabelStyle"
+                android:text="Already have an account?"
+                android:textColor="@color/account"
+                android:textSize="16sp" />
+
+            <TextView
+                android:id="@+id/login"
+                style="@style/LabelStyle"
+                android:layout_toEndOf="@id/have_account"
+                android:text=" Login"
+                android:textColor="@color/orange"
+                android:textSize="16sp"
+                android:layout_toRightOf="@id/have_account" />
+        </RelativeLayout>
+    </RelativeLayout>
+
+
+</RelativeLayout>

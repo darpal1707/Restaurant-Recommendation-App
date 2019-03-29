@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main_content"
+    android:layout_width="match_parent"
+    android:background="#fff"
+    android:layout_height="match_parent"
+    android:focusableInTouchMode="true">
+
+    <android.support.design.widget.AppBarLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:theme="@style/ThemeOverlay.AppCompat.Dark">
+
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="@color/colorPrimary"
+            app:layout_scrollFlags="scroll|enterAlways"
+            app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
+            app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
+
+        </android.support.v7.widget.Toolbar>
+
+        <RelativeLayout
+                android:id="@+id/search_layout"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@color/colorPrimary"
+                android:orientation="vertical"
+                android:padding="@dimen/activity_horizontal_margin">
+
+                <EditText
+                    android:id="@+id/searchview_searchpage"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="#fff"
+                    android:drawableLeft="@drawable/search"
+                    android:drawablePadding="22dp"
+                    android:gravity="left|center"
+                    android:hint="Search a restaurant"
+                    android:inputType="text"
+                    android:padding="10dp"
+                    android:textColor="#000"
+                    android:textColorHint="@android:color/darker_gray"
+                    tools:ignore="RtlHardcoded" />
+
+            </RelativeLayout>
+
+    </android.support.design.widget.AppBarLayout>
+
+    <android.support.v4.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/search_layout"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <TextView
+                android:id="@+id/trending_lbl"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Trending near you"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:layout_margin="15dp"/>
+
+            <TextView
+                android:id="@+id/viewMore_trending_lbl"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="View more"
+                android:layout_alignParentEnd="true"
+                android:textSize="16sp"
+                android:layout_margin="15dp"/>
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/trending_recyclerview"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/trending_lbl"
+                app:layoutManager="android.support.v7.widget.LinearLayoutManager"
+                android:clipToPadding="false"
+                android:orientation="horizontal"
+                android:paddingStart="20dp"
+                android:paddingEnd="20dp"/>
+
+            <TextView
+                android:id="@+id/likes_lbl"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Based on your likes"
+                android:layout_below="@id/trending_recyclerview"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:layout_margin="15dp"/>
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/likes_recyclerview"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/likes_lbl"
+                app:layoutManager="android.support.v7.widget.LinearLayoutManager"
+                android:orientation="vertical"
+                android:clipToPadding="false"
+                android:paddingStart="20dp"
+                android:paddingEnd="20dp" />
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/semicircle"
+                android:layout_marginTop="20dp"
+                android:backgroundTint="@color/colorAccent"
+                android:layout_below="@id/likes_recyclerview">
+
+                <TextView
+                    android:id="@+id/notdecided_lbl"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Don't know where to eat?"
+                    android:textSize="20sp"
+                    android:layout_centerHorizontal="true"
+                    android:layout_margin="40dp"
+                    android:textColor="#fff"
+                    android:textStyle="bold"/>
+
+                <Button
+                    android:id="@+id/notDecided_btn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:padding="10dp"
+                    android:layout_below="@+id/notdecided_lbl"
+                    android:text="Let us Help You!"
+                    style="@style/Widget.AppCompat.Button.Colored"
+                    android:background="#fff"
+                    android:textColor="@color/colorPrimary"
+                    android:layout_centerHorizontal="true"/>
+
+            </RelativeLayout>
+
+
+
+        </RelativeLayout>
+
+    </android.support.v4.widget.NestedScrollView>
+
+
+</android.support.design.widget.CoordinatorLayout>

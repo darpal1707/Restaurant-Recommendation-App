@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <RelativeLayout
+        android:id="@+id/containerLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/toolbar"
+        android:layout_margin="36dp">
+
+        <TextView
+            android:id="@+id/login_title"
+            style="@style/LabelStyle"
+            android:layout_marginTop="0dp"
+            android:text="Login"
+            android:textColor="@color/orange" />
+
+        <TextView
+            android:id="@+id/login_welcome_msg"
+            style="@style/LabelStyle"
+            android:layout_below="@id/login_title"
+            android:layout_marginTop="16dp"
+            android:text="Hello there! \nWelcome Back" />
+
+        <EditText
+            android:id="@+id/et_email_address"
+            style="@style/EditTextStyle"
+            android:layout_below="@id/login_welcome_msg"
+            android:layout_marginTop="16dp"
+            android:hint="Email Address"
+            android:textSize="16sp"
+            android:inputType="textEmailAddress" />
+
+        <EditText
+            android:id="@+id/et_password"
+            style="@style/EditTextStyle"
+            android:layout_below="@id/et_email_address"
+            android:layout_marginTop="16dp"
+            android:hint="Password"
+            android:textSize="16sp"
+            android:inputType="textPassword" />
+
+        <TextView
+            android:id="@+id/forgot_password"
+            style="@style/LabelStyle"
+            android:layout_alignParentEnd="true"
+            android:layout_below="@id/et_password"
+            android:layout_marginTop="16dp"
+            android:text="Forgot Password?"
+            android:textColor="@color/orange"
+            android:textSize="16sp"
+            android:layout_alignParentRight="true" />
+
+        <Button
+            android:id="@+id/btn_login"
+            style="@style/SolidButtonStyle"
+            android:layout_width="match_parent"
+            android:layout_below="@id/forgot_password"
+            android:layout_marginTop="16dp"
+            android:textSize="16sp"
+            android:text="Login" />
+
+        <RelativeLayout
+            android:id="@+id/divider"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/btn_login"
+            android:layout_marginBottom="8dp"
+            android:layout_marginTop="8dp">
+
+            <TextView
+                android:id="@+id/divider_or"
+                style="@style/LabelStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:text="OR"
+                android:textColor="@color/divider_or"
+                android:textSize="16sp" />
+
+        </RelativeLayout>
+
+        <com.google.android.gms.common.SignInButton
+            android:id="@+id/Google_sign_in_button"
+            android:layout_width="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/divider"/>
+
+
+        <RelativeLayout
+            android:id="@+id/sign_up_nav"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/Google_sign_in_button"
+            android:layout_marginTop="30dp"
+            android:gravity="center">
+
+            <TextView
+                android:id="@+id/no_account"
+                style="@style/LabelStyle"
+                android:text="Don't have an account?"
+                android:textColor="@color/account"
+                android:textSize="16sp" />
+
+            <TextView
+                android:id="@+id/sign_up"
+                style="@style/LabelStyle"
+                android:layout_toEndOf="@id/no_account"
+                android:text=" Signup"
+                android:textColor="@color/orange"
+                android:textSize="16sp"
+                android:layout_toRightOf="@id/no_account" />
+        </RelativeLayout>
+    </RelativeLayout>
+
+
+</RelativeLayout>
