@@ -37,10 +37,10 @@ public class LikesAdapter extends RecyclerView.Adapter<LikesAdapter.BasedOnLikes
     @Override
     public void onBindViewHolder(@NonNull BasedOnLikesVH basedOnLikesVH, int i) {
         basedOnLikesVH.resImage.setImageResource(likesData.get(i).getResImage());
-        basedOnLikesVH.resName.setText(likesData.get(i).getResName());
+        basedOnLikesVH.resName.setText(likesData.get(i).getName());
         basedOnLikesVH.resCuisine.setText(likesData.get(i).getResCuisine());
-        basedOnLikesVH.resLocation.setText(likesData.get(i).getResLocation());
-        basedOnLikesVH.resReviewCount.setText(likesData.get(i).getResReviewCount());
+        basedOnLikesVH.resLocation.setText(likesData.get(i).getAddress());
+        basedOnLikesVH.resReviewCount.setText(likesData.get(i).getReview_count());
     }
 
     @Override

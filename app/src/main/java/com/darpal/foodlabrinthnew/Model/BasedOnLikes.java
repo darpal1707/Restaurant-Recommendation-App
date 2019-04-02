@@ -3,17 +3,17 @@ package com.darpal.foodlabrinthnew.Model;
 public class BasedOnLikes {
 
     public int resImage;
-    public String resName;
+    public String name;
     public String resCuisine;
-    public String resLocation;
-    public String  resReviewCount;
+    public String address;
+    public String  review_count;
 
     public BasedOnLikes(int resImage, String resName, String resCuisine, String resLocation, String resReviewCount) {
         this.resImage = resImage;
-        this.resName = resName;
+        this.name = resName;
         this.resCuisine = resCuisine;
-        this.resLocation = resLocation;
-        this.resReviewCount = resReviewCount;
+        this.address = resLocation;
+        this.review_count = resReviewCount;
     }
 
     public BasedOnLikes() {
@@ -27,12 +27,12 @@ public class BasedOnLikes {
         this.resImage = resImage;
     }
 
-    public String getResName() {
-        return resName;
+    public String getName() {
+        return name;
     }
 
-    public void setResName(String resName) {
-        this.resName = resName;
+    public void setName(String name) {
+        this.name = name;
     }
 
     public String getResCuisine() {
@@ -43,19 +43,19 @@ public class BasedOnLikes {
         this.resCuisine = resCuisine;
     }
 
-    public String getResLocation() {
-        return resLocation;
+    public String getAddress() {
+        return address;
     }
 
-    public void setResLocation(String resLocation) {
-        this.resLocation = resLocation;
+    public void setAddress(String address) {
+        this.address = address;
     }
 
-    public String getResReviewCount() {
-        return resReviewCount;
+    public String getReview_count() {
+        return review_count;
     }
 
-    public void setResReviewCount(String resReviewCount) {
-        this.resReviewCount = resReviewCount;
+    public void setReview_count(String review_count) {
+        this.review_count = review_count;
     }
 }
