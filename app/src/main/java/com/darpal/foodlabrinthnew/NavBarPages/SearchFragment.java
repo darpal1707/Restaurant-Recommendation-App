@@ -1,16 +1,13 @@
 package com.darpal.foodlabrinthnew.NavBarPages;
 
 
-import android.annotation.SuppressLint;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
-import android.support.v7.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
+
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.GridView;
-import android.widget.Toolbar;
 
 import com.darpal.foodlabrinthnew.Handler.CuisineSearchAdapter;
 import com.darpal.foodlabrinthnew.R;

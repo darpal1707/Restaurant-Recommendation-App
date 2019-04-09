@@ -5,14 +5,12 @@
 
 package com.darpal.foodlabrinthnew;
 
-import android.support.annotation.DrawableRes;
-import android.support.annotation.StringRes;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
+import androidx.annotation.DrawableRes;
+import androidx.annotation.StringRes;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.Toolbar;
-
-import com.darpal.foodlabrinthnew.R;
+import androidx.appcompat.widget.Toolbar;
 
 public class ToolbarActivity extends AppCompatActivity {
 

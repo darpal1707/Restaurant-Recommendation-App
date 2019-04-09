@@ -1,19 +1,19 @@
 package com.darpal.foodlabrinthnew.NavBarPages;
 
 
+import android.annotation.SuppressLint;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
+import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
-import com.darpal.foodlabrinthnew.Handler.LikesAdapter;
+import com.darpal.foodlabrinthnew.Handler.BasedOnLikesAdapter;
 import com.darpal.foodlabrinthnew.Handler.TrendingAdapter;
 import com.darpal.foodlabrinthnew.Model.BasedOnLikes;
 import com.darpal.foodlabrinthnew.Model.Trending;
@@ -39,15 +39,16 @@ public class HomeFragment extends Fragment {
     private RecyclerView trending_recycler;
     private RecyclerView likes_recycler;
 
-    private ArrayList<Trending> trendingList;
+    private List<Trending> trendingList;
     TrendingAdapter trendingAdapter;
 
-    private ArrayList<BasedOnLikes> likesList;
-    LikesAdapter likesAdapter;
+    private List<BasedOnLikes> likesList;
+    BasedOnLikesAdapter likesAdapter;
 
     DatabaseReference databaseReference;
     Query recentPostsQuery;
 
+    @SuppressLint("WrongConstant")
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -56,8 +57,7 @@ public class HomeFragment extends Fragment {
         trending_recycler = (RecyclerView) view.findViewById(R.id.trending_recyclerview);
         likes_recycler = (RecyclerView) view.findViewById(R.id.likes_recyclerview);
 
-        trendingList = new ArrayList<Trending>();
-        likesList = new ArrayList<BasedOnLikes>();
+        trendingList = new ArrayList<>();
 
         trendingList.add(new Trending(R.drawable.american, "Lenwich", "American", "8th AVE", "1500"));
         trendingList.add(new Trending(R.drawable.mexican, "Chipotle", "Mexican", "Herald Square", "1881"));
@@ -71,35 +71,38 @@ public class HomeFragment extends Fragment {
         trending_recycler.setLayoutManager(new LinearLayoutManager(getActivity(),LinearLayoutManager.HORIZONTAL,false));
         trending_recycler.setAdapter(trendingAdapter);
 
-        likesAdapter = new LikesAdapter(getContext(),likesList);
+        likesList = new ArrayList<>();
+        showLikesData();
+        likesAdapter = new BasedOnLikesAdapter(getContext(),likesList);
         likes_recycler.setLayoutManager(new LinearLayoutManager(getActivity(),LinearLayoutManager.VERTICAL,false));
+        likes_recycler.setAdapter(likesAdapter);
 
+        return view;
+    }
 
+    private void showLikesData() {
+        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference();
+        Query recentPostsQuery = databaseReference.child("business")
+                .limitToFirst(10);
 
         recentPostsQuery.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                Toast.makeText(getActivity(), "inside the database reference", Toast.LENGTH_SHORT).show();
-                String value = String.valueOf(dataSnapshot.getValue(BasedOnLikes.class));
-                Log.d("inside dbreference", "Value is: " + value);
-                for(DataSnapshot dataSnapshot1 : dataSnapshot.getChildren()){
-                    BasedOnLikes basedOnLikes = dataSnapshot1.getValue(BasedOnLikes.class);
+                for(DataSnapshot dataSnapshot1 : dataSnapshot.getChildren()) {
+                    Log.e("TEST", String.valueOf(dataSnapshot1));
+                    BasedOnLikes basedOnLikes = dataSnapshot1.child("value").getValue(BasedOnLikes.class);
                     likesList.add(basedOnLikes);
                 }
-                likesAdapter = new LikesAdapter(getContext(),likesList);
-                likes_recycler.setAdapter(likesAdapter);
+
             }
+
 
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
                 Toast.makeText(getActivity(), "Something went wrong!", Toast.LENGTH_SHORT).show();
             }
         });
-        Log.d("datares", String.valueOf(databaseReference));
-
-        return view;
     }
-
    /* @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

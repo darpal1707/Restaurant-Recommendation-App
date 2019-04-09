@@ -7,13 +7,13 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".NavBarPages.SearchFragment">
 
-    <android.support.design.widget.AppBarLayout
+    <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/sview"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:theme="@style/ThemeOverlay.AppCompat.Dark">
 
-        <android.support.v7.widget.Toolbar
+        <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
@@ -45,7 +45,7 @@
                 tools:ignore="RtlHardcoded" />
 
         </RelativeLayout>
-    </android.support.design.widget.AppBarLayout>
+    </com.google.android.material.appbar.AppBarLayout>
 
     <GridView
         android:id="@+id/cuisineGrid"

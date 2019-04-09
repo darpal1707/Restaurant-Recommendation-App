@@ -4,14 +4,12 @@ public class BasedOnLikes {
 
     public int resImage;
     public String name;
-    public String resCuisine;
     public String address;
     public String  review_count;
 
-    public BasedOnLikes(int resImage, String resName, String resCuisine, String resLocation, String resReviewCount) {
+    public BasedOnLikes(int resImage, String resName, String resLocation, String resReviewCount) {
         this.resImage = resImage;
         this.name = resName;
-        this.resCuisine = resCuisine;
         this.address = resLocation;
         this.review_count = resReviewCount;
     }
@@ -33,14 +31,6 @@ public class BasedOnLikes {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public String getResCuisine() {
-        return resCuisine;
-    }
-
-    public void setResCuisine(String resCuisine) {
-        this.resCuisine = resCuisine;
     }
 
     public String getAddress() {

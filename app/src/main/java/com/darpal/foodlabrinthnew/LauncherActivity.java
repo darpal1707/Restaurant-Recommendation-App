@@ -1,14 +1,11 @@
 package com.darpal.foodlabrinthnew;
 
 import android.content.Intent;
-import android.content.res.AssetManager;
 import android.graphics.Typeface;
 import android.os.Handler;
-import android.support.v7.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import android.widget.TextView;
-
-import java.util.Locale;
 
 public class LauncherActivity extends AppCompatActivity {
     int SPLASH_TIME = 3000;
