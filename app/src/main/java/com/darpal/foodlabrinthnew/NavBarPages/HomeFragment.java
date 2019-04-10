@@ -4,6 +4,7 @@ package com.darpal.foodlabrinthnew.NavBarPages;
 import android.annotation.SuppressLint;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -20,12 +21,17 @@ import com.darpal.foodlabrinthnew.Model.Trending;
 import com.darpal.foodlabrinthnew.R;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.common.SignInButton;
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -92,7 +98,10 @@ public class HomeFragment extends Fragment {
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 for(DataSnapshot dataSnapshot1 : dataSnapshot.getChildren()) {
                     Log.e("TEST", String.valueOf(dataSnapshot1));
-                    BasedOnLikes basedOnLikes = dataSnapshot1.child("value").getValue(BasedOnLikes.class);
+
+                    BasedOnLikes basedOnLikes = new BasedOnLikes(String.valueOf(dataSnapshot1.child("name").getValue()),
+                            String.valueOf(dataSnapshot1.child("address").getValue()),
+                            String.valueOf(dataSnapshot1.child("review_count").getValue()));
                     likesList.add(basedOnLikes);
                 }
 

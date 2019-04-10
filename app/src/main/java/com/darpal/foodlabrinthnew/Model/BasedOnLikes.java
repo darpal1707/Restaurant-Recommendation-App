@@ -1,5 +1,7 @@
 package com.darpal.foodlabrinthnew.Model;
 
+import android.util.Log;
+
 import com.google.firebase.database.DataSnapshot;
 
 public class BasedOnLikes {
@@ -13,6 +15,7 @@ public class BasedOnLikes {
         this.name = name;
         this.address = address;
         this.review_count = review_count;
+
     }
 
     public BasedOnLikes() {
