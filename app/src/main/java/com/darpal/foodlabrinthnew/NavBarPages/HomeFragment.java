@@ -18,6 +18,8 @@ import com.darpal.foodlabrinthnew.Handler.TrendingAdapter;
 import com.darpal.foodlabrinthnew.Model.BasedOnLikes;
 import com.darpal.foodlabrinthnew.Model.Trending;
 import com.darpal.foodlabrinthnew.R;
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
+import com.google.android.gms.common.SignInButton;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -58,7 +60,6 @@ public class HomeFragment extends Fragment {
         likes_recycler = (RecyclerView) view.findViewById(R.id.likes_recyclerview);
 
         trendingList = new ArrayList<>();
-
         trendingList.add(new Trending(R.drawable.american, "Lenwich", "American", "8th AVE", "1500"));
         trendingList.add(new Trending(R.drawable.mexican, "Chipotle", "Mexican", "Herald Square", "1881"));
         trendingList.add(new Trending(R.drawable.indian, "Sapphire", "Indian", "1845 Broadway", "2121"));
@@ -71,11 +72,11 @@ public class HomeFragment extends Fragment {
         trending_recycler.setLayoutManager(new LinearLayoutManager(getActivity(),LinearLayoutManager.HORIZONTAL,false));
         trending_recycler.setAdapter(trendingAdapter);
 
-        likesList = new ArrayList<>();
-        showLikesData();
+        likesList = new ArrayList<BasedOnLikes>();
         likesAdapter = new BasedOnLikesAdapter(getContext(),likesList);
-        likes_recycler.setLayoutManager(new LinearLayoutManager(getActivity(),LinearLayoutManager.VERTICAL,false));
-        likes_recycler.setAdapter(likesAdapter);
+        showLikesData();
+
+
 
         return view;
     }
@@ -86,6 +87,7 @@ public class HomeFragment extends Fragment {
                 .limitToFirst(10);
 
         recentPostsQuery.addValueEventListener(new ValueEventListener() {
+            @SuppressLint("WrongConstant")
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 for(DataSnapshot dataSnapshot1 : dataSnapshot.getChildren()) {
@@ -94,24 +96,13 @@ public class HomeFragment extends Fragment {
                     likesList.add(basedOnLikes);
                 }
 
+                likes_recycler.setLayoutManager(new LinearLayoutManager(getActivity(),LinearLayoutManager.VERTICAL,false));
+                likes_recycler.setAdapter(likesAdapter);
             }
-
-
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
-                Toast.makeText(getActivity(), "Something went wrong!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getActivity(), "Didn't get any data in Datasnapshot", Toast.LENGTH_SHORT).show();
             }
         });
     }
-   /* @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-        trendingList = new ArrayList<>();
-        trendingList.add(new Trending(R.drawable.american, "Lenwich", "American", "8th AVE", "1500"));
-        trendingList.add(new Trending(R.drawable.mexican, "Chipotle", "Mexican", "Herald Square", "1881"));
-        trendingList.add(new Trending(R.drawable.indian, "Sapphire", "Indian", "1845 Broadway", "2121"));
-
-        likesList = new ArrayList<>();
-    }*/
 }

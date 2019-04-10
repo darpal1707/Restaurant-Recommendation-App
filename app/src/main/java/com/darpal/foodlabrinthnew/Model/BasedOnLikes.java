@@ -1,29 +1,24 @@
 package com.darpal.foodlabrinthnew.Model;
 
+import com.google.firebase.database.DataSnapshot;
+
 public class BasedOnLikes {
 
-    public int resImage;
     public String name;
     public String address;
     public String  review_count;
 
-    public BasedOnLikes(int resImage, String resName, String resLocation, String resReviewCount) {
-        this.resImage = resImage;
-        this.name = resName;
-        this.address = resLocation;
-        this.review_count = resReviewCount;
+
+    public BasedOnLikes(String name, String address, String review_count) {
+        this.name = name;
+        this.address = address;
+        this.review_count = review_count;
     }
 
     public BasedOnLikes() {
     }
 
-    public int getResImage() {
-        return resImage;
-    }
 
-    public void setResImage(int resImage) {
-        this.resImage = resImage;
-    }
 
     public String getName() {
         return name;

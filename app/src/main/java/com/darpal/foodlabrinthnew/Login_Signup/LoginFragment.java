@@ -1,10 +1,16 @@
 package com.darpal.foodlabrinthnew.Login_Signup;
 
 
+import android.annotation.SuppressLint;
+import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
+
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,10 +20,18 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.darpal.foodlabrinthnew.R;
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.common.SignInButton;
+import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+
+import static com.firebase.ui.auth.AuthUI.TAG;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -34,6 +48,9 @@ public class LoginFragment extends Fragment {
     Button sigin;
     private FirebaseAuth auth;
 
+    private GoogleSignInClient mGoogleSignInClient;
+    private SignInButton google_loginBtn;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -42,7 +59,6 @@ public class LoginFragment extends Fragment {
 
         //Get Firebase auth instance
         auth = FirebaseAuth.getInstance();
-
         if (auth.getCurrentUser() != null) {
             UserProfileFragment loginFragment = new UserProfileFragment();
             getFragmentManager().beginTransaction().replace(R.id.login_frame, loginFragment).commit();
@@ -52,6 +68,19 @@ public class LoginFragment extends Fragment {
         inputPassword = (EditText) view.findViewById(R.id.et_password);
         signup = (TextView) view.findViewById(R.id.sign_up);
         sigin = (Button) view.findViewById(R.id.btn_login);
+        google_loginBtn = (SignInButton) view.findViewById(R.id.Google_sign_in_button);
+
+        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestEmail()
+                .build();
+        mGoogleSignInClient = GoogleSignIn.getClient(getContext(), gso);
+        google_loginBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent signInIntent = mGoogleSignInClient.getSignInIntent();
+                startActivityForResult(signInIntent, 101);
+            }
+        });
         signup.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -99,7 +128,43 @@ public class LoginFragment extends Fragment {
                         });
             }
         });
+
         return view;
     }
 
+    @Override
+    public void onStart() {
+        super.onStart();
+        GoogleSignInAccount alreadyloggedAccount = GoogleSignIn.getLastSignedInAccount(getContext());
+        if (alreadyloggedAccount != null) {
+            Toast.makeText(getActivity(), "Already Logged In", Toast.LENGTH_SHORT).show();
+            UserProfileFragment userProfileFragment = new UserProfileFragment();
+            getFragmentManager().beginTransaction().replace(R.id.login_frame, userProfileFragment).commit();
+        } else {
+            Log.d("LoginFragment", "Not logged in");
+        }
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode == Activity.RESULT_OK)
+            switch (requestCode) {
+                case 101:
+                    try {
+                        // The Task returned from this call is always completed, no need to attach
+                        // a listener.
+                        Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
+                        GoogleSignInAccount account = task.getResult(ApiException.class);
+
+                        UserProfileFragment userProfileFragment = new UserProfileFragment();
+                        getFragmentManager().beginTransaction().replace(R.id.login_frame, userProfileFragment).commit();
+
+                    } catch (ApiException e) {
+                        // The ApiException status code indicates the detailed failure reason.
+                        Log.w("LoginFragment", "signInResult:failed code=" + e.getStatusCode());
+                    }
+                    break;
+            }
+    }
 }

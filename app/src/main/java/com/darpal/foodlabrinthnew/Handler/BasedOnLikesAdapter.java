@@ -6,6 +6,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.darpal.foodlabrinthnew.Model.BasedOnLikes;
 import com.darpal.foodlabrinthnew.R;
@@ -39,7 +40,14 @@ public class BasedOnLikesAdapter extends RecyclerView.Adapter<BasedOnLikesAdapte
     @Override
     public void onBindViewHolder(@NonNull BasedOnLikesAdapter.LikesVH holder, int position) {
         BasedOnLikes item = basedOnLikesArrayList.get(position);
-        holder.resName.setText(basedOnLikesArrayList.get(position).name);
+        if(item!=null) {
+            holder.name.setText(basedOnLikesArrayList.get(position).getName());
+            holder.address.setText(basedOnLikesArrayList.get(position).getAddress());
+            holder.review_count.setText(basedOnLikesArrayList.get(position).getReview_count());
+        }
+        else {
+            Toast.makeText(context, "Something went wrong in BasedOnLikes Adapter!", Toast.LENGTH_SHORT).show();
+        }
     }
 
     @Override
@@ -49,21 +57,18 @@ public class BasedOnLikesAdapter extends RecyclerView.Adapter<BasedOnLikesAdapte
 
     public class LikesVH extends RecyclerView.ViewHolder {
 
-        private TextView resName;
-        //private TextView resCuisine;
-        private TextView resLocation;
-        private TextView resReviewCount;
+        private TextView name;
+        private TextView address;
+        private TextView review_count;
         private TextView city;
         private TextView state;
         private TextView is_open;
 
         public LikesVH(View view) {
             super(view);
-            //resImage = (ImageView) itemView.findViewById(R.id.res_img);
-            resName = (TextView) itemView.findViewById(R.id.res_title);
-            //resCuisine = (TextView) itemView.findViewById(R.id.res_cuisine);
-            resLocation = (TextView) itemView.findViewById(R.id.res_location);
-            resReviewCount = (TextView) itemView.findViewById(R.id.ratings_value);
+            name = (TextView) itemView.findViewById(R.id.res_title);
+            address = (TextView) itemView.findViewById(R.id.res_location);
+            review_count = (TextView) itemView.findViewById(R.id.ratings_value);
             //city = (TextView) itemView.findViewById(R.id.res_city);
             //state = (TextView) itemView.findViewById(R.id.res_state);
 
