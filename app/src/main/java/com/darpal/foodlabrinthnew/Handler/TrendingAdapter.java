@@ -14,6 +14,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.darpal.foodlabrinthnew.Model.Trending;
+import com.darpal.foodlabrinthnew.NavBarPages.HomeFragment;
 import com.darpal.foodlabrinthnew.R;
 import com.darpal.foodlabrinthnew.RestaurantProfileActivity;
 
@@ -22,7 +23,7 @@ import java.util.List;
 public class TrendingAdapter extends RecyclerView.Adapter<TrendingAdapter.TrendingVH> {
 
     public static Context context;
-    List<Trending> trendingData;
+    public List<Trending> trendingData;
 
     public TrendingAdapter(Context context, List<Trending> trendingList) {
         this.context = context;
@@ -41,11 +42,12 @@ public class TrendingAdapter extends RecyclerView.Adapter<TrendingAdapter.Trendi
     public void onBindViewHolder(@NonNull final TrendingVH trendingVH, final int i) {
         Trending item = trendingData.get(i);
         if(item!=null) {
+           // Log.e("pos",trendingData.get(i).getName()+" "+i);
             trendingVH.name.setText(trendingData.get(i).getName());
             trendingVH.address.setText(trendingData.get(i).getAddress());
             trendingVH.review_count.setText(trendingData.get(i).getReview_count());
-            //trendingVH.city.setText(trendingData.get(i).getCity());
-            //trendingVH.state.setText(trendingData.get(i).getState());
+            trendingVH.city.setText(trendingData.get(i).getCity());
+            trendingVH.state.setText(trendingData.get(i).getState());
         }
         else {
             Toast.makeText(context, "Something went wrong in Adapter!", Toast.LENGTH_SHORT).show();
@@ -80,8 +82,17 @@ public class TrendingAdapter extends RecyclerView.Adapter<TrendingAdapter.Trendi
 
         @Override
         public void onClick(View v) {
-            Toast.makeText(context, "" + getPosition(), Toast.LENGTH_SHORT).show();
+            String  position = String.valueOf(getAdapterPosition());
+            Toast.makeText(context, "Position: " + position, Toast.LENGTH_SHORT).show();
             Intent myIntent = new Intent(context, RestaurantProfileActivity.class);
+            myIntent.putExtra("rest_id",HomeFragment.business_id);
+            myIntent.putExtra("name", HomeFragment.name);
+            myIntent.putExtra("address",HomeFragment.address);
+            myIntent.putExtra("city",HomeFragment.city);
+            myIntent.putExtra("state", HomeFragment.state);
+            myIntent.putExtra("lat",HomeFragment.latitude);
+            myIntent.putExtra("long", HomeFragment.longitude);
+            Toast.makeText(context, "" + HomeFragment.business_id, Toast.LENGTH_SHORT).show();
             context.startActivity(myIntent);
         }
     }

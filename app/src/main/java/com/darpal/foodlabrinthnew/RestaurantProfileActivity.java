@@ -1,11 +1,15 @@
 package com.darpal.foodlabrinthnew;
 
 import android.Manifest;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import androidx.core.app.ActivityCompat;
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
+import android.widget.Button;
+import android.widget.TextView;
 
+import com.darpal.foodlabrinthnew.Model.Trending;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
@@ -13,16 +17,26 @@ import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 public class RestaurantProfileActivity extends AppCompatActivity {
 
     MapView mapView;
     GoogleMap map;
+    TextView restName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_restaurant_profile);
+
+        restName = (TextView) findViewById(R.id.tvName);
+
+        Intent intent = getIntent();
+        String id = intent.getStringExtra("rest_id");
+        String name = intent.getStringExtra("name");
+        restName.setText(name);
 
         mapView = (MapView) findViewById(R.id.res_mapview);
         mapView.onCreate(savedInstanceState);
@@ -53,8 +67,8 @@ public class RestaurantProfileActivity extends AppCompatActivity {
                     // for ActivityCompat#requestPermissions for more details.
                     return;
                 }
-                mMap.setMyLocationEnabled(false);
-                mMap.getUiSettings().setScrollGesturesEnabled(false);
+                mMap.setMyLocationEnabled(true);
+                mMap.getUiSettings().setScrollGesturesEnabled(true);
                 // For dropping a marker at a point on the Map
                 LatLng sydney = new LatLng(43.6054989743, -79.652288909);
                 mMap.addMarker(new MarkerOptions().position(sydney));

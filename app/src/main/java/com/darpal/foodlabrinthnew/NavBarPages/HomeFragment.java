@@ -53,7 +53,13 @@ public class HomeFragment extends Fragment {
     private List<BasedOnLikes> likesList;
     BasedOnLikesAdapter likesAdapter;
 
-    DatabaseReference databaseReference;
+    public static String business_id;
+    public static String name;
+    public static String address;
+    public static String latitude;
+    public static String longitude;
+    public static String city;
+    public static String state;
 
 
     @SuppressLint("WrongConstant")
@@ -65,26 +71,21 @@ public class HomeFragment extends Fragment {
         trending_recycler = (RecyclerView) view.findViewById(R.id.trending_recyclerview);
         likes_recycler = (RecyclerView) view.findViewById(R.id.likes_recyclerview);
 
-        databaseReference = FirebaseDatabase.getInstance().getReference().child("business");
-
         trendingList = new ArrayList<>();
         trendingAdapter = new TrendingAdapter(getContext(),trendingList);
         showTrendingData();
-
-
 
         likesList = new ArrayList<>();
         likesAdapter = new BasedOnLikesAdapter(getContext(),likesList);
         showLikesData();
 
-
-
         return view;
     }
 
     private void showTrendingData() {
-        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference();
-        Query  trendingPostQuery = databaseReference.child("business").limitToFirst(5);
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference();
+        Query trendingPostQuery = reference.child("business")
+                .limitToFirst(5);
 
         trendingPostQuery.addValueEventListener(new ValueEventListener() {
             @SuppressLint("WrongConstant")
@@ -92,11 +93,22 @@ public class HomeFragment extends Fragment {
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 for(DataSnapshot dataSnapshot1 : dataSnapshot.getChildren()) {
                     Log.e("Trending Test", String.valueOf(dataSnapshot1));
+                    business_id = String.valueOf(dataSnapshot1.child("business_id").getValue());
+                    name = String.valueOf(dataSnapshot1.child("name").getValue());
+                    address = String.valueOf(dataSnapshot1.child("address").getValue());
+                    latitude =  String.valueOf(dataSnapshot1.child("latitude").getValue());
+                    longitude = String.valueOf(dataSnapshot1.child("longitude").getValue());
+                    city = String.valueOf(dataSnapshot1.child("city").getValue());
+                    state = String.valueOf(dataSnapshot1.child("state").getValue());
+
                     Trending trending = new Trending(String.valueOf(dataSnapshot1.child("name").getValue()),
                             String.valueOf(dataSnapshot1.child("address").getValue()),
                             String.valueOf(dataSnapshot1.child("review_count").getValue()),
                             String.valueOf(dataSnapshot1.child("city").getValue()),
-                            String.valueOf(dataSnapshot1.child("state").getValue()));
+                            String.valueOf(dataSnapshot1.child("state").getValue()),
+                            String.valueOf(dataSnapshot1.child("latitude").getValue()),
+                            String.valueOf(dataSnapshot1.child("longitude").getValue()),
+                            String.valueOf(dataSnapshot1.child("business_id").getValue()));
                     trendingList.add(trending);
                 }
                 trending_recycler.setLayoutManager(new LinearLayoutManager(getActivity(),LinearLayoutManager.HORIZONTAL,false));
@@ -118,14 +130,21 @@ public class HomeFragment extends Fragment {
             @SuppressLint("WrongConstant")
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                for(DataSnapshot dataSnapshot1 : dataSnapshot.getChildren()) {
-                    Log.e("TEST", String.valueOf(dataSnapshot1));
+                for(DataSnapshot ds : dataSnapshot.getChildren()) {
+                    Log.e("Likes Test", String.valueOf(ds));
+                    business_id = String.valueOf(ds.child("business_id").getValue());
+                    name = String.valueOf(ds.child("name").getValue());
+                    address = String.valueOf(ds.child("address").getValue());
+                    latitude =  String.valueOf(ds.child("latitude").getValue());
+                    longitude = String.valueOf(ds.child("longitude").getValue());
+                    city = String.valueOf(ds.child("city").getValue());
+                    state = String.valueOf(ds.child("state").getValue());
 
-                    BasedOnLikes basedOnLikes = new BasedOnLikes(String.valueOf(dataSnapshot1.child("name").getValue()),
-                            String.valueOf(dataSnapshot1.child("address").getValue()),
-                            String.valueOf(dataSnapshot1.child("review_count").getValue()),
-                            String.valueOf(dataSnapshot1.child("city").getValue()),
-                            String.valueOf(dataSnapshot1.child("state").getValue()));
+                    BasedOnLikes basedOnLikes = new BasedOnLikes(String.valueOf(ds.child("name").getValue()),
+                            String.valueOf(ds.child("address").getValue()),
+                            String.valueOf(ds.child("review_count").getValue()),
+                            String.valueOf(ds.child("city").getValue()),
+                            String.valueOf(ds.child("state").getValue()));
                     likesList.add(basedOnLikes);
                 }
 
