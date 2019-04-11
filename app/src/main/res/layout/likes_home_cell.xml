@@ -58,6 +58,26 @@
                     android:textColor="@color/grey_700"
                     android:textSize="12sp" />
 
+                <TextView
+                    android:id="@+id/res_city"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/res_location"
+                    android:text="City"
+                    android:textColor="@color/grey_700"
+                    android:textSize="12sp" />
+
+                <TextView
+                    android:id="@+id/res_state"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/res_location"
+                    android:layout_toEndOf="@+id/res_city"
+                    android:layout_marginStart="5dp"
+                    android:text="State"
+                    android:textColor="@color/grey_700"
+                    android:textSize="12sp" />
+
 
                 <TextView
                     android:id="@+id/ratings_value"

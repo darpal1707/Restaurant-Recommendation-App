@@ -54,7 +54,7 @@ public class HomeFragment extends Fragment {
     BasedOnLikesAdapter likesAdapter;
 
     DatabaseReference databaseReference;
-    Query recentPostsQuery;
+
 
     @SuppressLint("WrongConstant")
     @Override
@@ -65,26 +65,48 @@ public class HomeFragment extends Fragment {
         trending_recycler = (RecyclerView) view.findViewById(R.id.trending_recyclerview);
         likes_recycler = (RecyclerView) view.findViewById(R.id.likes_recyclerview);
 
-        trendingList = new ArrayList<>();
-        trendingList.add(new Trending(R.drawable.american, "Lenwich", "American", "8th AVE", "1500"));
-        trendingList.add(new Trending(R.drawable.mexican, "Chipotle", "Mexican", "Herald Square", "1881"));
-        trendingList.add(new Trending(R.drawable.indian, "Sapphire", "Indian", "1845 Broadway", "2121"));
-
         databaseReference = FirebaseDatabase.getInstance().getReference().child("business");
-        recentPostsQuery = databaseReference.child("business")
-                .limitToFirst(10);
 
+        trendingList = new ArrayList<>();
         trendingAdapter = new TrendingAdapter(getContext(),trendingList);
-        trending_recycler.setLayoutManager(new LinearLayoutManager(getActivity(),LinearLayoutManager.HORIZONTAL,false));
-        trending_recycler.setAdapter(trendingAdapter);
+        showTrendingData();
 
-        likesList = new ArrayList<BasedOnLikes>();
+
+
+        likesList = new ArrayList<>();
         likesAdapter = new BasedOnLikesAdapter(getContext(),likesList);
         showLikesData();
 
 
 
         return view;
+    }
+
+    private void showTrendingData() {
+        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference();
+        Query  trendingPostQuery = databaseReference.child("business").limitToFirst(5);
+
+        trendingPostQuery.addValueEventListener(new ValueEventListener() {
+            @SuppressLint("WrongConstant")
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                for(DataSnapshot dataSnapshot1 : dataSnapshot.getChildren()) {
+                    Log.e("Trending Test", String.valueOf(dataSnapshot1));
+                    Trending trending = new Trending(String.valueOf(dataSnapshot1.child("name").getValue()),
+                            String.valueOf(dataSnapshot1.child("address").getValue()),
+                            String.valueOf(dataSnapshot1.child("review_count").getValue()),
+                            String.valueOf(dataSnapshot1.child("city").getValue()),
+                            String.valueOf(dataSnapshot1.child("state").getValue()));
+                    trendingList.add(trending);
+                }
+                trending_recycler.setLayoutManager(new LinearLayoutManager(getActivity(),LinearLayoutManager.HORIZONTAL,false));
+                trending_recycler.setAdapter(trendingAdapter);
+            }
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                Toast.makeText(getActivity(), "Didn't get any data in Datasnapshot", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     private void showLikesData() {
@@ -101,7 +123,9 @@ public class HomeFragment extends Fragment {
 
                     BasedOnLikes basedOnLikes = new BasedOnLikes(String.valueOf(dataSnapshot1.child("name").getValue()),
                             String.valueOf(dataSnapshot1.child("address").getValue()),
-                            String.valueOf(dataSnapshot1.child("review_count").getValue()));
+                            String.valueOf(dataSnapshot1.child("review_count").getValue()),
+                            String.valueOf(dataSnapshot1.child("city").getValue()),
+                            String.valueOf(dataSnapshot1.child("state").getValue()));
                     likesList.add(basedOnLikes);
                 }
 

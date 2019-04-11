@@ -32,19 +32,24 @@ public class TrendingAdapter extends RecyclerView.Adapter<TrendingAdapter.Trendi
     @NonNull
     @Override
     public TrendingVH onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
-        View view = LayoutInflater.from(context).inflate(R.layout.trending_home_cell, viewGroup, false);
+        View view = LayoutInflater.from(context).inflate(R.layout.likes_home_cell, viewGroup, false);
         TrendingVH trendingVH = new TrendingVH(view);
         return new TrendingVH(view);
     }
 
     @Override
     public void onBindViewHolder(@NonNull final TrendingVH trendingVH, final int i) {
-        Log.d("TAG", "Trending: OnBinder Called.");
-        trendingVH.resImage.setImageResource(trendingData.get(i).getResImage());
-        trendingVH.resName.setText(trendingData.get(i).getResName());
-        trendingVH.resCuisine.setText(trendingData.get(i).getResCuisine());
-        trendingVH.resLocation.setText(trendingData.get(i).getResLocation());
-        trendingVH.resReviewCount.setText(trendingData.get(i).getResReviewCount());
+        Trending item = trendingData.get(i);
+        if(item!=null) {
+            trendingVH.name.setText(trendingData.get(i).getName());
+            trendingVH.address.setText(trendingData.get(i).getAddress());
+            trendingVH.review_count.setText(trendingData.get(i).getReview_count());
+            //trendingVH.city.setText(trendingData.get(i).getCity());
+            //trendingVH.state.setText(trendingData.get(i).getState());
+        }
+        else {
+            Toast.makeText(context, "Something went wrong in Adapter!", Toast.LENGTH_SHORT).show();
+        }
 
     }
 
@@ -55,22 +60,21 @@ public class TrendingAdapter extends RecyclerView.Adapter<TrendingAdapter.Trendi
 
     public static class TrendingVH extends RecyclerView.ViewHolder implements View.OnClickListener {
 
-        ImageView resImage;
-        TextView resName;
-        TextView resCuisine;
-        TextView resLocation;
-        TextView resReviewCount;
-        CardView trendingCard;
+        private TextView name;
+        private TextView address;
+        private TextView review_count;
+        private TextView city;
+        private TextView state;
+        private TextView is_open;
 
         public TrendingVH(@NonNull View itemView) {
             super(itemView);
 
-            trendingCard = (CardView) itemView.findViewById(R.id.res_cellcard);
-            resImage = (ImageView) itemView.findViewById(R.id.res_img);
-            resName = (TextView) itemView.findViewById(R.id.res_title);
-            resCuisine = (TextView) itemView.findViewById(R.id.res_cuisine);
-            resLocation = (TextView) itemView.findViewById(R.id.res_location);
-            resReviewCount = (TextView) itemView.findViewById(R.id.ratings_value);
+            name = (TextView) itemView.findViewById(R.id.res_title);
+            address = (TextView) itemView.findViewById(R.id.res_location);
+            review_count = (TextView) itemView.findViewById(R.id.ratings_value);
+            city = (TextView) itemView.findViewById(R.id.res_city);
+            state = (TextView) itemView.findViewById(R.id.res_state);
             itemView.setOnClickListener(this);
         }
 

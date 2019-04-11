@@ -3,62 +3,62 @@ package com.darpal.foodlabrinthnew.Model;
 import java.util.ArrayList;
 
 public class Trending {
-    public int resImage;
-    public String resName;
-    public String resCuisine;
-    public String resLocation;
-    public String  resReviewCount;
+    public String name;
+    public String address;
+    public String review_count;
+    public String city;
+    public String state;
 
     public Trending() {
     }
 
 
-    public Trending(int resImage, String resName, String resCuisine, String resLocation, String  resReviewCount) {
-        this.resImage = resImage;
-        this.resName = resName;
-        this.resCuisine = resCuisine;
-        this.resLocation = resLocation;
-        this.resReviewCount = resReviewCount;
+    public Trending(String name, String address, String review_count, String city, String state) {
+        this.name = name;
+        this.address = address;
+        this.review_count = review_count;
+        this.city = city;
+        this.state = state;
     }
 
 
-    public int getResImage() {
-        return resImage;
+    public String getName() {
+        return name;
     }
 
-    public void setResImage(int resImage) {
-        this.resImage = resImage;
+    public void setName(String name) {
+        this.name = name;
     }
 
-    public String getResName() {
-        return resName;
+    public String getAddress() {
+        return address;
     }
 
-    public void setResName(String resName) {
-        this.resName = resName;
+    public void setAddress(String address) {
+        this.address = address;
     }
 
-    public String getResCuisine() {
-        return resCuisine;
+    public String getReview_count() {
+        return review_count;
     }
 
-    public void setResCuisine(String resCuisine) {
-        this.resCuisine = resCuisine;
+    public void setReview_count(String review_count) {
+        this.review_count = review_count;
     }
 
-    public String getResLocation() {
-        return resLocation;
+    public String getCity() {
+        return city;
     }
 
-    public void setResLocation(String resLocation) {
-        this.resLocation = resLocation;
+    public void setCity(String city) {
+        this.city = city;
     }
 
-    public String  getResReviewCount() {
-        return resReviewCount;
+    public String getState() {
+        return state;
     }
 
-    public void setResReviewCount(String  resReviewCount) {
-        this.resReviewCount = resReviewCount;
+    public void setState(String state) {
+        this.state = state;
     }
 }
