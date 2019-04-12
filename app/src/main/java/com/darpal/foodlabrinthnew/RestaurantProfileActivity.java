@@ -41,13 +41,11 @@ public class RestaurantProfileActivity extends AppCompatActivity {
         mapView = (MapView) findViewById(R.id.res_mapview);
         mapView.onCreate(savedInstanceState);
         mapView.onResume(); // needed to get the map to display immediately
-
         try {
             MapsInitializer.initialize(this);
         } catch (Exception e) {
             e.printStackTrace();
         }
-
         mapView.getMapAsync(new OnMapReadyCallback() {
             @Override
             public void onMapReady(GoogleMap mMap) {
@@ -67,7 +65,7 @@ public class RestaurantProfileActivity extends AppCompatActivity {
                     // for ActivityCompat#requestPermissions for more details.
                     return;
                 }
-                mMap.setMyLocationEnabled(true);
+                mMap.setMyLocationEnabled(false);
                 mMap.getUiSettings().setScrollGesturesEnabled(true);
                 // For dropping a marker at a point on the Map
                 LatLng sydney = new LatLng(43.6054989743, -79.652288909);
@@ -83,8 +81,8 @@ public class RestaurantProfileActivity extends AppCompatActivity {
 
     @Override
     public void onResume() {
-        mapView.onResume();
         super.onResume();
+        mapView.onResume();
     }
 
     @Override
