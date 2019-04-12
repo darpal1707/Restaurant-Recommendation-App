@@ -32,7 +32,6 @@ public class RestaurantProfileActivity extends AppCompatActivity {
         setContentView(R.layout.activity_restaurant_profile);
 
         restName = (TextView) findViewById(R.id.tvName);
-
         Intent intent = getIntent();
         String id = intent.getStringExtra("rest_id");
         String name = intent.getStringExtra("name");
@@ -41,6 +40,7 @@ public class RestaurantProfileActivity extends AppCompatActivity {
         mapView = (MapView) findViewById(R.id.res_mapview);
         mapView.onCreate(savedInstanceState);
         mapView.onResume(); // needed to get the map to display immediately
+        
         try {
             MapsInitializer.initialize(this);
         } catch (Exception e) {
