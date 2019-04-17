@@ -24,7 +24,7 @@ public class RestaurantProfileActivity extends AppCompatActivity {
 
     MapView mapView;
     GoogleMap map;
-    TextView restName;
+    TextView restName,addressLocation,restCity,resState;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,15 +32,31 @@ public class RestaurantProfileActivity extends AppCompatActivity {
         setContentView(R.layout.activity_restaurant_profile);
 
         restName = (TextView) findViewById(R.id.tvName);
+        addressLocation = (TextView) findViewById(R.id.tvEducation);
+        restCity = (TextView) findViewById(R.id.restCity);
+        resState = (TextView) findViewById(R.id.resState);
+
         Intent intent = getIntent();
         String id = intent.getStringExtra("rest_id");
         String name = intent.getStringExtra("name");
+        String address = intent.getStringExtra("address");
+        String city = intent.getStringExtra("city");
+        String state = intent.getStringExtra("state");
+        String lat = (intent.getStringExtra("latitude"));
+        String longi = (intent.getStringExtra("longitude"));
+
+//        final double latitude = Double.parseDouble(lat);
+//        final double longitude = Double.parseDouble(longi);
+
         restName.setText(name);
+        addressLocation.setText(address);
+        restCity.setText(city);
+        resState.setText(state);
 
         mapView = (MapView) findViewById(R.id.res_mapview);
         mapView.onCreate(savedInstanceState);
         mapView.onResume(); // needed to get the map to display immediately
-        
+
         try {
             MapsInitializer.initialize(this);
         } catch (Exception e) {
@@ -69,6 +85,7 @@ public class RestaurantProfileActivity extends AppCompatActivity {
                 mMap.getUiSettings().setScrollGesturesEnabled(true);
                 // For dropping a marker at a point on the Map
                 LatLng sydney = new LatLng(43.6054989743, -79.652288909);
+                //LatLng sydney = new LatLng(latitude, longitude);
                 mMap.addMarker(new MarkerOptions().position(sydney));
 
                 // For zooming automatically to the location of the marker

@@ -1,0 +1,30 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textAllCaps="false"
+        android:theme="@style/NotDecidedLabel"
+        android:text="What meal of the day you willing to eat?"
+        android:layout_margin="10dp"
+        android:textAlignment="center"
+        android:textSize="13pt" />
+
+
+    <GridView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/mealgrid"
+        android:numColumns="2">
+
+    </GridView>
+
+
+</LinearLayout>
+
+

@@ -9,6 +9,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -20,14 +21,18 @@ import com.darpal.foodlabrinthnew.RestaurantProfileActivity;
 
 import java.util.List;
 
+import static com.firebase.ui.auth.AuthUI.TAG;
+
 public class TrendingAdapter extends RecyclerView.Adapter<TrendingAdapter.TrendingVH> {
 
     public static Context context;
     public List<Trending> trendingData;
+    private AdapterView.OnItemClickListener mOnItemClickListener;
 
     public TrendingAdapter(Context context, List<Trending> trendingList) {
-        this.context = context;
         this.trendingData = trendingList;
+        this.context = context;
+
     }
 
     @NonNull
@@ -40,19 +45,34 @@ public class TrendingAdapter extends RecyclerView.Adapter<TrendingAdapter.Trendi
 
     @Override
     public void onBindViewHolder(@NonNull final TrendingVH trendingVH, final int i) {
-        Trending item = trendingData.get(i);
+        final Trending item = trendingData.get(i);
         if(item!=null) {
            // Log.e("pos",trendingData.get(i).getName()+" "+i);
-            trendingVH.name.setText(trendingData.get(i).getName());
-            trendingVH.address.setText(trendingData.get(i).getAddress());
-            trendingVH.review_count.setText(trendingData.get(i).getReview_count());
-            trendingVH.city.setText(trendingData.get(i).getCity());
-            trendingVH.state.setText(trendingData.get(i).getState());
+            trendingVH.name.setText(item.getName());
+            trendingVH.address.setText(item.getAddress());
+            trendingVH.review_count.setText(item.getReview_count());
+            trendingVH.city.setText(item.getCity());
+            trendingVH.state.setText(item.getState());
+            trendingVH.itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    //Toast.makeText(context, (CharSequence) item, Toast.LENGTH_SHORT).show();
+                    Intent intent = new Intent(context, RestaurantProfileActivity.class);
+                    intent.putExtra("rest_id",item.getBusiness_id());
+                    intent.putExtra("name", item.getName());
+                    intent.putExtra("address",HomeFragment.address);
+                    intent.putExtra("city",HomeFragment.city);
+                    intent.putExtra("state", HomeFragment.state);
+                    intent.putExtra("lat",HomeFragment.latitude.trim().toString());
+                    intent.putExtra("long", HomeFragment.longitude.trim().toString());
+                    Toast.makeText(context, "" + item.getBusiness_id(), Toast.LENGTH_SHORT).show();
+                    context.startActivity(intent);
+                }
+            });
         }
         else {
             Toast.makeText(context, "Something went wrong in Adapter!", Toast.LENGTH_SHORT).show();
         }
-
     }
 
     @Override
@@ -60,7 +80,7 @@ public class TrendingAdapter extends RecyclerView.Adapter<TrendingAdapter.Trendi
         return trendingData.size();
     }
 
-    public static class TrendingVH extends RecyclerView.ViewHolder implements View.OnClickListener {
+    public static class TrendingVH extends RecyclerView.ViewHolder {
 
         private TextView name;
         private TextView address;
@@ -77,10 +97,10 @@ public class TrendingAdapter extends RecyclerView.Adapter<TrendingAdapter.Trendi
             review_count = (TextView) itemView.findViewById(R.id.ratings_value);
             city = (TextView) itemView.findViewById(R.id.res_city);
             state = (TextView) itemView.findViewById(R.id.res_state);
-            itemView.setOnClickListener(this);
+            //itemView.setOnClickListener(this);
         }
 
-        @Override
+       /* @Override
         public void onClick(View v) {
             String  position = String.valueOf(getAdapterPosition());
             Toast.makeText(context, "Position: " + position, Toast.LENGTH_SHORT).show();
@@ -94,6 +114,6 @@ public class TrendingAdapter extends RecyclerView.Adapter<TrendingAdapter.Trendi
             myIntent.putExtra("long", HomeFragment.longitude);
             Toast.makeText(context, "" + HomeFragment.business_id, Toast.LENGTH_SHORT).show();
             context.startActivity(myIntent);
-        }
+        }*/
     }
 }

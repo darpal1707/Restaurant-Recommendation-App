@@ -108,12 +108,34 @@
                 android:text="Restaurant Location"
                 android:textSize="16sp" />
 
+            <TextView
+                android:id="@+id/restCity"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/tvEducation"
+                android:layout_marginStart="10dp"
+                android:layout_marginEnd="10dp"
+                android:layout_marginBottom="4dp"
+                android:text="City"
+                android:textSize="16sp" />
+
+            <TextView
+                android:id="@+id/resState"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/tvEducation"
+                android:layout_marginEnd="10dp"
+                android:layout_toEndOf="@id/restCity"
+                android:layout_marginBottom="4dp"
+                android:text="State"
+                android:textSize="16sp" />
+
 
             <LinearLayout
                 android:id="@+id/btnLayout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/tvEducation"
+                android:layout_below="@id/resState"
                 android:orientation="horizontal">
 
 

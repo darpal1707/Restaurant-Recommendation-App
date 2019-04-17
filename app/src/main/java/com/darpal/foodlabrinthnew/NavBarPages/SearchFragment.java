@@ -7,10 +7,13 @@ import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.GridView;
 
 import com.darpal.foodlabrinthnew.Handler.CuisineSearchAdapter;
 import com.darpal.foodlabrinthnew.R;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -22,6 +25,7 @@ public class SearchFragment extends Fragment {
         // Required empty public constructor
     }
     GridView cuisine;
+    EditText searchbar;
     static final String[] cuisines = new String[]{"American", "Asian", "BBQ", "Chinese", "Coffee & Tea", "Deli", "Desserts",
             "European", "Fast Food", "Greek", "Halal", "Indian", "Italian", "Jamaican", "Japanese", "Korean",
             "Mediterranean", "Mexican", "Salads", "Spanish", "Sushi", "Thai", "Vegan", "Vegetarian"};
@@ -38,6 +42,12 @@ public class SearchFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_search, container, false);
+
+        searchbar = (EditText) view.findViewById(R.id.searchview);
+        String searchString = String.valueOf(searchbar.getText());
+
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference();
+        reference.orderByChild("business").startAt(searchString).endAt(searchString+"\uf8ff");
         cuisine = (GridView) view.findViewById(R.id.cuisineGrid);
         CuisineSearchAdapter searchAdapter = new CuisineSearchAdapter(getContext(), cuisines, cuisineImg);
         cuisine.setVerticalScrollBarEnabled(false);

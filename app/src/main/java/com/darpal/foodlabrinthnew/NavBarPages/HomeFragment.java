@@ -2,22 +2,30 @@ package com.darpal.foodlabrinthnew.NavBarPages;
 
 
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.Toast;
 
 import com.darpal.foodlabrinthnew.Handler.BasedOnLikesAdapter;
 import com.darpal.foodlabrinthnew.Handler.TrendingAdapter;
+import com.darpal.foodlabrinthnew.MapView.MapActivity;
 import com.darpal.foodlabrinthnew.Model.BasedOnLikes;
 import com.darpal.foodlabrinthnew.Model.Trending;
+import com.darpal.foodlabrinthnew.NotDecided.NotDecidedActivity;
 import com.darpal.foodlabrinthnew.R;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.common.SignInButton;
@@ -35,6 +43,7 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -44,6 +53,7 @@ public class HomeFragment extends Fragment {
         // Required empty public constructor
     }
 
+    Button notDecided;
     private RecyclerView trending_recycler;
     private RecyclerView likes_recycler;
 
@@ -68,6 +78,17 @@ public class HomeFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_home, container, false);
+        Toolbar toolbar = (Toolbar) view.findViewById(R.id.toolbar);
+        toolbar.inflateMenu(R.menu.mymenu);
+        toolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                Intent intent = new Intent(getActivity(),MapActivity.class);
+                startActivity(intent);
+                return true;
+            }
+        });
+        notDecided = (Button) view.findViewById(R.id.notDecided_btn);
         trending_recycler = (RecyclerView) view.findViewById(R.id.trending_recyclerview);
         likes_recycler = (RecyclerView) view.findViewById(R.id.likes_recyclerview);
 
@@ -79,13 +100,21 @@ public class HomeFragment extends Fragment {
         likesAdapter = new BasedOnLikesAdapter(getContext(),likesList);
         showLikesData();
 
+        notDecided.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getActivity(), NotDecidedActivity.class);
+                startActivity(intent);
+            }
+        });
+
         return view;
     }
 
     private void showTrendingData() {
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference();
         Query trendingPostQuery = reference.child("business")
-                .limitToFirst(5);
+                .limitToLast(5);
 
         trendingPostQuery.addValueEventListener(new ValueEventListener() {
             @SuppressLint("WrongConstant")

@@ -37,7 +37,7 @@
                 android:drawableLeft="@drawable/search"
                 android:drawablePadding="20dp"
                 android:gravity="left|center"
-                android:hint="Search for a cuisine or dish"
+                android:hint="Search for a cuisine"
                 android:inputType="text"
                 android:padding="10dp"
                 android:textColor="#000"

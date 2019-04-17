@@ -43,6 +43,10 @@
         <item name="android:textColor">@color/primary_txt</item>
     </style>
 
+    <style name="NotDecidedLabel">
+        <item name="android:fontFamily">fonts/Montserrat-Medium.ttf</item>
+    </style>
+
     <style name="ToolbarStyle">
         <item name="android:layout_height">?actionBarSize</item>
         <item name="android:layout_width">match_parent</item>
