@@ -6,4 +6,30 @@
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="title_activity_maps">Map</string>
+    <string-array name="cuisines">
+        <item>American</item>
+        <item>Asian</item>
+        <item>BBQ</item>
+        <item>Chinese</item>
+        <item>Coffee / Tea</item>
+        <item>Deli</item>
+        <item>Desserts</item>
+        <item>European</item>
+        <item>Fast Food</item>
+        <item>Greek</item>
+        <item>Halal</item>
+        <item>Indian</item>
+        <item>Italian</item>
+        <item>Jamaican</item>
+        <item>Japanese</item>
+        <item>Korean</item>
+        <item>Mediterranean</item>
+        <item>Mexican</item>
+        <item>Salads</item>
+        <item>Spanish</item>
+        <item>Sushi</item>
+        <item>Thai</item>
+        <item>Vegan</item>
+        <item>Vegetarian</item>
+    </string-array>
 </resources>

@@ -46,21 +46,29 @@
     <style name="NotDecidedLabel">
         <item name="android:fontFamily">fonts/Montserrat-Medium.ttf</item>
     </style>
+    
+
 
     <style name="ToolbarStyle">
         <item name="android:layout_height">?actionBarSize</item>
         <item name="android:layout_width">match_parent</item>
     </style>
 
+    <style name="searchbarDesign">
+        <item name="android:fontFamily">fonts/Montserrat-Medium.ttf</item>
+        <item name="android:editTextColor">@android:color/black</item>
+        <item name="android:textColorHint">@android:color/darker_gray</item>
+        <item name="android:color">@android:color/black</item>
+    </style>
 
     <style name="EditTextStyle">
-    <item name="android:layout_width">match_parent</item>
-    <item name="android:layout_height">wrap_content</item>
-    <item name="android:backgroundTint" tools:targetApi="lollipop">@color/edit_text_bg</item>
-    <item name="android:textColor">@color/edit_text_txt</item>
-    <item name="android:textColorHint">@color/edit_text_hint</item>
-    <item name="android:textSize">22sp</item>
-    <item name="android:paddingBottom">16dp</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:backgroundTint" tools:targetApi="lollipop">@color/edit_text_bg</item>
+        <item name="android:textColor">@color/edit_text_txt</item>
+        <item name="android:textColorHint">@color/edit_text_hint</item>
+        <item name="android:textSize">22sp</item>
+        <item name="android:paddingBottom">16dp</item>
     </style>
 
     <style name="SolidButtonStyle" parent="Widget.AppCompat.Button.Borderless">

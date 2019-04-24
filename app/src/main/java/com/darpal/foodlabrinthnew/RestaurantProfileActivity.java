@@ -24,7 +24,8 @@ public class RestaurantProfileActivity extends AppCompatActivity {
 
     MapView mapView;
     GoogleMap map;
-    TextView restName,addressLocation,restCity,resState;
+    TextView restName,addressLocation,restCity,resState, resCuisine;
+    double lat, longi;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,26 +33,27 @@ public class RestaurantProfileActivity extends AppCompatActivity {
         setContentView(R.layout.activity_restaurant_profile);
 
         restName = (TextView) findViewById(R.id.tvName);
+        resCuisine = (TextView) findViewById(R.id.cuisines);
         addressLocation = (TextView) findViewById(R.id.tvEducation);
         restCity = (TextView) findViewById(R.id.restCity);
         resState = (TextView) findViewById(R.id.resState);
 
         Intent intent = getIntent();
-        String id = intent.getStringExtra("rest_id");
-        String name = intent.getStringExtra("name");
-        String address = intent.getStringExtra("address");
-        String city = intent.getStringExtra("city");
-        String state = intent.getStringExtra("state");
-        String lat = (intent.getStringExtra("latitude"));
-        String longi = (intent.getStringExtra("longitude"));
+        if(intent!=null){
+            String name = intent.getStringExtra("name");
+            String address = intent.getStringExtra("address");
+            String city = intent.getStringExtra("city");
+            String state = intent.getStringExtra("state");
+            String cuisine = intent.getStringExtra("cuisine");
+            lat = Double.parseDouble(intent.getStringExtra("lat"));
+            longi = Double.parseDouble(intent.getStringExtra("long"));
 
-//        final double latitude = Double.parseDouble(lat);
-//        final double longitude = Double.parseDouble(longi);
-
-        restName.setText(name);
-        addressLocation.setText(address);
-        restCity.setText(city);
-        resState.setText(state);
+            restName.setText(name);
+            resCuisine.setText(cuisine);
+            addressLocation.setText(address);
+            restCity.setText(city);
+            resState.setText(state);
+        }
 
         mapView = (MapView) findViewById(R.id.res_mapview);
         mapView.onCreate(savedInstanceState);
@@ -84,8 +86,8 @@ public class RestaurantProfileActivity extends AppCompatActivity {
                 mMap.setMyLocationEnabled(false);
                 mMap.getUiSettings().setScrollGesturesEnabled(true);
                 // For dropping a marker at a point on the Map
-                LatLng sydney = new LatLng(43.6054989743, -79.652288909);
-                //LatLng sydney = new LatLng(latitude, longitude);
+                //LatLng sydney = new LatLng(43.6054989743, -79.652288909);
+                LatLng sydney = new LatLng(lat, longi);
                 mMap.addMarker(new MarkerOptions().position(sydney));
 
                 // For zooming automatically to the location of the marker

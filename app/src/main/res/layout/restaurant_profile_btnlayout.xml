@@ -1,0 +1,73 @@
+<LinearLayout android:id="@+id/btnLayout"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_below="@id/resState"
+    android:orientation="horizontal"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+
+    <Button
+        android:id="@+id/WebsiteBtn"
+        android:layout_width="0dp"
+        android:layout_height="fill_parent"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="16dp"
+        android:layout_weight="1"
+        android:background="#fff"
+        android:drawableTop="@drawable/ic_open_in_new_black_24dp"
+        android:padding="5dp"
+        android:stateListAnimator="@null"
+        android:text="Visit Website"
+        android:textAllCaps="false"
+        android:textColor="#a9a9a9"
+        android:textSize="16sp" />
+
+    <Button
+        android:id="@+id/BookmarkBtn"
+        android:layout_width="0dp"
+        android:layout_height="fill_parent"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="16dp"
+        android:layout_weight="1"
+        android:background="#fff"
+        android:drawableTop="@drawable/ic_star_black_24dp"
+        android:padding="5dp"
+        android:stateListAnimator="@null"
+        android:text="Like"
+        android:textAllCaps="false"
+        android:textColor="#a9a9a9"
+        android:textSize="16sp" />
+
+    <Button
+        android:id="@+id/ContactBtn"
+        android:layout_width="0dp"
+        android:layout_height="fill_parent"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="16dp"
+        android:layout_weight="1"
+        android:background="#fff"
+        android:drawableTop="@drawable/ic_local_phone_black_24dp"
+        android:padding="5dp"
+        android:stateListAnimator="@null"
+        android:text="Call us"
+        android:textAllCaps="false"
+        android:textColor="#a9a9a9"
+        android:textSize="16sp" />
+
+    <Button
+        android:id="@+id/ShareBtn"
+        android:layout_width="0dp"
+        android:layout_height="fill_parent"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="16dp"
+        android:layout_weight="1"
+        android:background="#fff"
+        android:drawableTop="@drawable/ic_share_black_24dp"
+        android:padding="5dp"
+        android:stateListAnimator="@null"
+        android:text="Share"
+        android:textAllCaps="false"
+        android:textColor="#a9a9a9"
+        android:textSize="16sp" />
+
+</LinearLayout>

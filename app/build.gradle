@@ -50,14 +50,18 @@ dependencies {
     implementation 'com.google.android.gms:play-services-maps:16.1.0'
 
     implementation 'com.google.firebase:firebase-auth:16.2.1'
-    implementation 'com.firebaseui:firebase-ui-auth:4.3.1'
+    implementation 'com.firebaseui:firebase-ui-auth:4.3.2'
     implementation 'com.google.android.gms:play-services-auth:16.0.1'
     implementation 'com.google.firebase:firebase-core:16.0.8'
     implementation 'com.google.firebase:firebase-database:16.1.0'
+    implementation 'com.firebaseui:firebase-ui-database:4.3.2'
     implementation 'com.google.android.gms:play-services-location:16.0.0'
+    implementation 'com.shreyaspatil:FirebaseRecyclerPagination:1.0.1'
+    implementation "android.arch.paging:runtime:1.0.1"
+
     testImplementation 'junit:junit:4.12'
-    androidTestImplementation 'androidx.test:runner:1.2.0-alpha03'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0-alpha03'
+    androidTestImplementation 'androidx.test:runner:1.2.0-alpha04'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0-alpha04'
 }
 
 apply plugin: 'com.google.gms.google-services'

@@ -16,6 +16,7 @@
     <color name="grey_700">#616161</color>
     <color name="colorControlHighlight">@color/fifty_percent_transparency_grey_400</color>
     <color name="fifty_percent_transparency_grey_400">#80bdbdbd</color>
+    <color name="autocompletet_background_color">#fff</color>
 </resources>
 
 

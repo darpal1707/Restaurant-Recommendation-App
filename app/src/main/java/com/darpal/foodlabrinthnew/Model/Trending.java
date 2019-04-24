@@ -6,6 +6,7 @@ public class Trending {
 
     public static String business_id;
     public static String name;
+    public static String categories;
     public static String address;
     public static String review_count;
     public static String city;
@@ -17,7 +18,9 @@ public class Trending {
     }
 
 
-    public Trending(String name, String address, String review_count, String city, String state, String latitude, String longitude, String business_id) {
+    public Trending(String name, String address, String review_count,
+                    String city, String state, String latitude, String longitude,
+                    String business_id, String cuisine) {
         this.name = name;
         this.address = address;
         this.review_count = review_count;
@@ -26,8 +29,16 @@ public class Trending {
         this.latitude = latitude;
         this.longitude = longitude;
         this.business_id = business_id;
+        this.categories = cuisine;
     }
 
+    public static String getCategories() {
+        return categories;
+    }
+
+    public static void setCategories(String categories) {
+        Trending.categories = categories;
+    }
 
     public String getName() {
         return name;

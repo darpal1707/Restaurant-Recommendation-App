@@ -32,7 +32,7 @@
                 android:padding="@dimen/activity_horizontal_margin">
 
                 <EditText
-                    android:id="@+id/searchview_searchpage"
+                    android:id="@+id/searchview_homepage"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="#fff"
@@ -70,10 +70,11 @@
                 android:layout_margin="15dp"/>
 
             <TextView
-                android:id="@+id/viewMore_trending_lbl"
+                android:id="@+id/viewmore_likesLabel"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="View more"
+                android:layout_below="@id/trending_recyclerview"
                 android:layout_alignParentEnd="true"
                 android:textSize="16sp"
                 android:layout_margin="15dp"/>

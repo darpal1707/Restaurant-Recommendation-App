@@ -1,19 +1,24 @@
 package com.darpal.foodlabrinthnew.NavBarPages;
 
 
+import android.content.Intent;
 import android.os.Bundle;
+
 import androidx.fragment.app.Fragment;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.GridView;
+import android.widget.Toast;
 
 import com.darpal.foodlabrinthnew.Handler.CuisineSearchAdapter;
 import com.darpal.foodlabrinthnew.R;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
+
+import java.util.List;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -24,9 +29,9 @@ public class SearchFragment extends Fragment {
     public SearchFragment() {
         // Required empty public constructor
     }
-    GridView cuisine;
-    EditText searchbar;
-    static final String[] cuisines = new String[]{"American", "Asian", "BBQ", "Chinese", "Coffee & Tea", "Deli", "Desserts",
+    GridView cuisineGrid;
+    public static String posValue;
+    String[] cuisines = new String[]{"American", "Asian", "BBQ", "Chinese", "Coffee & Tea", "Deli", "Desserts",
             "European", "Fast Food", "Greek", "Halal", "Indian", "Italian", "Jamaican", "Japanese", "Korean",
             "Mediterranean", "Mexican", "Salads", "Spanish", "Sushi", "Thai", "Vegan", "Vegetarian"};
 
@@ -37,23 +42,31 @@ public class SearchFragment extends Fragment {
             R.drawable.mediterranean, R.drawable.mexican, R.drawable.salads, R.drawable.spanish,
             R.drawable.sushi, R.drawable.thai, R.drawable.vegan, R.drawable.vegetarian};
 
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.fragment_search, container, false);
-
-        searchbar = (EditText) view.findViewById(R.id.searchview);
-        String searchString = String.valueOf(searchbar.getText());
-
-        DatabaseReference reference = FirebaseDatabase.getInstance().getReference();
-        reference.orderByChild("business").startAt(searchString).endAt(searchString+"\uf8ff");
-        cuisine = (GridView) view.findViewById(R.id.cuisineGrid);
+        View view= inflater.inflate(R.layout.fragment_search, container, false);
+        cuisineGrid = (GridView) view.findViewById(R.id.cuisineGrid);
         CuisineSearchAdapter searchAdapter = new CuisineSearchAdapter(getContext(), cuisines, cuisineImg);
-        cuisine.setVerticalScrollBarEnabled(false);
-        cuisine.setAdapter(searchAdapter);
+        //cuisine.setVerticalScrollBarEnabled(false);
+        cuisineGrid.setAdapter(searchAdapter);
+        cuisineGrid.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                posValue = parent.getItemAtPosition(position).toString();
+                Log.d("cuisine value in search", posValue);
+                Intent intent = new Intent(getActivity(),SearchResultDisplayActivity.class);
+                intent.putExtra("cuisine_value",posValue);
+                startActivity(intent);
+            }
+        });
+
 
         return view;
     }
+
+
 
 }

@@ -6,6 +6,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import com.darpal.foodlabrinthnew.NavBarPages.SearchFragment;
 import com.darpal.foodlabrinthnew.R;
@@ -29,16 +30,16 @@ public class CuisineSearchAdapter extends BaseAdapter {
 
     @Override
     public Object getItem(int position) {
-        return null;
+        return cuisine[position];
     }
 
     @Override
     public long getItemId(int position) {
-        return 0;
+        return position;
     }
 
     @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
+    public View getView(final int position, View convertView, final ViewGroup parent) {
         View grid;
         LayoutInflater inflater = (LayoutInflater) mContext
                 .getSystemService(Context.LAYOUT_INFLATER_SERVICE);

@@ -5,16 +5,14 @@ import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.darpal.foodlabrinthnew.Model.BasedOnLikes;
-import com.darpal.foodlabrinthnew.NavBarPages.HomeFragment;
 import com.darpal.foodlabrinthnew.R;
 import com.darpal.foodlabrinthnew.RestaurantProfileActivity;
+import com.darpal.foodlabrinthnew.Util.LikesUtil;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import androidx.annotation.NonNull;
@@ -72,28 +70,30 @@ public class BasedOnLikesAdapter extends RecyclerView.Adapter<BasedOnLikesAdapte
         public LikesVH(View view) {
             super(view);
 
-            name = (TextView) itemView.findViewById(R.id.res_title);
-            address = (TextView) itemView.findViewById(R.id.res_location);
-            review_count = (TextView) itemView.findViewById(R.id.ratings_value);
-            city = (TextView) itemView.findViewById(R.id.res_city);
-            state = (TextView) itemView.findViewById(R.id.res_state);
-            itemView.setOnClickListener(this);
+            name = (TextView) view.findViewById(R.id.res_title);
+            address = (TextView) view.findViewById(R.id.res_location);
+            review_count = (TextView) view.findViewById(R.id.ratings_value);
+            city = (TextView) view.findViewById(R.id.res_city);
+            state = (TextView) view.findViewById(R.id.res_state);
+            view.setOnClickListener(this);
         }
 
         @Override
         public void onClick(View v) {
-            String  position = String.valueOf(getAdapterPosition());
-            Toast.makeText(context, "Position: " + position, Toast.LENGTH_SHORT).show();
-            Intent myIntent = new Intent(context, RestaurantProfileActivity.class);
-            myIntent.putExtra("rest_id", HomeFragment.business_id);
-            myIntent.putExtra("name", HomeFragment.name);
-            myIntent.putExtra("address",HomeFragment.address);
-            myIntent.putExtra("city",HomeFragment.city);
-            myIntent.putExtra("state", HomeFragment.state);
-            myIntent.putExtra("lat",HomeFragment.latitude);
-            myIntent.putExtra("long", HomeFragment.longitude);
-            Toast.makeText(context, "" + HomeFragment.business_id, Toast.LENGTH_SHORT).show();
-            context.startActivity(myIntent);
+            int  position = (getAdapterPosition());
+            //Toast.makeText(context, "Position: " + position, Toast.LENGTH_SHORT).show();
+            Intent intent = new Intent(context, RestaurantProfileActivity.class);
+            intent.putExtra("business_id", LikesUtil.businessIdArraryList.get(position));
+            intent.putExtra("name", LikesUtil.businessNameArrayList.get(position));
+            intent.putExtra("cuisine", LikesUtil.businessCuisineArrayList.get(position));
+            intent.putExtra("cuisine", LikesUtil.businessCuisineArrayList.get(position));
+            intent.putExtra("address", LikesUtil.businessAddressArrayList.get(position));
+            intent.putExtra("city", LikesUtil.businessCityArrayList.get(position));
+            intent.putExtra("state", LikesUtil.businessStateArrayList.get(position));
+            intent.putExtra("lat", LikesUtil.businessLatArrayList.get(position));
+            intent.putExtra("long", LikesUtil.businessLongArrayList.get(position));
+
+            context.startActivity(intent);
         }
     }
 }

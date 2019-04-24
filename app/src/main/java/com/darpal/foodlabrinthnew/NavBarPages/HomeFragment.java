@@ -5,19 +5,18 @@ import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.darpal.foodlabrinthnew.Handler.BasedOnLikesAdapter;
@@ -27,9 +26,8 @@ import com.darpal.foodlabrinthnew.Model.BasedOnLikes;
 import com.darpal.foodlabrinthnew.Model.Trending;
 import com.darpal.foodlabrinthnew.NotDecided.NotDecidedActivity;
 import com.darpal.foodlabrinthnew.R;
-import com.google.android.gms.auth.api.signin.GoogleSignInClient;
-import com.google.android.gms.common.SignInButton;
-import com.google.firebase.database.ChildEventListener;
+import com.darpal.foodlabrinthnew.Util.LikesUtil;
+import com.darpal.foodlabrinthnew.Util.TrendingUtil;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -37,13 +35,8 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -54,6 +47,8 @@ public class HomeFragment extends Fragment {
     }
 
     Button notDecided;
+    EditText search;
+    TextView viewmore;
     private RecyclerView trending_recycler;
     private RecyclerView likes_recycler;
 
@@ -63,14 +58,15 @@ public class HomeFragment extends Fragment {
     private List<BasedOnLikes> likesList;
     BasedOnLikesAdapter likesAdapter;
 
-    public static String business_id;
-    public static String name;
-    public static String address;
-    public static String latitude;
-    public static String longitude;
-    public static String city;
-    public static String state;
-
+    public static String business_id, TrendID;
+    public static String categories, TrendCuisine;
+    public static String name, Trendname;
+    public static String address, Trendaddress;
+    public static String latitude, Trendlat;
+    public static String longitude, Trendlong;
+    public static String city, Trendcity;
+    public static String state, Trendstate;
+    String searchString;
 
     @SuppressLint("WrongConstant")
     @Override
@@ -78,6 +74,7 @@ public class HomeFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_home, container, false);
+        viewmore = (TextView) view.findViewById(R.id.viewmore_likesLabel);
         Toolbar toolbar = (Toolbar) view.findViewById(R.id.toolbar);
         toolbar.inflateMenu(R.menu.mymenu);
         toolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
@@ -88,6 +85,17 @@ public class HomeFragment extends Fragment {
                 return true;
             }
         });
+
+        viewmore.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getActivity(),LikesListDetailActivity.class);
+                startActivity(intent);
+            }
+        });
+
+        search = (EditText) view.findViewById(R.id.searchview_homepage);
+
         notDecided = (Button) view.findViewById(R.id.notDecided_btn);
         trending_recycler = (RecyclerView) view.findViewById(R.id.trending_recyclerview);
         likes_recycler = (RecyclerView) view.findViewById(R.id.likes_recyclerview);
@@ -99,7 +107,6 @@ public class HomeFragment extends Fragment {
         likesList = new ArrayList<>();
         likesAdapter = new BasedOnLikesAdapter(getContext(),likesList);
         showLikesData();
-
         notDecided.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -114,7 +121,7 @@ public class HomeFragment extends Fragment {
     private void showTrendingData() {
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference();
         Query trendingPostQuery = reference.child("business")
-                .limitToLast(5);
+                .limitToLast(1);
 
         trendingPostQuery.addValueEventListener(new ValueEventListener() {
             @SuppressLint("WrongConstant")
@@ -122,13 +129,23 @@ public class HomeFragment extends Fragment {
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 for(DataSnapshot dataSnapshot1 : dataSnapshot.getChildren()) {
                     Log.e("Trending Test", String.valueOf(dataSnapshot1));
-                    business_id = String.valueOf(dataSnapshot1.child("business_id").getValue());
-                    name = String.valueOf(dataSnapshot1.child("name").getValue());
-                    address = String.valueOf(dataSnapshot1.child("address").getValue());
-                    latitude =  String.valueOf(dataSnapshot1.child("latitude").getValue());
-                    longitude = String.valueOf(dataSnapshot1.child("longitude").getValue());
-                    city = String.valueOf(dataSnapshot1.child("city").getValue());
-                    state = String.valueOf(dataSnapshot1.child("state").getValue());
+                    TrendID = String.valueOf(dataSnapshot1.child("business_id").getValue());
+                    Trendname = String.valueOf(dataSnapshot1.child("name").getValue());
+                    TrendCuisine = String.valueOf(dataSnapshot1.child("categories").getValue());
+                    Trendaddress = String.valueOf(dataSnapshot1.child("address").getValue());
+                    Trendlat =  String.valueOf(dataSnapshot1.child("latitude").getValue());
+                    Trendlong = String.valueOf(dataSnapshot1.child("longitude").getValue());
+                    Trendcity = String.valueOf(dataSnapshot1.child("city").getValue());
+                    Trendstate = String.valueOf(dataSnapshot1.child("state").getValue());
+
+                    TrendingUtil.businessIdArraryList.add(TrendID);
+                    TrendingUtil.businessNameArrayList.add(Trendname);
+                    TrendingUtil.businessCuisineArrayList.add(TrendCuisine);
+                    TrendingUtil.businessAddressArrayList.add(Trendaddress);
+                    TrendingUtil.businessCityArrayList.add(Trendcity);
+                    TrendingUtil.businessStateArrayList.add(Trendstate);
+                    TrendingUtil.businessLatArrayList.add(Trendlat);
+                    TrendingUtil.businessLongArrayList.add(Trendlong);
 
                     Trending trending = new Trending(String.valueOf(dataSnapshot1.child("name").getValue()),
                             String.valueOf(dataSnapshot1.child("address").getValue()),
@@ -137,7 +154,8 @@ public class HomeFragment extends Fragment {
                             String.valueOf(dataSnapshot1.child("state").getValue()),
                             String.valueOf(dataSnapshot1.child("latitude").getValue()),
                             String.valueOf(dataSnapshot1.child("longitude").getValue()),
-                            String.valueOf(dataSnapshot1.child("business_id").getValue()));
+                            String.valueOf(dataSnapshot1.child("business_id").getValue()),
+                            String.valueOf(dataSnapshot1.child("categories").getValue()));
                     trendingList.add(trending);
                 }
                 trending_recycler.setLayoutManager(new LinearLayoutManager(getActivity(),LinearLayoutManager.HORIZONTAL,false));
@@ -162,6 +180,7 @@ public class HomeFragment extends Fragment {
                 for(DataSnapshot ds : dataSnapshot.getChildren()) {
                     Log.e("Likes Test", String.valueOf(ds));
                     business_id = String.valueOf(ds.child("business_id").getValue());
+                    categories = String.valueOf(ds.child("categories").getValue());
                     name = String.valueOf(ds.child("name").getValue());
                     address = String.valueOf(ds.child("address").getValue());
                     latitude =  String.valueOf(ds.child("latitude").getValue());
@@ -169,11 +188,21 @@ public class HomeFragment extends Fragment {
                     city = String.valueOf(ds.child("city").getValue());
                     state = String.valueOf(ds.child("state").getValue());
 
+                    LikesUtil.businessIdArraryList.add(business_id);
+                    LikesUtil.businessNameArrayList.add(name);
+                    LikesUtil.businessCuisineArrayList.add(categories);
+                    LikesUtil.businessAddressArrayList.add(address);
+                    LikesUtil.businessCityArrayList.add(city);
+                    LikesUtil.businessStateArrayList.add(state);
+                    LikesUtil.businessLatArrayList.add(latitude);
+                    LikesUtil.businessLongArrayList.add(longitude);
+
                     BasedOnLikes basedOnLikes = new BasedOnLikes(String.valueOf(ds.child("name").getValue()),
                             String.valueOf(ds.child("address").getValue()),
                             String.valueOf(ds.child("review_count").getValue()),
                             String.valueOf(ds.child("city").getValue()),
-                            String.valueOf(ds.child("state").getValue()));
+                            String.valueOf(ds.child("state").getValue()),
+                            String.valueOf(ds.child("categories").getValue()));
                     likesList.add(basedOnLikes);
                 }
 
