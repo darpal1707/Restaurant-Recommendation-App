@@ -23,7 +23,8 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
-        <activity android:name=".NavBarPages.LikesListDetailActivity"></activity>
+        <activity android:name=".NotDecided.RestaurantsNotDecidedActivity"></activity>
+        <activity android:name=".NavBarPages.LikesListDetailActivity" />
         <activity android:name=".NavBarPages.SearchResultDisplayActivity" />
         <activity android:name=".MapView.MapActivity" />
         <activity android:name=".NotDecided.NotDecidedActivity" />

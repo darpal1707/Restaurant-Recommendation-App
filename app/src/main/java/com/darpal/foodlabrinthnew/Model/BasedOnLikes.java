@@ -10,7 +10,7 @@ public class BasedOnLikes {
     public String business_id;
     public String categories;
     public String address;
-    public String review_count;
+    public String review_count="00";
     public String city;
     public String state;
 
@@ -21,7 +21,7 @@ public class BasedOnLikes {
         this.review_count = review_count;
         this.city = city;
         this.state = state;
-        this.categories = cuisine;
+        //this.categories = cuisine;
     }
 
     public String getBusiness_id() {

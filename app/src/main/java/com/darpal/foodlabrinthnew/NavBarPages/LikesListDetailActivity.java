@@ -99,9 +99,9 @@ public class LikesListDetailActivity extends AppCompatActivity {
                 BasedOnLikes user;
                 List<BasedOnLikes> model = new ArrayList<>();
                 for (DataSnapshot userSnapshot : dataSnapshot.getChildren()) {
-                    Log.e("view more", String.valueOf(userSnapshot));
+                   Log.e("view more", String.valueOf(userSnapshot));
                     model.add(userSnapshot.getValue(BasedOnLikes.class));
-                }
+                   }
 
                 mAdapter.addAll(model);
                 mIsLoading = false;

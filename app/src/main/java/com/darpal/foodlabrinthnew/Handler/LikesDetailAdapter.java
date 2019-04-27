@@ -34,7 +34,7 @@ public class LikesDetailAdapter  extends RecyclerView.Adapter<LikesDetailVH> {
     public void addAll(List<BasedOnLikes> newUsers) {
         String  initialSize = String.valueOf(userModels.size());
         userModels.addAll(newUsers);
-        notifyItemRangeInserted(Integer.parseInt(initialSize), newUsers.size());
+        //notifyItemRangeInserted(Integer.parseInt(initialSize), newUsers.size());
     }
 
     public String getLastItemId() {
