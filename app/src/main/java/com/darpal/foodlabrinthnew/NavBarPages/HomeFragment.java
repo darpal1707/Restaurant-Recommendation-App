@@ -21,6 +21,7 @@ import android.widget.Toast;
 
 import com.darpal.foodlabrinthnew.Handler.BasedOnLikesAdapter;
 import com.darpal.foodlabrinthnew.Handler.TrendingAdapter;
+import com.darpal.foodlabrinthnew.MainActivity;
 import com.darpal.foodlabrinthnew.MapView.MapActivity;
 import com.darpal.foodlabrinthnew.Model.BasedOnLikes;
 import com.darpal.foodlabrinthnew.Model.Trending;
@@ -74,6 +75,18 @@ public class HomeFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_home, container, false);
+
+        EditText searchHome = (EditText) view.findViewById(R.id.searchview_homepage);
+        searchHome.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if(hasFocus){
+                    MainActivity.navigation.setSelectedItemId(R.id.search);
+                    SearchFragment searchFragment = new SearchFragment();
+                    getFragmentManager().beginTransaction().replace(R.id.login_frame,searchFragment).commit();
+                }
+            }
+        });
         viewmore = (TextView) view.findViewById(R.id.viewmore_likesLabel);
         Toolbar toolbar = (Toolbar) view.findViewById(R.id.toolbar);
         toolbar.inflateMenu(R.menu.mymenu);
@@ -171,7 +184,7 @@ public class HomeFragment extends Fragment {
     private void showLikesData() {
         DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference();
         Query recentPostsQuery = databaseReference.child("business")
-                .limitToFirst(10);
+                .limitToFirst(20);
 
         recentPostsQuery.addValueEventListener(new ValueEventListener() {
             @SuppressLint("WrongConstant")

@@ -12,6 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.darpal.foodlabrinthnew.R;
 
@@ -56,7 +57,6 @@ public class BudgetQuestionFragment extends Fragment {
                 l = "500";
                 m = "";
                 h = "";
-
             }
         });
         medium.setOnClickListener(new View.OnClickListener() {
@@ -86,7 +86,7 @@ public class BudgetQuestionFragment extends Fragment {
         this.arr=data;
         for(int i=0;i<data.length;i++)
         {
-            Log.e("forth",data[i]);
+            Log.e("forth fragment",data[i]);
         }
         /*HashSet<String >hs=new HashSet<>();
         hs.addAll(arrayList);*/

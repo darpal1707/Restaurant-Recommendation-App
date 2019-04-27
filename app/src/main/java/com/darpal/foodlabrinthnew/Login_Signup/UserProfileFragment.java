@@ -3,6 +3,7 @@ package com.darpal.foodlabrinthnew.Login_Signup;
 
 import android.os.Bundle;
 import androidx.annotation.NonNull;
+import androidx.cardview.widget.CardView;
 import androidx.fragment.app.Fragment;
 
 import android.view.LayoutInflater;
@@ -32,12 +33,21 @@ public class UserProfileFragment extends Fragment {
     private FirebaseAuth auth;
     Button signout;
     private GoogleSignInClient mGoogleSignInClient;
+    CardView uploadPhoto;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view =  inflater.inflate(R.layout.fragment_user_profile, container, false);
+        uploadPhoto = (CardView) view.findViewById(R.id. photoUpload);
+        uploadPhoto.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                UploadImage image = new UploadImage();
+                getFragmentManager().beginTransaction().replace(R.id.login_frame,image).commit();
+            }
+        });
         //get firebase auth instance
         auth = FirebaseAuth.getInstance();
         //get current user

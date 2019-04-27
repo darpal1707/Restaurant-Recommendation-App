@@ -34,30 +34,30 @@
     </androidx.cardview.widget.CardView>
 
 
+
     <androidx.cardview.widget.CardView
         android:layout_width="150dp"
         android:layout_height="100dp"
         android:layout_margin="20dp"
         android:layout_below="@+id/username"
-        android:id="@+id/bookmarksuser"
+        android:id="@+id/photoUpload"
         android:elevation="5dp">
 
         <ImageView
             android:layout_width="30dp"
             android:layout_height="30dp"
             android:layout_gravity="center"
-            android:src="@drawable/ic_bookmark_black_24dp"/>
+            android:src="@drawable/ic_photo_camera_black_24dp"/>
 
         <TextView
-            android:id="@+id/bookmark"
+            android:id="@+id/photos"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Bookmarks"
+            android:text="Upload Photo"
             android:textAlignment="center"
             android:layout_marginTop="25dp"
             android:layout_gravity="center"
             android:textColor="#000000"/>
-
 
     </androidx.cardview.widget.CardView>
 
@@ -65,7 +65,7 @@
     <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/bookmarksuser">
+        android:layout_below="@+id/photoUpload">
 
         <LinearLayout
             android:layout_width="wrap_content"

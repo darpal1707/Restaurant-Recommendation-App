@@ -25,16 +25,25 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 public class MapActivity extends AppCompatActivity implements OnMapReadyCallback, GoogleApiClient.ConnectionCallbacks,
@@ -49,11 +58,39 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     private static final int Request_User_Location_Code = 99;
     private double latitude,longitude;
     private int ProximityRadius=10000;
+    public ArrayList<String > LatTestArrayList= new ArrayList<>();
+    public ArrayList<String > LongTestArrayList= new ArrayList<>();
+    public static String lati;
+    public static String longi;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_map);
+
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference();
+        Query mapQuery = reference.child("business")
+                .limitToLast(10);
+
+        mapQuery.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                for(DataSnapshot snapshot : dataSnapshot.getChildren()){
+                    Log.e("map", String.valueOf(snapshot));
+                    lati = String.valueOf(snapshot.child("latitude").getValue());
+                    longi = String.valueOf(snapshot.child("longitude").getValue());
+
+                    LatTestArrayList.add((lati));
+                    LongTestArrayList.add((longi));
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
 
         if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.M)
         {
@@ -99,10 +136,64 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-        if(ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)== PackageManager.PERMISSION_GRANTED){
-            buildGoogleApiClient();
-            mMap.setMyLocationEnabled(true);
+        LatLngBounds.Builder builder = new LatLngBounds.Builder();
+
+        List<Marker> markerList= new ArrayList<>();
+        for (int i = 0; i<LatTestArrayList.size(); i++){
+
+            double w,v;
+
+            try {
+                w = Double.valueOf(LatTestArrayList.get(i));
+                v = Double.valueOf(LongTestArrayList.get(i));
+            } catch (NumberFormatException e) {
+                w = 0;
+                v = 0;// your default value
+            }
+            LatLng latLng = new LatLng(w,v);
+
+            MarkerOptions markerOptions = new MarkerOptions();
+            markerOptions.position(latLng);
+            markerOptions.title("Rest "+i);
+            Marker marker = mMap.addMarker(markerOptions);
+
+            // Click on Map Marker Open Popup of details of Garage
+            mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+                @Override
+                public boolean onMarkerClick(Marker marker) {
+                    final String title = marker.getTitle();
+                    Toast.makeText(MapActivity.this,"Rest clicked",Toast.LENGTH_SHORT).show();
+                    return true;
+                }
+            });
+            markerList.add(marker);
+            //builder.include(latLng);
         }
+        // Zoom Map
+        for(Marker m : markerList){
+            builder.include(m.getPosition());
+        }
+        final LatLngBounds bounds;
+        bounds=builder.build();
+        //Log.e("bound",bounds.toString());
+        final int padding = 100; // offset from edges of the map in pixels
+
+        final CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds, padding);
+
+        mMap.setOnMapLoadedCallback(new GoogleMap.OnMapLoadedCallback() {
+            @Override
+            public void onMapLoaded() {
+                //animate camera here
+                mMap.animateCamera(cu);
+
+            }
+        });
+        mMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
+            @Override
+            public void onInfoWindowClick(Marker marker) {
+
+            }
+        });
     }
     protected synchronized void buildGoogleApiClient()
     {
