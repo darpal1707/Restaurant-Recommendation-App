@@ -3,6 +3,7 @@ package com.darpal.foodlabrinthnew.NotDecided;
 
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
 import android.view.LayoutInflater;
@@ -23,19 +24,18 @@ public class MealQuestionFragment extends Fragment {
     public MealQuestionFragment() {
         // Required empty public constructor
     }
-    GridView gridView;
-    public RadioButton checkBox;
-    int[] array = new int[]{R.drawable.breakfast, R.drawable.lunch, R.drawable.dinner, R.drawable.coffee, R.drawable.latenight};
-    String arr[] = {"Breakfast", "Lunch", "Dinner", "Cafe", "Late Night"};
+
+    private int[] array = new int[]{R.drawable.breakfast, R.drawable.lunch, R.drawable.dinner, R.drawable.coffee, R.drawable.latenight};
+    private String arr[] = {"Breakfast", "Lunch", "Dinner", "Cafe", "Late Night"};
 
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_first_question, container, false);
 
-        gridView = (GridView) view.findViewById(R.id.mealgrid);
+        GridView gridView = (GridView) view.findViewById(R.id.mealgrid);
         final MealCustomAdapter mealCustomAdapter = new MealCustomAdapter(getActivity(), array, arr);
         gridView.setAdapter(mealCustomAdapter);
 

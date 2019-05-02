@@ -13,6 +13,7 @@ public class Trending {
     public static String state;
     public static String latitude;
     public static String longitude;
+    public static String hours;
 
     public Trending() {
     }
@@ -20,7 +21,7 @@ public class Trending {
 
     public Trending(String name, String address, String review_count,
                     String city, String state, String latitude, String longitude,
-                    String business_id, String cuisine) {
+                    String business_id, String cuisine, String hours) {
         this.name = name;
         this.address = address;
         this.review_count = review_count;
@@ -29,7 +30,16 @@ public class Trending {
         this.latitude = latitude;
         this.longitude = longitude;
         this.business_id = business_id;
+        this.hours = hours;
         this.categories = cuisine;
+    }
+
+    public static String getHours() {
+        return hours;
+    }
+
+    public static void setHours(String hours) {
+        Trending.hours = hours;
     }
 
     public static String getCategories() {

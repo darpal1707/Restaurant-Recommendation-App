@@ -4,8 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main_content"
     android:layout_width="match_parent"
-    android:background="#fff"
     android:layout_height="match_parent"
+    android:background="#fff"
     android:focusableInTouchMode="true">
 
     <com.google.android.material.appbar.AppBarLayout
@@ -21,32 +21,56 @@
             app:layout_scrollFlags="scroll|enterAlways"
             app:popupTheme="@style/ThemeOverlay.AppCompat.Light">
 
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <ImageView
+                    android:id="@+id/logo"
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
+                    android:adjustViewBounds="true"
+                    android:layout_centerVertical="true"
+                    android:src="@drawable/logo" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Food Labrinth"
+                    android:layout_toEndOf="@+id/logo"
+                    android:layout_centerVertical="true"
+                    android:layout_marginStart="5dp"
+                    android:textSize="20sp"
+                    android:textColor="#fff" />
+
+            </RelativeLayout>
+
         </androidx.appcompat.widget.Toolbar>
 
         <RelativeLayout
-                android:id="@+id/search_layout"
+            android:id="@+id/search_layout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/colorPrimary"
+            android:orientation="vertical"
+            android:padding="@dimen/activity_horizontal_margin">
+
+            <EditText
+                android:id="@+id/searchview_homepage"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:background="@color/colorPrimary"
-                android:orientation="vertical"
-                android:padding="@dimen/activity_horizontal_margin">
+                android:layout_height="wrap_content"
+                android:background="#fff"
+                android:drawableLeft="@drawable/search"
+                android:drawablePadding="22dp"
+                android:gravity="left|center"
+                android:hint="Search a restaurant"
+                android:inputType="text"
+                android:padding="10dp"
+                android:textColor="#000"
+                android:textColorHint="@android:color/darker_gray"
+                tools:ignore="RtlHardcoded" />
 
-                <EditText
-                    android:id="@+id/searchview_homepage"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:background="#fff"
-                    android:drawableLeft="@drawable/search"
-                    android:drawablePadding="22dp"
-                    android:gravity="left|center"
-                    android:hint="Search a restaurant"
-                    android:inputType="text"
-                    android:padding="10dp"
-                    android:textColor="#000"
-                    android:textColorHint="@android:color/darker_gray"
-                    tools:ignore="RtlHardcoded" />
-
-            </RelativeLayout>
+        </RelativeLayout>
 
     </com.google.android.material.appbar.AppBarLayout>
 
@@ -64,86 +88,85 @@
                 android:id="@+id/trending_lbl"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_margin="15dp"
                 android:text="Trending near you"
                 android:textSize="18sp"
-                android:textStyle="bold"
-                android:layout_margin="15dp"/>
+                android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/viewmore_likesLabel"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="View more"
                 android:layout_below="@id/trending_recyclerview"
                 android:layout_alignParentEnd="true"
-                android:textSize="16sp"
-                android:layout_margin="15dp"/>
+                android:layout_margin="15dp"
+                android:text="View more"
+                android:textSize="16sp" />
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/trending_recyclerview"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/trending_lbl"
-                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                 android:clipToPadding="false"
                 android:orientation="horizontal"
                 android:paddingStart="20dp"
-                android:paddingEnd="20dp"/>
+                android:paddingEnd="20dp"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
 
             <TextView
                 android:id="@+id/likes_lbl"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Based on your likes"
                 android:layout_below="@id/trending_recyclerview"
+                android:layout_margin="15dp"
+                android:text="Based on your likes"
                 android:textSize="18sp"
-                android:textStyle="bold"
-                android:layout_margin="15dp"/>
+                android:textStyle="bold" />
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/likes_recyclerview"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/likes_lbl"
-                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-                android:orientation="vertical"
                 android:clipToPadding="false"
+                android:orientation="vertical"
                 android:paddingStart="20dp"
-                android:paddingEnd="20dp" />
+                android:paddingEnd="20dp"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
 
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@drawable/semicircle"
+                android:layout_below="@id/likes_recyclerview"
                 android:layout_marginTop="20dp"
-                android:backgroundTint="@color/colorAccent"
-                android:layout_below="@id/likes_recyclerview">
+                android:background="@drawable/semicircle"
+                android:backgroundTint="@color/colorAccent">
 
                 <TextView
                     android:id="@+id/notdecided_lbl"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Don't know where to eat?"
-                    android:textSize="20sp"
                     android:layout_centerHorizontal="true"
                     android:layout_margin="40dp"
+                    android:text="Don't know where to eat?"
                     android:textColor="#fff"
-                    android:textStyle="bold"/>
+                    android:textSize="20sp"
+                    android:textStyle="bold" />
 
                 <Button
                     android:id="@+id/notDecided_btn"
+                    style="@style/Widget.AppCompat.Button.Colored"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:padding="10dp"
                     android:layout_below="@+id/notdecided_lbl"
-                    android:text="Let us Help You!"
-                    style="@style/Widget.AppCompat.Button.Colored"
+                    android:layout_centerHorizontal="true"
                     android:background="#fff"
-                    android:textColor="@color/colorPrimary"
-                    android:layout_centerHorizontal="true"/>
+                    android:padding="10dp"
+                    android:text="Let us Help You!"
+                    android:textColor="@color/colorPrimary" />
 
             </RelativeLayout>
-
 
 
         </RelativeLayout>

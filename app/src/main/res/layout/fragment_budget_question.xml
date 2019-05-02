@@ -3,14 +3,12 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    tools:context="com.example.darpal.demo5.com.foodlabrinth.darpal.demo5.Not_Decided.FirstQuestion">
+    android:orientation="vertical">
 
     <!-- TODO: Update blank fragment layout -->
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:fontFamily="sans-serif-smallcaps"
         android:text="HOW MUCH WOULD YOU LIKE TO SPEND?"
         android:layout_marginTop="10dp"
         android:textAlignment="center"
@@ -19,14 +17,14 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:orientation="vertical"
+        android:gravity="center">
 
 
         <androidx.cardview.widget.CardView
             android:layout_width="100dp"
             android:layout_height="100dp"
-            android:layout_marginLeft="15dp"
-            android:layout_marginTop="20dp"
+            android:layout_margin="15dp"
             android:elevation="5dp"
             app:cardCornerRadius="40dp"
             android:id="@+id/lowbudget">
@@ -34,7 +32,7 @@
             <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
-                android:src="@drawable/xyz"/>
+                android:src="@drawable/low"/>
 
 
         </androidx.cardview.widget.CardView>
@@ -43,8 +41,7 @@
         <androidx.cardview.widget.CardView
             android:layout_width="100dp"
             android:layout_height="100dp"
-            android:layout_marginLeft="15dp"
-            android:layout_marginTop="20dp"
+            android:layout_margin="15dp"
             android:elevation="5dp"
             app:cardCornerRadius="40dp"
             android:id="@+id/mediumbudget">
@@ -52,15 +49,14 @@
             <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
-                android:src="@drawable/abcdone"/>
+                android:src="@drawable/medium"/>
 
         </androidx.cardview.widget.CardView>
 
         <androidx.cardview.widget.CardView
             android:layout_width="100dp"
             android:layout_height="100dp"
-            android:layout_marginLeft="15dp"
-            android:layout_marginTop="20dp"
+            android:layout_margin="15dp"
             android:elevation="5dp"
             app:cardCornerRadius="40dp"
             android:id="@+id/highbudget">
@@ -68,7 +64,7 @@
             <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
-                android:src="@drawable/efg"/>
+                android:src="@drawable/high"/>
 
         </androidx.cardview.widget.CardView>
 
@@ -76,13 +72,6 @@
     </LinearLayout>
 
 
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Search Restaurants"
-        android:id="@+id/click"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginTop="50dp"/>
 
 </LinearLayout>
 

@@ -40,11 +40,6 @@ public class LauncherActivity extends AppCompatActivity {
         new Handler().postDelayed(new Runnable(){
             @Override
             public void run() {
-                /* Create an Intent that will start the Menu-Activity. */
-                /*new PermissionService(LauncherActivity.this).request(
-                        new String[]{ACCESS_FINE_LOCATION, ACCESS_COARSE_LOCATION, CAMERA,READ_EXTERNAL_STORAGE, WRITE_EXTERNAL_STORAGE, ACCESS_NETWORK_STATE},
-                        callback);*/
-
                 Intent mainIntent = new Intent(LauncherActivity.this,MainActivity.class);
                 startActivity(mainIntent);
                 finish();
@@ -52,25 +47,4 @@ public class LauncherActivity extends AppCompatActivity {
         }, SPLASH_TIME);
 
     }
-
-    /*private PermissionService.Callback callback = new PermissionService.Callback() {
-        @Override
-        public void onRefuse(ArrayList<String> RefusePermissions) {
-            // todo
-            Toast.makeText(getBaseContext(),
-                    "Have to allow all permissions",
-                    Toast.LENGTH_SHORT).show();
-        }
-
-        @Override
-        public void onFinally() {
-            // todo
-        }
-    };*/
-
-   /* @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        callback.handler(permissions, grantResults);
-    }*/
 }

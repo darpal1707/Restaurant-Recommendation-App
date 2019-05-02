@@ -67,7 +67,14 @@ public class HomeFragment extends Fragment {
     public static String longitude, Trendlong;
     public static String city, Trendcity;
     public static String state, Trendstate;
-    String searchString;
+    public static String hours, likesHours;
+
+    int[] myImageList = {R.drawable.american, R.drawable.asian, R.drawable.bbq, R.drawable.chinese,
+            R.drawable.coffee_tea, R.drawable.deli, R.drawable.desserts_two, R.drawable.european,
+            R.drawable.fast_food, R.drawable.greek, R.drawable.halal, R.drawable.indian,
+            R.drawable.italian, R.drawable.jamaican, R.drawable.japanese, R.drawable.korean,
+            R.drawable.mediterranean, R.drawable.mexican, R.drawable.salads, R.drawable.spanish,
+            R.drawable.sushi, R.drawable.thai, R.drawable.vegan, R.drawable.vegetarian};
 
     @SuppressLint("WrongConstant")
     @Override
@@ -75,6 +82,7 @@ public class HomeFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_home, container, false);
+
 
         EditText searchHome = (EditText) view.findViewById(R.id.searchview_homepage);
         searchHome.setOnFocusChangeListener(new View.OnFocusChangeListener() {
@@ -150,6 +158,7 @@ public class HomeFragment extends Fragment {
                     Trendlong = String.valueOf(dataSnapshot1.child("longitude").getValue());
                     Trendcity = String.valueOf(dataSnapshot1.child("city").getValue());
                     Trendstate = String.valueOf(dataSnapshot1.child("state").getValue());
+                    hours = String.valueOf(dataSnapshot1.child("hours").getValue());
 
                     TrendingUtil.businessIdArraryList.add(TrendID);
                     TrendingUtil.businessNameArrayList.add(Trendname);
@@ -159,6 +168,7 @@ public class HomeFragment extends Fragment {
                     TrendingUtil.businessStateArrayList.add(Trendstate);
                     TrendingUtil.businessLatArrayList.add(Trendlat);
                     TrendingUtil.businessLongArrayList.add(Trendlong);
+                    TrendingUtil.businessHoursArrayList.add(hours);
 
                     Trending trending = new Trending(String.valueOf(dataSnapshot1.child("name").getValue()),
                             String.valueOf(dataSnapshot1.child("address").getValue()),
@@ -168,7 +178,8 @@ public class HomeFragment extends Fragment {
                             String.valueOf(dataSnapshot1.child("latitude").getValue()),
                             String.valueOf(dataSnapshot1.child("longitude").getValue()),
                             String.valueOf(dataSnapshot1.child("business_id").getValue()),
-                            String.valueOf(dataSnapshot1.child("categories").getValue()));
+                            String.valueOf(dataSnapshot1.child("categories").getValue()),
+                            String.valueOf(dataSnapshot1.child("hours").getValue()));
                     trendingList.add(trending);
                 }
                 trending_recycler.setLayoutManager(new LinearLayoutManager(getActivity(),LinearLayoutManager.HORIZONTAL,false));
@@ -200,6 +211,7 @@ public class HomeFragment extends Fragment {
                     longitude = String.valueOf(ds.child("longitude").getValue());
                     city = String.valueOf(ds.child("city").getValue());
                     state = String.valueOf(ds.child("state").getValue());
+                    likesHours = String.valueOf(ds.child("hours").getValue());
 
                     LikesUtil.businessIdArraryList.add(business_id);
                     LikesUtil.businessNameArrayList.add(name);
@@ -209,13 +221,16 @@ public class HomeFragment extends Fragment {
                     LikesUtil.businessStateArrayList.add(state);
                     LikesUtil.businessLatArrayList.add(latitude);
                     LikesUtil.businessLongArrayList.add(longitude);
+                    LikesUtil.businessHoursArrayList.add(likesHours);
 
                     BasedOnLikes basedOnLikes = new BasedOnLikes(String.valueOf(ds.child("name").getValue()),
                             String.valueOf(ds.child("address").getValue()),
                             String.valueOf(ds.child("review_count").getValue()),
                             String.valueOf(ds.child("city").getValue()),
                             String.valueOf(ds.child("state").getValue()),
-                            String.valueOf(ds.child("categories").getValue()));
+                            String.valueOf(ds.child("categories").getValue()),
+                            String.valueOf(ds.child("hours").getValue()));
+                   
                     likesList.add(basedOnLikes);
                 }
 

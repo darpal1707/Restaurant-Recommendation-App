@@ -1,6 +1,7 @@
 package com.darpal.foodlabrinthnew.NotDecided;
 
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.cardview.widget.CardView;
@@ -14,6 +15,7 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.darpal.foodlabrinthnew.NotDecided.RestaurantData.NotDecidedOutputActivity;
 import com.darpal.foodlabrinthnew.R;
 
 import java.util.ArrayList;
@@ -30,13 +32,8 @@ public class BudgetQuestionFragment extends Fragment {
 
     private TextView subtitleTextView;
     private View descriptionLayout;
-    Button click;
-    CardView low, medium, high;
-    ArrayList<String> getdata;
-    String meal;
-    String ambianc;
     String l = "", m = "", h = "", temp = "";
-    String arr[];
+    public String cuisineValue;
 
 
     @Override
@@ -45,18 +42,20 @@ public class BudgetQuestionFragment extends Fragment {
         // Inflate the layout for this fragment
         View view =  inflater.inflate(R.layout.fragment_budget_question, container, false);
 
-        low = (CardView) view.findViewById(R.id.lowbudget);
-        medium = (CardView) view.findViewById(R.id.mediumbudget);
-        high = (CardView) view.findViewById(R.id.highbudget);
-        getdata = new ArrayList<>();
+        CardView low = (CardView) view.findViewById(R.id.lowbudget);
+        CardView medium = (CardView) view.findViewById(R.id.mediumbudget);
+        CardView high = (CardView) view.findViewById(R.id.highbudget);
+        ArrayList<String> getdata = new ArrayList<>();
 
-        click = (Button) view.findViewById(R.id.click);
         low.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 l = "500";
                 m = "";
                 h = "";
+                Intent intent = new Intent(getActivity(), NotDecidedOutputActivity.class);
+                intent.putExtra("cuisine",cuisineValue);
+                startActivity(intent);
             }
         });
         medium.setOnClickListener(new View.OnClickListener() {
@@ -65,6 +64,9 @@ public class BudgetQuestionFragment extends Fragment {
                 m = "1500";
                 l = "";
                 h = "";
+                Intent intent = new Intent(getActivity(), NotDecidedOutputActivity.class);
+                intent.putExtra("cuisine",cuisineValue);
+                startActivity(intent);
             }
         });
         high.setOnClickListener(new View.OnClickListener() {
@@ -73,6 +75,9 @@ public class BudgetQuestionFragment extends Fragment {
                 h = "2500";
                 l = "";
                 m = "";
+                Intent intent = new Intent(getActivity(), NotDecidedOutputActivity.class);
+                intent.putExtra("cuisine",cuisineValue);
+                startActivity(intent);
             }
         });
 
@@ -80,16 +85,13 @@ public class BudgetQuestionFragment extends Fragment {
     }
 
     public void alldata( String ambiance,String data[],String meal) {
-        //this.getdata = arrayList;
-        this.meal = meal;
-        this.ambianc = ambiance;
-        this.arr=data;
+        String meal1 = meal;
+        String ambianc = ambiance;
+        String[] arr = data;
         for(int i=0;i<data.length;i++)
         {
-            Log.e("forth fragment",data[i]);
+            cuisineValue = data[i];
+            Log.e("fourth fragment",data[i]);
         }
-        /*HashSet<String >hs=new HashSet<>();
-        hs.addAll(arrayList);*/
-        //Log.e("Hasdata NEw", String.valueOf(hs));
     }
 }

@@ -60,6 +60,8 @@ dependencies {
     implementation "android.arch.paging:runtime:1.0.1"
     implementation 'com.romellfudi.permission:fudi-permission:1.0.a'
     implementation 'com.google.firebase:firebase-storage:16.1.0'
+    implementation 'com.squareup.picasso:picasso:2.71828'
+    implementation 'com.github.bumptech.glide:glide:4.2.0'
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test:runner:1.2.0-alpha04'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0-alpha04'

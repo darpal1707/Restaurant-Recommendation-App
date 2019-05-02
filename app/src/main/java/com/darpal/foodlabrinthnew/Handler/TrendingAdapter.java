@@ -91,6 +91,7 @@ public class TrendingAdapter extends RecyclerView.Adapter<TrendingAdapter.Trendi
             intent.putExtra("state", TrendingUtil.businessStateArrayList.get(position));
             intent.putExtra("lat", TrendingUtil.businessLatArrayList.get(position));
             intent.putExtra("long", TrendingUtil.businessLongArrayList.get(position));
+            intent.putExtra("hours",TrendingUtil.businessHoursArrayList.get(position));
             context.startActivity(intent);
         }
     }

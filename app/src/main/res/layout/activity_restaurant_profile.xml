@@ -46,6 +46,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/appbar_layout"
+        android:paddingBottom="20dp"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
         <RelativeLayout
@@ -70,6 +71,7 @@
                 android:layout_marginEnd="10dp"
                 android:layout_marginBottom="8dp"
                 android:text="Restaurant Name"
+                android:fontFamily="@assets/Montserrat-Medium.ttf"
                 android:textColor="@android:color/black"
                 android:textSize="24sp" />
 
@@ -155,6 +157,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="40dp"
                     android:paddingEnd="10dp"
+                    android:id="@+id/mapbutton"
                     android:layout_gravity="center"
                     android:clickable="true"
                     android:elevation="10dp"
@@ -186,10 +189,15 @@
                 android:id="@+id/openHoursLayour"
                 layout="@layout/open_hours"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:layout_below="@id/cuisineLayout" />
 
-
+            <include
+                android:id="@+id/reviews"
+                layout="@layout/review_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/openHoursLayour" />
 
 
         </RelativeLayout>

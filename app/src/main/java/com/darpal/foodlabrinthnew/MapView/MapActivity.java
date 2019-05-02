@@ -142,7 +142,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         for (int i = 0; i<LatTestArrayList.size(); i++){
 
             double w,v;
-
             try {
                 w = Double.valueOf(LatTestArrayList.get(i));
                 v = Double.valueOf(LongTestArrayList.get(i));
@@ -157,7 +156,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
             markerOptions.title("Rest "+i);
             Marker marker = mMap.addMarker(markerOptions);
 
-            // Click on Map Marker Open Popup of details of Garage
+            // Click on Map Marker Open Popup of details of Restaurants
             mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
                 @Override
                 public boolean onMarkerClick(Marker marker) {
@@ -173,9 +172,9 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         for(Marker m : markerList){
             builder.include(m.getPosition());
         }
-        final LatLngBounds bounds;
+        LatLngBounds bounds;
         bounds=builder.build();
-        //Log.e("bound",bounds.toString());
+        Log.e("bound",bounds.toString());
         final int padding = 100; // offset from edges of the map in pixels
 
         final CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds, padding);

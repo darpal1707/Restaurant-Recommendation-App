@@ -33,44 +33,37 @@ public class AmbienceQuestionFragment extends Fragment {
         // Required empty public constructor
     }
 
-    GridView gridView;
     public CheckBox checkBox;
-    int[] array = new int[]{R.drawable.luxury, R.drawable.romantic, R.drawable.rooftop, R.drawable.streetamb, R.drawable.unnamed, R.drawable.hangoutspark};
-    String arr[] = {"Luxury", "Romantic", "Roof Top", "Street/Open Area", "Unique Dining", "Hangout"};
-    ArrayList<String> getdata;
-    String meal;
-    String[] stockArr;
+    private int[] array = new int[]{R.drawable.luxury, R.drawable.romantic, R.drawable.rooftop, R.drawable.streetamb, R.drawable.unnamed, R.drawable.hangoutspark};
+    private String arr[] = {"Luxury", "Romantic", "Roof Top", "Street/Open Area", "Unique Dining", "Hangout"};
+    private ArrayList<String> getdata;
+    private String meal;
+    private String[] stockArr;
     String s1, s2, s3, s4, s5, s6, s7, s8, s9, s10, s11, s12, s13, s14;
-    SharedPreferences pref;
-    SharedPreferences.Editor editor;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
         View view =  inflater.inflate(R.layout.fragment_ambience_question, container, false);
 
         getdata = new ArrayList<>();
-        gridView = (GridView) view.findViewById(R.id.ambiencegrid);
+        GridView gridView = (GridView) view.findViewById(R.id.ambiencegrid);
         AmbienceCustomAdapter ambienceCustomAdapter = new AmbienceCustomAdapter(getActivity(), array);
         gridView.setAdapter(ambienceCustomAdapter);
-        /*pref = getActivity().getSharedPreferences("Ref", Context.MODE_PRIVATE);
-        ed = pref.edit();*/
+
         gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-
                 String data = arr[position];
-                Toast.makeText(getActivity(), "" + data, Toast.LENGTH_SHORT).show();
+                //Toast.makeText(getActivity(), "" + data, Toast.LENGTH_SHORT).show();
                 BudgetQuestionFragment fourthQuestion = new BudgetQuestionFragment();
                 fourthQuestion.alldata(data, stockArr, meal);
                 getFragmentManager().beginTransaction().replace(R.id.questionFrame, fourthQuestion).addToBackStack(null).commit();
-
             }
         });
 
-        pref = getActivity().getSharedPreferences("Cuisines", Context.MODE_PRIVATE);
-        editor = pref.edit();
+        SharedPreferences pref = getActivity().getSharedPreferences("Cuisines", Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = pref.edit();
         return view;
     }
 
@@ -87,8 +80,6 @@ public class AmbienceQuestionFragment extends Fragment {
         }
         stockArr = new String[getdata.size()];
         stockArr = getdata.toArray(stockArr);
-        Log.e("Array Converted", stockArr.toString());
-
         StringTokenizer st = new StringTokenizer(getdata.toString());
         while (st.hasMoreTokens()) {
             System.out.println("Next token is : " + st.nextToken(","));
@@ -102,7 +93,6 @@ public class AmbienceQuestionFragment extends Fragment {
         } catch (Exception e) {
             Log.e("error", String.valueOf(e));
         }*/
-
     }
 
 }

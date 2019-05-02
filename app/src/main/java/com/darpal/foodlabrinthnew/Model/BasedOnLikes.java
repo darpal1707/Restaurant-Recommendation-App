@@ -1,27 +1,43 @@
 package com.darpal.foodlabrinthnew.Model;
 
-import android.util.Log;
-
-import com.google.firebase.database.DataSnapshot;
-
 public class BasedOnLikes {
 
     public String name;
+    private int imgUrl;
     public String business_id;
     public String categories;
     public String address;
     public String review_count="00";
     public String city;
     public String state;
+    public String hours;
 
 
-    public BasedOnLikes(String name, String address, String review_count, String city, String state, String cuisine) {
+    public BasedOnLikes(String name, String address, String review_count, String city, String state, String cuisine, String hours) {
         this.name = name;
         this.address = address;
         this.review_count = review_count;
         this.city = city;
         this.state = state;
-        //this.categories = cuisine;
+        this.hours = hours;
+        this.categories = cuisine;
+        this.imgUrl = imgUrl;
+    }
+
+    public int getImgUrl() {
+        return imgUrl;
+    }
+
+    public void setImgUrl(int imgUrl) {
+        this.imgUrl = imgUrl;
+    }
+
+    public String getHours() {
+        return hours;
+    }
+
+    public void setHours(String hours) {
+        this.hours = hours;
     }
 
     public String getBusiness_id() {

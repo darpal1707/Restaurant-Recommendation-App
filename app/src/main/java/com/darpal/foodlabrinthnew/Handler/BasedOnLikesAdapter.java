@@ -5,13 +5,16 @@ import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.darpal.foodlabrinthnew.ImageLinks;
 import com.darpal.foodlabrinthnew.Model.BasedOnLikes;
 import com.darpal.foodlabrinthnew.R;
 import com.darpal.foodlabrinthnew.RestaurantProfileActivity;
 import com.darpal.foodlabrinthnew.Util.LikesUtil;
+import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
@@ -42,6 +45,7 @@ public class BasedOnLikesAdapter extends RecyclerView.Adapter<BasedOnLikesAdapte
     public void onBindViewHolder(@NonNull BasedOnLikesAdapter.LikesVH holder, int position) {
         BasedOnLikes item = basedOnLikesArrayList.get(position);
         if(item!=null) {
+            holder.resImage.setImageResource(basedOnLikesArrayList.get(position).getImgUrl());
             holder.name.setText(basedOnLikesArrayList.get(position).getName());
             holder.address.setText(basedOnLikesArrayList.get(position).getAddress());
             holder.review_count.setText(basedOnLikesArrayList.get(position).getReview_count());
@@ -61,6 +65,7 @@ public class BasedOnLikesAdapter extends RecyclerView.Adapter<BasedOnLikesAdapte
     public class LikesVH extends RecyclerView.ViewHolder implements View.OnClickListener {
 
         private TextView name;
+        private ImageView resImage;
         private TextView address;
         private TextView review_count;
         private TextView city;
@@ -70,6 +75,7 @@ public class BasedOnLikesAdapter extends RecyclerView.Adapter<BasedOnLikesAdapte
         public LikesVH(View view) {
             super(view);
 
+            resImage = (ImageView) view.findViewById(R.id.res_img);
             name = (TextView) view.findViewById(R.id.res_title);
             address = (TextView) view.findViewById(R.id.res_location);
             review_count = (TextView) view.findViewById(R.id.ratings_value);
@@ -92,6 +98,7 @@ public class BasedOnLikesAdapter extends RecyclerView.Adapter<BasedOnLikesAdapte
             intent.putExtra("state", LikesUtil.businessStateArrayList.get(position));
             intent.putExtra("lat", LikesUtil.businessLatArrayList.get(position));
             intent.putExtra("long", LikesUtil.businessLongArrayList.get(position));
+            intent.putExtra("hours", LikesUtil.businessHoursArrayList.get(position));
 
             context.startActivity(intent);
         }

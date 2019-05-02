@@ -1,6 +1,8 @@
 package com.darpal.foodlabrinthnew.Login_Signup;
 
 
+import android.accounts.Account;
+import android.accounts.AccountManager;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
@@ -10,6 +12,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.TextView;
 
 import com.darpal.foodlabrinthnew.R;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
@@ -19,6 +22,8 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+
+import static android.content.Context.ACCOUNT_SERVICE;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -41,6 +46,7 @@ public class UserProfileFragment extends Fragment {
         // Inflate the layout for this fragment
         View view =  inflater.inflate(R.layout.fragment_user_profile, container, false);
         uploadPhoto = (CardView) view.findViewById(R.id. photoUpload);
+        TextView username = (TextView) view.findViewById(R.id.tvuname);
         uploadPhoto.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -48,6 +54,20 @@ public class UserProfileFragment extends Fragment {
                 getFragmentManager().beginTransaction().replace(R.id.login_frame,image).commit();
             }
         });
+        AccountManager manager = (AccountManager) getActivity().getSystemService(ACCOUNT_SERVICE);
+        Account[] list = manager.getAccounts();
+        String gmail = null;
+
+        for(Account account: list)
+        {
+            if(account.type.equalsIgnoreCase("com.google"))
+            {
+                gmail = account.name;
+                String fullName = gmail.substring(0,gmail.lastIndexOf("@"));
+                username.setText(fullName);
+                break;
+            }
+        }
         //get firebase auth instance
         auth = FirebaseAuth.getInstance();
         //get current user

@@ -11,4 +11,5 @@ public class TrendingUtil {
     public static ArrayList<String> businessStateArrayList= new ArrayList<>();
     public static ArrayList<String> businessLatArrayList= new ArrayList<>();
     public static ArrayList<String> businessLongArrayList= new ArrayList<>();
+    public static ArrayList<String> businessHoursArrayList= new ArrayList<>();
 }
