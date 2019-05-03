@@ -5,6 +5,7 @@ import android.content.Intent;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.graphics.Typeface;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -76,6 +77,13 @@ public class TrendingAdapter extends RecyclerView.Adapter<TrendingAdapter.Trendi
             city = (TextView) itemView.findViewById(R.id.res_city);
             state = (TextView) itemView.findViewById(R.id.res_state);
             itemView.setOnClickListener(this);
+
+            Typeface custom_font = Typeface.createFromAsset(context.getAssets(),  "fonts/Montserrat-Medium.ttf");
+            name.setTypeface(custom_font);
+            address.setTypeface(custom_font);
+            review_count.setTypeface(custom_font);
+            city.setTypeface(custom_font);
+            state.setTypeface(custom_font);
         }
 
         @Override

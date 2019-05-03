@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingBottom="50dp"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical">
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:minHeight="?actionBarSize"
+        android:gravity="center_vertical"
+        android:text="Write a Review"
+        android:paddingStart="24dp"
+        android:textAppearance="@style/Base.TextAppearance.AppCompat.Title"
+        android:textColor="#000" />
+
+    <EditText
+        android:id="@+id/review_dialog"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:textSize="20sp"
+        android:textColor="#000"
+        android:hint="Enter maximum of 256 characters"
+        android:layout_margin="20dp"
+        android:background="@android:color/transparent"
+        android:maxLines="10"
+        android:minLines="1"
+        android:inputType="textCapSentences|textMultiLine"/>
+
+</LinearLayout>

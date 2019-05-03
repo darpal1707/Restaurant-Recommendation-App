@@ -89,7 +89,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="15dp"
-                android:text="Trending near you"
+                android:text="Trending"
                 android:textSize="18sp"
                 android:textStyle="bold" />
 
@@ -120,7 +120,7 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@id/trending_recyclerview"
                 android:layout_margin="15dp"
-                android:text="Based on your likes"
+                android:text="Recommended"
                 android:textSize="18sp"
                 android:textStyle="bold" />
 

@@ -1,22 +1,31 @@
 package com.darpal.foodlabrinthnew;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.core.app.ActivityCompat;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
-import com.darpal.foodlabrinthnew.Model.Trending;
+import com.darpal.foodlabrinthnew.Handler.ReviewsAdapter;
+import com.darpal.foodlabrinthnew.Model.Reviews;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
@@ -25,6 +34,9 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.snackbar.Snackbar;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -32,18 +44,36 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
-import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
 
 public class RestaurantProfileActivity extends AppCompatActivity {
 
     MapView mapView;
     GoogleMap map;
-    TextView restName,addressLocation,restCity,resState,
-            resCuisine, reshours, resReviews, reviewsUseful,
-            reviewsFunny;
+    TextView restName, addressLocation, restCity, resState,
+            resCuisine, reshours;
     double lat, longi;
     FloatingActionButton mapLink;
-    Button share;
+    Button share, addreview;
+    RecyclerView reviewsRecycler;
+    private List<Reviews> reviewsList;
+    ReviewsAdapter reviewsAdapter;
+
+    public static String reviewText;
+    public static String date;
+    public static String business_id;
+    public static String userid;
+    public static String reviewId;
+    public static String resid;
+    FirebaseAuth mAuth;
+    FirebaseUser user;
+    DatabaseReference mReference;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,15 +86,30 @@ public class RestaurantProfileActivity extends AppCompatActivity {
         restCity = (TextView) findViewById(R.id.restCity);
         resState = (TextView) findViewById(R.id.resState);
         reshours = (TextView) findViewById(R.id.hours_time);
-        resReviews = (TextView) findViewById(R.id.review_text);
-        reviewsUseful = (TextView) findViewById(R.id.usefulValue);
-        reviewsFunny = (TextView) findViewById(R.id.funnyValue);
+        addreview = (Button) findViewById(R.id.addReview);
+
+
+        Typeface custom_font = Typeface.createFromAsset(getAssets(),  "fonts/Montserrat-Medium.ttf");
+        restName.setTypeface(custom_font);
+        resCuisine.setTypeface(custom_font);
+        addressLocation.setTypeface(custom_font);
+        restCity.setTypeface(custom_font);
+        resState.setTypeface(custom_font);
+        addreview.setTypeface(custom_font);
+
+
         mapLink = (FloatingActionButton) findViewById(R.id.mapbutton);
         share = (Button) findViewById(R.id.ShareBtn);
+        reviewsRecycler = (RecyclerView) findViewById(R.id.reviewsRecycler);
+        reviewsList = new ArrayList<>();
+        reviewsAdapter = new ReviewsAdapter(this, reviewsList);
+        mReference = FirebaseDatabase.getInstance().getReference();
+        showReviews();
+
 
         Intent intent = getIntent();
-        if(intent!=null){
-            String business_id = intent.getStringExtra("business_id");
+        if (intent != null) {
+            resid = intent.getStringExtra("business_id");
             String name = intent.getStringExtra("name");
             String address = intent.getStringExtra("address");
             String city = intent.getStringExtra("city");
@@ -81,16 +126,15 @@ public class RestaurantProfileActivity extends AppCompatActivity {
             resState.setText(state);
             reshours.setText(hours);
         }
-        final String mapUrl = "http://maps.google.com/maps?&daddr="+lat+","+longi;
+
+
+        final String mapUrl = "http://maps.google.com/maps?&daddr=" + lat + "," + longi;
         share.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent share = new Intent(android.content.Intent.ACTION_SEND);
                 share.setType("text/plain");
                 share.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
-
-                // Add data to the intent, the receiving app will decide
-                // what to do with it.
                 share.putExtra(Intent.EXTRA_SUBJECT, "Food Labrinth");
                 share.putExtra(Intent.EXTRA_TEXT, "Hey! I found this restaurant on Food Labrinth. Checkout the place! " + mapUrl);
 
@@ -105,6 +149,55 @@ public class RestaurantProfileActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+
+        addreview.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                user = FirebaseAuth.getInstance().getCurrentUser();
+                if (user != null) {
+                    // User is signed in
+                    String email = user.getEmail();
+                    String Uid = user.getUid();
+
+                    LayoutInflater li = LayoutInflater.from(RestaurantProfileActivity.this);
+                    View promptsView = li.inflate(R.layout.fragment_full_screen_dialog, null);
+                    AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
+                            RestaurantProfileActivity.this);
+                    alertDialogBuilder.setView(promptsView);
+                    final EditText userInput = (EditText) promptsView
+                            .findViewById(R.id.review_dialog);
+                    alertDialogBuilder
+                            .setCancelable(false)
+                            .setPositiveButton("OK",
+                                    new DialogInterface.OnClickListener() {
+                                        public void onClick(DialogInterface dialog,int id) {
+                                            String userid = user.getUid();
+                                            String reviewText = userInput.getText().toString();
+                                            Date currentTime = Calendar.getInstance().getTime();
+                                            @SuppressLint("SimpleDateFormat") DateFormat dateFormat = new SimpleDateFormat("yyyy-mm-dd hh:mm:ss");
+                                            String formatDate = dateFormat.format(currentTime);
+                                            Toast.makeText(RestaurantProfileActivity.this, "date" + formatDate, Toast.LENGTH_SHORT).show();
+
+                                            Reviews reviews = new Reviews(reviewText,resid,formatDate,userid);
+                                            mReference.child("reviews").push().setValue(reviews);
+                                        }
+                                    })
+                            .setNegativeButton("Cancel",
+                                    new DialogInterface.OnClickListener() {
+                                        public void onClick(DialogInterface dialog,int id) {
+                                            dialog.cancel();
+                                        }
+                                    });
+                    AlertDialog alertDialog = alertDialogBuilder.create();
+                    alertDialog.show();
+                } else {
+                    // No user is signed in
+                    Snackbar snackbar = Snackbar.make(v,"Login to submit a review",Snackbar.LENGTH_LONG);
+                    snackbar.show();
+                }
+            }
+        });
+
 
         mapView = (MapView) findViewById(R.id.res_mapview);
         mapView.onCreate(savedInstanceState);
@@ -146,6 +239,45 @@ public class RestaurantProfileActivity extends AppCompatActivity {
             }
         });
 
+    }
+
+    private void showReviews() {
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference();
+        Query trendingPostQuery = reference.child("reviews")
+                .limitToLast(20);
+
+        trendingPostQuery.addValueEventListener(new ValueEventListener() {
+            @SuppressLint("WrongConstant")
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                for (DataSnapshot dataSnapshot1 : dataSnapshot.getChildren()) {
+                    Log.e("Reviews Test", String.valueOf(dataSnapshot1));
+                    reviewText = String.valueOf(dataSnapshot1.child("text").getValue());
+                    date = String.valueOf(dataSnapshot1.child("date").getValue());
+                    business_id = String.valueOf(dataSnapshot1.child("business_id").getValue());
+                    reviewId = String.valueOf(dataSnapshot1.child("review_id").getValue());
+                    userid = String.valueOf(dataSnapshot1.child("user_id").getValue());
+
+                    if (business_id.contains(resid)) {
+                        Reviews review = new Reviews(String.valueOf(dataSnapshot1.child("business_id").getValue()),
+                                String.valueOf(dataSnapshot1.child("date").getValue()),
+                                String.valueOf(dataSnapshot1.child("text").getValue()),
+                                String.valueOf(dataSnapshot1.child("user_id").getValue()));
+
+                        reviewsList.add(review);
+                    }
+
+                }
+                reviewsAdapter = new ReviewsAdapter(RestaurantProfileActivity.this, reviewsList);
+                reviewsRecycler.setLayoutManager(new LinearLayoutManager(RestaurantProfileActivity.this, LinearLayoutManager.VERTICAL, false));
+                reviewsRecycler.setAdapter(reviewsAdapter);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                Toast.makeText(RestaurantProfileActivity.this, "Didn't get any data in Datasnapshot", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     @Override

@@ -199,6 +199,16 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@id/openHoursLayour" />
 
+            <Button
+                android:id="@+id/addReview"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Write a Review"
+                android:textAllCaps="false"
+                android:layout_margin="20dp"
+                android:textColor="#fff"
+                android:background="@color/colorPrimary"
+                android:layout_below="@+id/reviews"/>
 
         </RelativeLayout>
 

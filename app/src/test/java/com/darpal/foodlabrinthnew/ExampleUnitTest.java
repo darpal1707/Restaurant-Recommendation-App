@@ -1,4 +1,4 @@
-package com.example.foodlabrinthnew;
+package com.darpal.foodlabrinthnew;
 
 import org.junit.Test;
 

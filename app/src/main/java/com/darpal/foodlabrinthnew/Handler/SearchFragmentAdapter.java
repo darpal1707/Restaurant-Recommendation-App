@@ -2,6 +2,7 @@ package com.darpal.foodlabrinthnew.Handler;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Typeface;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -76,6 +77,13 @@ public class SearchFragmentAdapter extends RecyclerView.Adapter<SearchFragmentAd
             city = (TextView) view.findViewById(R.id.res_city);
             state = (TextView) view.findViewById(R.id.res_state);
             view.setOnClickListener(this);
+
+            Typeface custom_font = Typeface.createFromAsset(context.getAssets(),  "fonts/Montserrat-Medium.ttf");
+            name.setTypeface(custom_font);
+            address.setTypeface(custom_font);
+            review_count.setTypeface(custom_font);
+            city.setTypeface(custom_font);
+            state.setTypeface(custom_font);
         }
         private TextView city;
         private TextView state;

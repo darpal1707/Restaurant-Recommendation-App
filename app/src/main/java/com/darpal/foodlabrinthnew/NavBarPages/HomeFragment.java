@@ -83,7 +83,6 @@ public class HomeFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_home, container, false);
 
-
         EditText searchHome = (EditText) view.findViewById(R.id.searchview_homepage);
         searchHome.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
