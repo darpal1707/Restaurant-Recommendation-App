@@ -47,6 +47,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
+import com.google.gson.Gson;
 
 import java.io.IOException;
 import java.text.DateFormat;
@@ -145,19 +146,18 @@ public class RestaurantProfileActivity extends AppCompatActivity {
         }
 
         final String cuisineClicked = SearchResultDisplayActivity.value;
+
         like.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                SharedPreferences preferences = getSharedPreferences("cuisinePref", Context.MODE_PRIVATE);
                 Toast.makeText(RestaurantProfileActivity.this, "Cuisine clicked is " + cuisineClicked, Toast.LENGTH_SHORT).show();
                 LikesUtil.likedCuisine.add(cuisineClicked);
-                SharedPreferences preferences = getSharedPreferences("cuisinePref", Context.MODE_PRIVATE);
+                Gson gson = new Gson();
+                String json = gson.toJson(LikesUtil.likedCuisine);
                 SharedPreferences.Editor editor = preferences.edit();
-                try {
-                    editor.putString("cuisine",ObjectSerializer.serialize(LikesUtil.likedCuisine));
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                editor.commit();
+                editor.putString("cuisine", json);
+                editor.apply();
             }
         });
 

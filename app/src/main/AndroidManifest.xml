@@ -56,8 +56,6 @@
         <activity android:name=".ToolbarActivity" />
         <activity android:name=".NotDecided.RestaurantData.NotDecidedOutputActivity"
             tools:ignore="InnerclassSeparator" />
-        <activity android:name=".NavBarPages.LikesListDetailActivity"
-            tools:ignore="InnerclassSeparator" />
         <activity android:name=".NavBarPages.SearchResultDisplayActivity"
             tools:ignore="InnerclassSeparator" />
         <activity android:name=".MapView.MapActivity"

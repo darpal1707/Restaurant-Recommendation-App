@@ -93,16 +93,6 @@
                 android:textSize="18sp"
                 android:textStyle="bold" />
 
-            <TextView
-                android:id="@+id/viewmore_likesLabel"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/trending_recyclerview"
-                android:layout_alignParentEnd="true"
-                android:layout_margin="15dp"
-                android:text="View more"
-                android:textSize="16sp" />
-
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/trending_recyclerview"
                 android:layout_width="match_parent"
@@ -120,7 +110,7 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@id/trending_recyclerview"
                 android:layout_margin="15dp"
-                android:text="Recommended"
+                android:text="Based on your Likes"
                 android:textSize="18sp"
                 android:textStyle="bold" />
 

@@ -30,7 +30,6 @@ import com.darpal.foodlabrinthnew.MapView.MapActivity;
 import com.darpal.foodlabrinthnew.Model.BasedOnLikes;
 import com.darpal.foodlabrinthnew.Model.Trending;
 import com.darpal.foodlabrinthnew.NotDecided.NotDecidedActivity;
-import com.darpal.foodlabrinthnew.ObjectSerializer;
 import com.darpal.foodlabrinthnew.R;
 import com.darpal.foodlabrinthnew.Util.LikesUtil;
 import com.darpal.foodlabrinthnew.Util.TrendingUtil;
@@ -40,7 +39,10 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -74,6 +76,9 @@ public class HomeFragment extends Fragment {
     public static String state, Trendstate;
     public static String hours, likesHours;
 
+    List<String> cusineData;
+    String data;
+
     int[] myImageList = {R.drawable.american, R.drawable.asian, R.drawable.bbq, R.drawable.chinese,
             R.drawable.coffee_tea, R.drawable.deli, R.drawable.desserts_two, R.drawable.european,
             R.drawable.fast_food, R.drawable.greek, R.drawable.halal, R.drawable.indian,
@@ -90,10 +95,20 @@ public class HomeFragment extends Fragment {
 
         SharedPreferences sharedPreferences = getActivity().getSharedPreferences("cuisinePref", Context.MODE_PRIVATE);
         try {
-            LikesUtil.likedCuisine = (ArrayList<String>) ObjectSerializer.deserialize(sharedPreferences.getString("cuisine", ObjectSerializer.serialize(new ArrayList<String>())));
-            Toast.makeText(getActivity(), "Liked value is here " + LikesUtil.likedCuisine, Toast.LENGTH_SHORT).show();
-
+            Gson gson = new Gson();
+            String json = sharedPreferences.getString("cuisine", "");
+            if (json.isEmpty()) {
+                Toast.makeText(getActivity(), " didnt get any data", Toast.LENGTH_SHORT).show();
+            } else {
+                Type type = new TypeToken<List<String>>() {
+                }.getType();
+                cusineData = gson.fromJson(json, type);
+                data = cusineData.toString();
+                data = data.substring(1,data.length()-1);
+                Toast.makeText(getActivity(), "cusine liked are " + data, Toast.LENGTH_SHORT).show();
+            }
         } catch (Exception e) {
+            Log.e("exception shared pref", String.valueOf(e));
             Toast.makeText(getActivity(), "something went wrong in home fragment shared pref", Toast.LENGTH_SHORT).show();
         }
 
@@ -108,7 +123,7 @@ public class HomeFragment extends Fragment {
                 }
             }
         });
-        viewmore = (TextView) view.findViewById(R.id.viewmore_likesLabel);
+
         Toolbar toolbar = (Toolbar) view.findViewById(R.id.toolbar);
         toolbar.inflateMenu(R.menu.mymenu);
         toolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
@@ -120,16 +135,7 @@ public class HomeFragment extends Fragment {
             }
         });
 
-        viewmore.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(getActivity(), LikesListDetailActivity.class);
-                startActivity(intent);
-            }
-        });
-
         search = (EditText) view.findViewById(R.id.searchview_homepage);
-
         notDecided = (Button) view.findViewById(R.id.notDecided_btn);
         trending_recycler = (RecyclerView) view.findViewById(R.id.trending_recyclerview);
         likes_recycler = (RecyclerView) view.findViewById(R.id.likes_recyclerview);
@@ -139,7 +145,6 @@ public class HomeFragment extends Fragment {
         showTrendingData();
 
         likesList = new ArrayList<>();
-        likesAdapter = new BasedOnLikesAdapter(getContext(), likesList);
         showLikesData();
         notDecided.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -209,7 +214,7 @@ public class HomeFragment extends Fragment {
     private void showLikesData() {
         DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference();
         Query recentPostsQuery = databaseReference.child("business")
-                .limitToFirst(20);
+                .limitToFirst(100);
 
         recentPostsQuery.addValueEventListener(new ValueEventListener() {
             @SuppressLint("WrongConstant")
@@ -227,27 +232,30 @@ public class HomeFragment extends Fragment {
                     state = String.valueOf(ds.child("state").getValue());
                     likesHours = String.valueOf(ds.child("hours").getValue());
 
-                    LikesUtil.businessIdArraryList.add(business_id);
-                    LikesUtil.businessNameArrayList.add(name);
-                    LikesUtil.businessCuisineArrayList.add(categories);
-                    LikesUtil.businessAddressArrayList.add(address);
-                    LikesUtil.businessCityArrayList.add(city);
-                    LikesUtil.businessStateArrayList.add(state);
-                    LikesUtil.businessLatArrayList.add(latitude);
-                    LikesUtil.businessLongArrayList.add(longitude);
-                    LikesUtil.businessHoursArrayList.add(likesHours);
+                    if(categories.contains(data)) {
+                        LikesUtil.businessIdArraryList.add(business_id);
+                        LikesUtil.businessNameArrayList.add(name);
+                        LikesUtil.businessCuisineArrayList.add(categories);
+                        LikesUtil.businessAddressArrayList.add(address);
+                        LikesUtil.businessCityArrayList.add(city);
+                        LikesUtil.businessStateArrayList.add(state);
+                        LikesUtil.businessLatArrayList.add(latitude);
+                        LikesUtil.businessLongArrayList.add(longitude);
+                        LikesUtil.businessHoursArrayList.add(likesHours);
 
-                    BasedOnLikes basedOnLikes = new BasedOnLikes(String.valueOf(ds.child("name").getValue()),
-                            String.valueOf(ds.child("address").getValue()),
-                            String.valueOf(ds.child("review_count").getValue()),
-                            String.valueOf(ds.child("city").getValue()),
-                            String.valueOf(ds.child("state").getValue()),
-                            String.valueOf(ds.child("categories").getValue()),
-                            String.valueOf(ds.child("hours").getValue()));
+                        BasedOnLikes basedOnLikes = new BasedOnLikes(String.valueOf(ds.child("name").getValue()),
+                                String.valueOf(ds.child("address").getValue()),
+                                String.valueOf(ds.child("review_count").getValue()),
+                                String.valueOf(ds.child("city").getValue()),
+                                String.valueOf(ds.child("state").getValue()),
+                                String.valueOf(ds.child("categories").getValue()),
+                                String.valueOf(ds.child("hours").getValue()));
 
-                    likesList.add(basedOnLikes);
+                        likesList.add(basedOnLikes);
+                    }
+
                 }
-
+                likesAdapter = new BasedOnLikesAdapter(getContext(), likesList);
                 likes_recycler.setLayoutManager(new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false));
                 likes_recycler.setAdapter(likesAdapter);
             }

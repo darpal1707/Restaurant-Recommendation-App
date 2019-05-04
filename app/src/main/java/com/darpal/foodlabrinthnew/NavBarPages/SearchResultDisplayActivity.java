@@ -109,10 +109,6 @@ public class SearchResultDisplayActivity extends AppCompatActivity {
 
                         likesDetailsList.add(basedOnLikes);
                     }
-
-                   /* else{
-                        Toast.makeText(SearchResultDisplayActivity.this, "Something went wrong! Please Search Again!", Toast.LENGTH_SHORT).show();
-                    }*/
                 }
                 likesAdapter = new SearchFragmentAdapter(SearchResultDisplayActivity.this, likesDetailsList);
                 likes_recycler.setLayoutManager(new LinearLayoutManager(SearchResultDisplayActivity.this, LinearLayoutManager.VERTICAL, false));
