@@ -18,7 +18,7 @@
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:background="#fff"
-            app:title="Search By Cuisine"
+            app:title="Search Restaurants By Cuisine"
             app:titleTextColor="#000"
             app:layout_scrollFlags="scroll|enterAlways" />
 

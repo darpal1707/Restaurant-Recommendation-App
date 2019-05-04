@@ -53,7 +53,8 @@ public class MainActivity extends AppCompatActivity {
 
         navigation = (BottomNavigationView) findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
-        loadFragment(new HomeFragment());
+        loadFragment(new SearchFragment());
+        navigation.setSelectedItemId(R.id.search);
     }
 
     private void loadFragment(Fragment fragment) {

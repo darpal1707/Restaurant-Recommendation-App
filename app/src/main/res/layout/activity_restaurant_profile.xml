@@ -167,6 +167,7 @@
                     app:fabSize="normal" />
 
                 <TextView
+                    android:id="@+id/mapDirectionLabel"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="5dp"

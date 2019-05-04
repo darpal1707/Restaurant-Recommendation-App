@@ -2,13 +2,17 @@ package com.darpal.foodlabrinthnew.NavBarPages;
 
 
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -26,6 +30,7 @@ import com.darpal.foodlabrinthnew.MapView.MapActivity;
 import com.darpal.foodlabrinthnew.Model.BasedOnLikes;
 import com.darpal.foodlabrinthnew.Model.Trending;
 import com.darpal.foodlabrinthnew.NotDecided.NotDecidedActivity;
+import com.darpal.foodlabrinthnew.ObjectSerializer;
 import com.darpal.foodlabrinthnew.R;
 import com.darpal.foodlabrinthnew.Util.LikesUtil;
 import com.darpal.foodlabrinthnew.Util.TrendingUtil;
@@ -83,14 +88,23 @@ public class HomeFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_home, container, false);
 
+        SharedPreferences sharedPreferences = getActivity().getSharedPreferences("cuisinePref", Context.MODE_PRIVATE);
+        try {
+            LikesUtil.likedCuisine = (ArrayList<String>) ObjectSerializer.deserialize(sharedPreferences.getString("cuisine", ObjectSerializer.serialize(new ArrayList<String>())));
+            Toast.makeText(getActivity(), "Liked value is here " + LikesUtil.likedCuisine, Toast.LENGTH_SHORT).show();
+
+        } catch (Exception e) {
+            Toast.makeText(getActivity(), "something went wrong in home fragment shared pref", Toast.LENGTH_SHORT).show();
+        }
+
         EditText searchHome = (EditText) view.findViewById(R.id.searchview_homepage);
         searchHome.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
             public void onFocusChange(View v, boolean hasFocus) {
-                if(hasFocus){
+                if (hasFocus) {
                     MainActivity.navigation.setSelectedItemId(R.id.search);
                     SearchFragment searchFragment = new SearchFragment();
-                    getFragmentManager().beginTransaction().replace(R.id.login_frame,searchFragment).commit();
+                    getFragmentManager().beginTransaction().replace(R.id.login_frame, searchFragment).commit();
                 }
             }
         });
@@ -100,7 +114,7 @@ public class HomeFragment extends Fragment {
         toolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
-                Intent intent = new Intent(getActivity(),MapActivity.class);
+                Intent intent = new Intent(getActivity(), MapActivity.class);
                 startActivity(intent);
                 return true;
             }
@@ -109,7 +123,7 @@ public class HomeFragment extends Fragment {
         viewmore.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(getActivity(),LikesListDetailActivity.class);
+                Intent intent = new Intent(getActivity(), LikesListDetailActivity.class);
                 startActivity(intent);
             }
         });
@@ -121,11 +135,11 @@ public class HomeFragment extends Fragment {
         likes_recycler = (RecyclerView) view.findViewById(R.id.likes_recyclerview);
 
         trendingList = new ArrayList<>();
-        trendingAdapter = new TrendingAdapter(getContext(),trendingList);
+        trendingAdapter = new TrendingAdapter(getContext(), trendingList);
         showTrendingData();
 
         likesList = new ArrayList<>();
-        likesAdapter = new BasedOnLikesAdapter(getContext(),likesList);
+        likesAdapter = new BasedOnLikesAdapter(getContext(), likesList);
         showLikesData();
         notDecided.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -147,13 +161,13 @@ public class HomeFragment extends Fragment {
             @SuppressLint("WrongConstant")
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                for(DataSnapshot dataSnapshot1 : dataSnapshot.getChildren()) {
+                for (DataSnapshot dataSnapshot1 : dataSnapshot.getChildren()) {
                     Log.e("Trending Test", String.valueOf(dataSnapshot1));
                     TrendID = String.valueOf(dataSnapshot1.child("business_id").getValue());
                     Trendname = String.valueOf(dataSnapshot1.child("name").getValue());
                     TrendCuisine = String.valueOf(dataSnapshot1.child("categories").getValue());
                     Trendaddress = String.valueOf(dataSnapshot1.child("address").getValue());
-                    Trendlat =  String.valueOf(dataSnapshot1.child("latitude").getValue());
+                    Trendlat = String.valueOf(dataSnapshot1.child("latitude").getValue());
                     Trendlong = String.valueOf(dataSnapshot1.child("longitude").getValue());
                     Trendcity = String.valueOf(dataSnapshot1.child("city").getValue());
                     Trendstate = String.valueOf(dataSnapshot1.child("state").getValue());
@@ -181,9 +195,10 @@ public class HomeFragment extends Fragment {
                             String.valueOf(dataSnapshot1.child("hours").getValue()));
                     trendingList.add(trending);
                 }
-                trending_recycler.setLayoutManager(new LinearLayoutManager(getActivity(),LinearLayoutManager.HORIZONTAL,false));
+                trending_recycler.setLayoutManager(new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL, false));
                 trending_recycler.setAdapter(trendingAdapter);
             }
+
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
                 Toast.makeText(getActivity(), "Didn't get any data in Datasnapshot", Toast.LENGTH_SHORT).show();
@@ -200,13 +215,13 @@ public class HomeFragment extends Fragment {
             @SuppressLint("WrongConstant")
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                for(DataSnapshot ds : dataSnapshot.getChildren()) {
+                for (DataSnapshot ds : dataSnapshot.getChildren()) {
                     Log.e("Likes Test", String.valueOf(ds));
                     business_id = String.valueOf(ds.child("business_id").getValue());
                     categories = String.valueOf(ds.child("categories").getValue());
                     name = String.valueOf(ds.child("name").getValue());
                     address = String.valueOf(ds.child("address").getValue());
-                    latitude =  String.valueOf(ds.child("latitude").getValue());
+                    latitude = String.valueOf(ds.child("latitude").getValue());
                     longitude = String.valueOf(ds.child("longitude").getValue());
                     city = String.valueOf(ds.child("city").getValue());
                     state = String.valueOf(ds.child("state").getValue());
@@ -229,13 +244,14 @@ public class HomeFragment extends Fragment {
                             String.valueOf(ds.child("state").getValue()),
                             String.valueOf(ds.child("categories").getValue()),
                             String.valueOf(ds.child("hours").getValue()));
-                   
+
                     likesList.add(basedOnLikes);
                 }
 
-                likes_recycler.setLayoutManager(new LinearLayoutManager(getActivity(),LinearLayoutManager.VERTICAL,false));
+                likes_recycler.setLayoutManager(new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false));
                 likes_recycler.setAdapter(likesAdapter);
             }
+
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
                 Toast.makeText(getActivity(), "Didn't get any data in Datasnapshot", Toast.LENGTH_SHORT).show();

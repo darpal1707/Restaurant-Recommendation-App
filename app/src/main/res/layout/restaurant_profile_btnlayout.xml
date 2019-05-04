@@ -7,7 +7,7 @@
 
 
     <Button
-        android:id="@+id/BookmarkBtn"
+        android:id="@+id/likeBtn"
         android:layout_width="0dp"
         android:layout_height="fill_parent"
         android:layout_marginTop="16dp"
@@ -15,8 +15,6 @@
         android:layout_weight="1"
         android:background="#fff"
         android:layout_gravity="center"
-        android:layout_marginEnd="3dp"
-        android:layout_marginStart="2dp"
         android:drawableStart="@drawable/round_thumb_up_alt_black_24dp"
         android:paddingStart="65dp"
         android:paddingEnd="62dp"
@@ -34,8 +32,6 @@
         android:layout_marginBottom="16dp"
         android:layout_weight="1"
         android:background="#fff"
-        android:layout_marginStart="3dp"
-        android:layout_marginEnd="2dp"
         android:drawableStart="@drawable/ic_share_black_24dp"
         android:paddingStart="65dp"
         android:paddingEnd="60dp"

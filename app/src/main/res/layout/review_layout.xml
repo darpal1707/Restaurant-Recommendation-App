@@ -5,7 +5,7 @@
     android:layout_height="match_parent">
 
     <TextView
-        android:id="@+id/tvTitle"
+        android:id="@+id/ReviewsTitle"
         android:layout_width="250dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="10dp"
@@ -20,7 +20,7 @@
     <androidx.recyclerview.widget.RecyclerView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/tvTitle"
+        android:layout_below="@+id/ReviewsTitle"
         android:id="@+id/reviewsRecycler"
         android:layout_margin="10dp">
 

@@ -35,7 +35,7 @@ public class SearchFragment extends Fragment {
             "European", "Fast Food", "Greek", "Halal", "Indian", "Italian", "Jamaican", "Japanese", "Korean",
             "Mediterranean", "Mexican", "Salads", "Spanish", "Sushi", "Thai", "Vegan", "Vegetarian"};
 
-    int[] cuisineImg = {R.drawable.american, R.drawable.asian, R.drawable.bbq, R.drawable.chinese,
+    public static int[] cuisineImg = {R.drawable.american, R.drawable.asian, R.drawable.bbq, R.drawable.chinese,
             R.drawable.coffee_tea, R.drawable.deli, R.drawable.desserts_two, R.drawable.european,
             R.drawable.fast_food, R.drawable.greek, R.drawable.halal, R.drawable.indian,
             R.drawable.italian, R.drawable.jamaican, R.drawable.japanese, R.drawable.korean,
@@ -66,7 +66,4 @@ public class SearchFragment extends Fragment {
 
         return view;
     }
-
-
-
 }

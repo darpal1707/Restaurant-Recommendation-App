@@ -2,8 +2,10 @@ package com.darpal.foodlabrinthnew;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 
 import androidx.annotation.NonNull;
@@ -26,6 +28,8 @@ import android.widget.Toast;
 
 import com.darpal.foodlabrinthnew.Handler.ReviewsAdapter;
 import com.darpal.foodlabrinthnew.Model.Reviews;
+import com.darpal.foodlabrinthnew.NavBarPages.SearchResultDisplayActivity;
+import com.darpal.foodlabrinthnew.Util.LikesUtil;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
@@ -44,6 +48,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
+import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -56,10 +61,11 @@ public class RestaurantProfileActivity extends AppCompatActivity {
     MapView mapView;
     GoogleMap map;
     TextView restName, addressLocation, restCity, resState,
-            resCuisine, reshours;
+            resCuisine, reshours, mapDirectionLabel;
+    TextView categories, openHours, reviews;
     double lat, longi;
     FloatingActionButton mapLink;
-    Button share, addreview;
+    Button share, addreview, like;
     RecyclerView reviewsRecycler;
     private List<Reviews> reviewsList;
     ReviewsAdapter reviewsAdapter;
@@ -87,6 +93,13 @@ public class RestaurantProfileActivity extends AppCompatActivity {
         resState = (TextView) findViewById(R.id.resState);
         reshours = (TextView) findViewById(R.id.hours_time);
         addreview = (Button) findViewById(R.id.addReview);
+        like = (Button) findViewById(R.id.likeBtn);
+        categories = (TextView) findViewById(R.id.CategoriesTitle);
+        openHours = (TextView) findViewById(R.id.OpenHoursTitle);
+        reviews = (TextView) findViewById(R.id.ReviewsTitle);
+        mapDirectionLabel = (TextView) findViewById(R.id.mapDirectionLabel);
+        mapLink = (FloatingActionButton) findViewById(R.id.mapbutton);
+        share = (Button) findViewById(R.id.ShareBtn);
 
 
         Typeface custom_font = Typeface.createFromAsset(getAssets(),  "fonts/Montserrat-Medium.ttf");
@@ -96,16 +109,20 @@ public class RestaurantProfileActivity extends AppCompatActivity {
         restCity.setTypeface(custom_font);
         resState.setTypeface(custom_font);
         addreview.setTypeface(custom_font);
+        share.setTypeface(custom_font);
+        like.setTypeface(custom_font);
+        categories.setTypeface(custom_font);
+        openHours.setTypeface(custom_font);
+        reviews.setTypeface(custom_font);
+        reshours.setTypeface(custom_font);
+        mapDirectionLabel.setTypeface(custom_font);
 
 
-        mapLink = (FloatingActionButton) findViewById(R.id.mapbutton);
-        share = (Button) findViewById(R.id.ShareBtn);
         reviewsRecycler = (RecyclerView) findViewById(R.id.reviewsRecycler);
         reviewsList = new ArrayList<>();
         reviewsAdapter = new ReviewsAdapter(this, reviewsList);
         mReference = FirebaseDatabase.getInstance().getReference();
         showReviews();
-
 
         Intent intent = getIntent();
         if (intent != null) {
@@ -126,6 +143,23 @@ public class RestaurantProfileActivity extends AppCompatActivity {
             resState.setText(state);
             reshours.setText(hours);
         }
+
+        final String cuisineClicked = SearchResultDisplayActivity.value;
+        like.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(RestaurantProfileActivity.this, "Cuisine clicked is " + cuisineClicked, Toast.LENGTH_SHORT).show();
+                LikesUtil.likedCuisine.add(cuisineClicked);
+                SharedPreferences preferences = getSharedPreferences("cuisinePref", Context.MODE_PRIVATE);
+                SharedPreferences.Editor editor = preferences.edit();
+                try {
+                    editor.putString("cuisine",ObjectSerializer.serialize(LikesUtil.likedCuisine));
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                editor.commit();
+            }
+        });
 
 
         final String mapUrl = "http://maps.google.com/maps?&daddr=" + lat + "," + longi;
@@ -174,11 +208,11 @@ public class RestaurantProfileActivity extends AppCompatActivity {
                                             String userid = user.getUid();
                                             String reviewText = userInput.getText().toString();
                                             Date currentTime = Calendar.getInstance().getTime();
-                                            @SuppressLint("SimpleDateFormat") DateFormat dateFormat = new SimpleDateFormat("yyyy-mm-dd hh:mm:ss");
+                                            DateFormat dateFormat = new SimpleDateFormat("yyyy-mm-dd hh:mm:ss");
                                             String formatDate = dateFormat.format(currentTime);
-                                            Toast.makeText(RestaurantProfileActivity.this, "date" + formatDate, Toast.LENGTH_SHORT).show();
+                                            //Toast.makeText(RestaurantProfileActivity.this, "date" + formatDate, Toast.LENGTH_SHORT).show();
 
-                                            Reviews reviews = new Reviews(reviewText,resid,formatDate,userid);
+                                            Reviews reviews = new Reviews(resid, formatDate, reviewText, userid);
                                             mReference.child("reviews").push().setValue(reviews);
                                         }
                                     })

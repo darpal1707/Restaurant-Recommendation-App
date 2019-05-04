@@ -24,6 +24,8 @@ public class LikesUtil {
     public static ArrayList<String> searchLong= new ArrayList<>();
     public static ArrayList<String> searchHours= new ArrayList<>();
 
+    public static ArrayList<String> likedCuisine = new ArrayList<>();
+
     public LikesUtil(String util) {
 
     }
