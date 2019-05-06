@@ -9,25 +9,34 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.widget.AppCompatRatingBar;
 import androidx.core.app.ActivityCompat;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.graphics.Bitmap;
 import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.darpal.foodlabrinthnew.Handler.PhotoDisplayAdapter;
 import com.darpal.foodlabrinthnew.Handler.ReviewsAdapter;
 import com.darpal.foodlabrinthnew.Model.Reviews;
+import com.darpal.foodlabrinthnew.Model.Upload;
+import com.darpal.foodlabrinthnew.NavBarPages.ProfileFragment;
 import com.darpal.foodlabrinthnew.NavBarPages.SearchResultDisplayActivity;
 import com.darpal.foodlabrinthnew.Util.LikesUtil;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -37,8 +46,12 @@ import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
+import com.google.firebase.FirebaseApp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -47,8 +60,13 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.OnProgressListener;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 import com.google.gson.Gson;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -75,12 +93,16 @@ public class RestaurantProfileActivity extends AppCompatActivity {
     public static String date;
     public static String business_id;
     public static String userid;
-    public static String reviewId;
     public static String resid;
+    public static String res_stars;
     FirebaseAuth mAuth;
     FirebaseUser user;
     DatabaseReference mReference;
+    String stars;
 
+    RecyclerView photos;
+    List<Upload> mUploads;
+    PhotoDisplayAdapter photoDisplayAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -103,7 +125,11 @@ public class RestaurantProfileActivity extends AppCompatActivity {
         share = (Button) findViewById(R.id.ShareBtn);
 
 
-        Typeface custom_font = Typeface.createFromAsset(getAssets(),  "fonts/Montserrat-Medium.ttf");
+        photos = (RecyclerView) findViewById(R.id.photo_horizontal);
+        mUploads = new ArrayList<>();
+        showPhotos();
+
+        Typeface custom_font = Typeface.createFromAsset(getAssets(), "fonts/Montserrat-Medium.ttf");
         restName.setTypeface(custom_font);
         resCuisine.setTypeface(custom_font);
         addressLocation.setTypeface(custom_font);
@@ -118,10 +144,9 @@ public class RestaurantProfileActivity extends AppCompatActivity {
         reshours.setTypeface(custom_font);
         mapDirectionLabel.setTypeface(custom_font);
 
-
         reviewsRecycler = (RecyclerView) findViewById(R.id.reviewsRecycler);
         reviewsList = new ArrayList<>();
-        reviewsAdapter = new ReviewsAdapter(this, reviewsList);
+        reviewsAdapter = new ReviewsAdapter(RestaurantProfileActivity.this, reviewsList);
         mReference = FirebaseDatabase.getInstance().getReference();
         showReviews();
 
@@ -145,23 +170,37 @@ public class RestaurantProfileActivity extends AppCompatActivity {
             reshours.setText(hours);
         }
 
+        //Likes user clicked value
         final String cuisineClicked = SearchResultDisplayActivity.value;
-
         like.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                SharedPreferences preferences = getSharedPreferences("cuisinePref", Context.MODE_PRIVATE);
-                Toast.makeText(RestaurantProfileActivity.this, "Cuisine clicked is " + cuisineClicked, Toast.LENGTH_SHORT).show();
-                LikesUtil.likedCuisine.add(cuisineClicked);
-                Gson gson = new Gson();
-                String json = gson.toJson(LikesUtil.likedCuisine);
-                SharedPreferences.Editor editor = preferences.edit();
-                editor.putString("cuisine", json);
-                editor.apply();
+                user = FirebaseAuth.getInstance().getCurrentUser();
+                if (user != null) {
+                    SharedPreferences preferences = getSharedPreferences("cuisinePref", Context.MODE_PRIVATE);
+                    Toast.makeText(RestaurantProfileActivity.this, "Cuisine clicked is " + cuisineClicked, Toast.LENGTH_SHORT).show();
+                    LikesUtil.likedCuisine.add(cuisineClicked);
+                    Gson gson = new Gson();
+                    String json = gson.toJson(LikesUtil.likedCuisine);
+                    SharedPreferences.Editor editor = preferences.edit();
+                    editor.putString("cuisine", json);
+                    editor.apply();
+                }
+                else {
+                    // No user is signed in
+                    Snackbar snackbar = Snackbar.make(v, "Please Login to get Custom Recommendations", Snackbar.LENGTH_LONG);
+                    /*snackbar.setAction("Login", new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+
+                        }
+                    });*/
+                    snackbar.show();
+                }
             }
         });
 
-
+        //share button code
         final String mapUrl = "http://maps.google.com/maps?&daddr=" + lat + "," + longi;
         share.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -175,6 +214,8 @@ public class RestaurantProfileActivity extends AppCompatActivity {
                 startActivity(Intent.createChooser(share, "Share link!"));
             }
         });
+
+        //Direction floating action button
         mapLink.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -184,6 +225,7 @@ public class RestaurantProfileActivity extends AppCompatActivity {
             }
         });
 
+        //Add review button action
         addreview.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -192,33 +234,47 @@ public class RestaurantProfileActivity extends AppCompatActivity {
                     // User is signed in
                     String email = user.getEmail();
                     String Uid = user.getUid();
-
-                    LayoutInflater li = LayoutInflater.from(RestaurantProfileActivity.this);
-                    View promptsView = li.inflate(R.layout.fragment_full_screen_dialog, null);
                     AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
                             RestaurantProfileActivity.this);
+                    LayoutInflater li = LayoutInflater.from(RestaurantProfileActivity.this);
+                    View promptsView = li.inflate(R.layout.fragment_full_screen_dialog, null);
                     alertDialogBuilder.setView(promptsView);
                     final EditText userInput = (EditText) promptsView
                             .findViewById(R.id.review_dialog);
+                    final AppCompatRatingBar ratingBar = (AppCompatRatingBar) promptsView.findViewById(R.id.ratingBar);
+                    final Button photo = (Button) promptsView.findViewById(R.id.uploadbtn);
+                    ratingBar.setOnRatingBarChangeListener(new RatingBar.OnRatingBarChangeListener() {
+                        @Override
+                        public void onRatingChanged(RatingBar ratingBar, float rating, boolean fromUser) {
+                            stars = String.valueOf(rating);
+                        }
+                    });
+                    photo.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                            startActivityForResult(intent, 1);
+                        }
+                    });
                     alertDialogBuilder
                             .setCancelable(false)
                             .setPositiveButton("OK",
                                     new DialogInterface.OnClickListener() {
-                                        public void onClick(DialogInterface dialog,int id) {
+                                        public void onClick(DialogInterface dialog, int id) {
                                             String userid = user.getUid();
                                             String reviewText = userInput.getText().toString();
+
                                             Date currentTime = Calendar.getInstance().getTime();
                                             DateFormat dateFormat = new SimpleDateFormat("yyyy-mm-dd hh:mm:ss");
                                             String formatDate = dateFormat.format(currentTime);
-                                            //Toast.makeText(RestaurantProfileActivity.this, "date" + formatDate, Toast.LENGTH_SHORT).show();
 
-                                            Reviews reviews = new Reviews(resid, formatDate, reviewText, userid);
+                                            Reviews reviews = new Reviews(resid, formatDate, reviewText, userid, stars);
                                             mReference.child("reviews").push().setValue(reviews);
                                         }
                                     })
                             .setNegativeButton("Cancel",
                                     new DialogInterface.OnClickListener() {
-                                        public void onClick(DialogInterface dialog,int id) {
+                                        public void onClick(DialogInterface dialog, int id) {
                                             dialog.cancel();
                                         }
                                     });
@@ -226,13 +282,21 @@ public class RestaurantProfileActivity extends AppCompatActivity {
                     alertDialog.show();
                 } else {
                     // No user is signed in
-                    Snackbar snackbar = Snackbar.make(v,"Login to submit a review",Snackbar.LENGTH_LONG);
+                    Snackbar snackbar = Snackbar.make(v, "Login to submit a review", Snackbar.LENGTH_LONG);
+                    /*snackbar.setAction("Login", new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+
+                        }
+                    });*/
                     snackbar.show();
                 }
+
+
             }
         });
 
-
+        //Google maps display
         mapView = (MapView) findViewById(R.id.res_mapview);
         mapView.onCreate(savedInstanceState);
         mapView.onResume(); // needed to get the map to display immediately
@@ -275,6 +339,29 @@ public class RestaurantProfileActivity extends AppCompatActivity {
 
     }
 
+    private void showPhotos() {
+        DatabaseReference mDatabaseRef = FirebaseDatabase.getInstance().getReference("photos");
+
+        mDatabaseRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
+                    Upload upload = postSnapshot.getValue(Upload.class);
+                    mUploads.add(upload);
+                    Log.e("photo url", String.valueOf(postSnapshot));
+                }
+                photoDisplayAdapter = new PhotoDisplayAdapter(RestaurantProfileActivity.this, mUploads);
+                photos.setLayoutManager(new LinearLayoutManager(RestaurantProfileActivity.this, LinearLayoutManager.HORIZONTAL, false));
+                photos.setAdapter(photoDisplayAdapter);
+            }
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                Toast.makeText(RestaurantProfileActivity.this, databaseError.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    //Display reviews based on the restaurant
     private void showReviews() {
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference();
         Query trendingPostQuery = reference.child("reviews")
@@ -289,14 +376,16 @@ public class RestaurantProfileActivity extends AppCompatActivity {
                     reviewText = String.valueOf(dataSnapshot1.child("text").getValue());
                     date = String.valueOf(dataSnapshot1.child("date").getValue());
                     business_id = String.valueOf(dataSnapshot1.child("business_id").getValue());
-                    reviewId = String.valueOf(dataSnapshot1.child("review_id").getValue());
-                    userid = String.valueOf(dataSnapshot1.child("user_id").getValue());
+                    userid = String.valueOf(dataSnapshot1.child("userid").getValue());
+                    res_stars = String.valueOf(dataSnapshot1.child("stars").getValue());
 
-                    if (business_id.contains(resid)) {
+                    if(business_id.equals(resid)) {
+                        //Toast.makeText(RestaurantProfileActivity.this, "business id" + business_id, Toast.LENGTH_SHORT).show();
                         Reviews review = new Reviews(String.valueOf(dataSnapshot1.child("business_id").getValue()),
                                 String.valueOf(dataSnapshot1.child("date").getValue()),
                                 String.valueOf(dataSnapshot1.child("text").getValue()),
-                                String.valueOf(dataSnapshot1.child("user_id").getValue()));
+                                String.valueOf(dataSnapshot1.child("userid").getValue()),
+                                String.valueOf(dataSnapshot1.child("stars").getValue()));
 
                         reviewsList.add(review);
                     }
@@ -312,6 +401,69 @@ public class RestaurantProfileActivity extends AppCompatActivity {
                 Toast.makeText(RestaurantProfileActivity.this, "Didn't get any data in Datasnapshot", Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    //Camera function to upload photo clicked to the database
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == 1 && resultCode == RESULT_OK) {
+            final String user_id = user.getUid();
+            Toast.makeText(RestaurantProfileActivity.this, "Uploading Now", Toast.LENGTH_SHORT).show();
+
+            Bundle extras = data.getExtras();
+            Bitmap bitmap = (Bitmap) data.getExtras().get("data");
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+            byte[] dataBAOS = baos.toByteArray();
+
+            FirebaseApp.initializeApp(RestaurantProfileActivity.this);
+
+            StorageReference storageRef = FirebaseStorage.getInstance().getReferenceFromUrl("gs://foodlabrinthnew.appspot.com/");
+            StorageReference imagesRef = storageRef.child("photos" + new Date().getTime());
+
+            FirebaseDatabase database = FirebaseDatabase.getInstance();
+            final DatabaseReference mDatabaseRef = database.getReference("photos");
+
+            final UploadTask uploadTask = imagesRef.putBytes(dataBAOS);
+
+            uploadTask.addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception exception) {
+                    Toast.makeText(RestaurantProfileActivity.this, "Sending failed. Please try again", Toast.LENGTH_SHORT).show();
+                }
+            }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                @Override
+                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                    Handler handler = new Handler();
+                    handler.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            //mProgressBar.setProgress(0);
+                        }
+                    }, 500);
+                    Toast.makeText(RestaurantProfileActivity.this, "Upload successful", Toast.LENGTH_LONG).show();
+
+                    Task<Uri> urlTask = taskSnapshot.getStorage().getDownloadUrl();
+                    while (!urlTask.isSuccessful()) ;
+                    Uri downloadUrl = urlTask.getResult();
+
+                    // Log.d(TAG, "onSuccess: firebase download url: " + downloadUrl.toString());
+                    Upload upload = new Upload(downloadUrl.toString(), user_id, resid);
+                    String uploadId = mDatabaseRef.push().getKey();
+                    mDatabaseRef.child(uploadId).setValue(upload);
+
+                }
+            }).addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
+                @Override
+                public void onProgress(UploadTask.TaskSnapshot taskSnapshot) {
+                    double progress = (100.0 * taskSnapshot.getBytesTransferred() / taskSnapshot.getTotalByteCount());
+                    //mProgressBar.setProgress((int) progress);
+                }
+            });
+        } else {
+            Toast.makeText(RestaurantProfileActivity.this, "No file selected", Toast.LENGTH_SHORT).show();
+        }
     }
 
     @Override

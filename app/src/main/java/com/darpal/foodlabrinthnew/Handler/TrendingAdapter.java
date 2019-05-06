@@ -9,6 +9,7 @@ import android.graphics.Typeface;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -24,11 +25,12 @@ public class TrendingAdapter extends RecyclerView.Adapter<TrendingAdapter.Trendi
 
     private Context context;
     private List<Trending> trendingData;
+    private int[] images;
 
-    public TrendingAdapter(Context context, List<Trending> trendingList) {
+    public TrendingAdapter(Context context, List<Trending> trendingList, int[] images) {
         this.trendingData = trendingList;
         this.context = context;
-
+        this.images = images;
     }
 
     @NonNull
@@ -43,6 +45,8 @@ public class TrendingAdapter extends RecyclerView.Adapter<TrendingAdapter.Trendi
         Trending item = trendingData.get(i);
         if(item!=null) {
            // Log.e("pos",trendingData.get(i).getName()+" "+i);
+            int image_id = images[i];
+            trendingVH.resImage.setImageResource(image_id);
             trendingVH.name.setText(trendingData.get(i).getName());
             trendingVH.address.setText(trendingData.get(i).getAddress());
             trendingVH.review_count.setText(trendingData.get(i).getReview_count());
@@ -67,10 +71,12 @@ public class TrendingAdapter extends RecyclerView.Adapter<TrendingAdapter.Trendi
         private TextView city;
         private TextView state;
         private TextView is_open;
+        private ImageView resImage;
 
         TrendingVH(@NonNull View itemView) {
             super(itemView);
 
+            resImage = (ImageView) itemView.findViewById(R.id.res_img);
             name = (TextView) itemView.findViewById(R.id.res_title);
             address = (TextView) itemView.findViewById(R.id.res_location);
             review_count = (TextView) itemView.findViewById(R.id.ratings_value);

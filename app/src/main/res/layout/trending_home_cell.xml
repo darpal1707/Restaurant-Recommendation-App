@@ -15,18 +15,18 @@
 
         <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:background="@drawable/shape_bg_white_rounded_rect">
 
             <ImageView
                 android:id="@+id/res_img"
                 android:layout_width="130dp"
-                android:layout_height="match_parent"
-                />
+                android:scaleType="centerCrop"
+                android:layout_height="180dp"/>
 
             <RelativeLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:layout_toEndOf="@+id/res_img"
                 android:gravity="center"
                 android:padding="16dp">
@@ -102,6 +102,17 @@
                     android:textColor="@color/grey_700"
                     android:textSize="14sp" />
 
+                <TextView
+                    android:id="@+id/sponsored_label"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Sponsored"
+                    android:drawableStart="@drawable/ic_stars_black_24dp"
+                    android:layout_below="@+id/ratings_lbl"
+                    android:layout_alignParentEnd="true"
+                    android:layout_marginTop="20dp"
+                    android:textSize="14sp"
+                    android:textStyle="bold" />
             </RelativeLayout>
 
         </RelativeLayout>

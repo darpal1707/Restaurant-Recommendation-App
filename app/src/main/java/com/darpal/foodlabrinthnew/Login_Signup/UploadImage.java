@@ -126,9 +126,9 @@ public class UploadImage extends Fragment {
                     Uri downloadUrl = urlTask.getResult();
 
                     // Log.d(TAG, "onSuccess: firebase download url: " + downloadUrl.toString());
-                    Upload upload = new Upload(downloadUrl.toString());
+                  /*  Upload upload = new Upload(downloadUrl.toString(), );
                     String uploadId = mDatabaseRef.push().getKey();
-                    mDatabaseRef.child(uploadId).setValue(upload);
+                    mDatabaseRef.child(uploadId).setValue(upload);*/
 
                    /* Upload upload = new Upload(mEditTextFileName.getText().toString().trim(),
                             taskSnapshot.getStorage().getDownloadUrl().toString());

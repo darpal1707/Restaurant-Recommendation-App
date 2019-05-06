@@ -44,6 +44,10 @@ public class SearchResultDisplayActivity extends AppCompatActivity {
     private RecyclerView likes_recycler;
 
     public static String value;
+    public static int[] searchImage = {R.mipmap.ten,R.mipmap.one,R.mipmap.two,R.mipmap.three,R.mipmap.four,R.mipmap.five,
+            R.mipmap.six,R.mipmap.seven,R.mipmap.eight,R.mipmap.nine, R.mipmap.ten,R.mipmap.one,R.mipmap.two,R.mipmap.three,R.mipmap.four,R.mipmap.five,
+            R.mipmap.six,R.mipmap.seven,R.mipmap.eight,R.mipmap.nine, R.mipmap.ten,R.mipmap.one,R.mipmap.two,R.mipmap.three,R.mipmap.four,R.mipmap.five,
+            R.mipmap.six,R.mipmap.seven,R.mipmap.eight,R.mipmap.nine};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -110,7 +114,7 @@ public class SearchResultDisplayActivity extends AppCompatActivity {
                         likesDetailsList.add(basedOnLikes);
                     }
                 }
-                likesAdapter = new SearchFragmentAdapter(SearchResultDisplayActivity.this, likesDetailsList);
+                likesAdapter = new SearchFragmentAdapter(SearchResultDisplayActivity.this, likesDetailsList, searchImage);
                 likes_recycler.setLayoutManager(new LinearLayoutManager(SearchResultDisplayActivity.this, LinearLayoutManager.VERTICAL, false));
                 likes_recycler.setAdapter(likesAdapter);
             }

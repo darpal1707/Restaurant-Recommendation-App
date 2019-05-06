@@ -2,25 +2,35 @@ package com.darpal.foodlabrinthnew.Model;
 
 public class Reviews {
 
-    String busines_id;
+    String business_id;
     String date;
     String review_id;
     String text;
     String userid;
+    String stars;
 
-    public Reviews(String busines_id, String date, String text, String userid) {
-        this.busines_id = busines_id;
+    public Reviews(String business_id, String date, String text, String userid, String stars) {
+        this.business_id = business_id;
         this.date = date;
         this.text = text;
         this.userid = userid;
+        this.stars = stars;
     }
 
-    public String getBusines_id() {
-        return busines_id;
+    public String getStars() {
+        return stars;
     }
 
-    public void setBusines_id(String busines_id) {
-        this.busines_id = busines_id;
+    public void setStars(String stars) {
+        this.stars = stars;
+    }
+
+    public String getBusiness_id() {
+        return business_id;
+    }
+
+    public void setBusiness_id(String business_id) {
+        this.business_id = business_id;
     }
 
     public String getDate() {

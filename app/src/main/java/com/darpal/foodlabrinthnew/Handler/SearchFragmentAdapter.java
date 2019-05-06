@@ -26,10 +26,12 @@ public class SearchFragmentAdapter extends RecyclerView.Adapter<SearchFragmentAd
 
     private List<BasedOnLikes> searchArrayList;
     Context context;
+    private int[] images;
 
-    public SearchFragmentAdapter(SearchResultDisplayActivity searchResultDisplayActivity, List<BasedOnLikes> likesDetailsList) {
+    public SearchFragmentAdapter(SearchResultDisplayActivity searchResultDisplayActivity, List<BasedOnLikes> likesDetailsList, int[] images) {
         this.searchArrayList = likesDetailsList;
         this.context = searchResultDisplayActivity;
+        this.images = images;
     }
 
 
@@ -46,7 +48,8 @@ public class SearchFragmentAdapter extends RecyclerView.Adapter<SearchFragmentAd
     public void onBindViewHolder(@NonNull SearchFragmentAdapter.SearchVH holder, int position) {
         BasedOnLikes item = searchArrayList.get(position);
         if(item!=null) {
-            holder.resImage.setImageResource(searchArrayList.get(position).getImgUrl());
+            int image_id = images[position];
+            holder.resImage.setImageResource(image_id);
             holder.name.setText(searchArrayList.get(position).getName());
             holder.address.setText(searchArrayList.get(position).getAddress());
             holder.review_count.setText(searchArrayList.get(position).getReview_count());

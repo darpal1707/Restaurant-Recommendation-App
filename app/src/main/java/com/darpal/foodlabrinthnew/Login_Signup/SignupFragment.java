@@ -5,6 +5,7 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import android.text.TextUtils;
+import android.util.Patterns;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -62,19 +63,19 @@ public class SignupFragment extends Fragment {
             public void onClick(View v) {
                 String email = inputEmail.getText().toString().trim();
                 String password = inputPassword.getText().toString().trim();
+                String fullname = inputFullName.getText().toString();
 
-                if (TextUtils.isEmpty(email)) {
-                    Toast.makeText(getActivity(), "Enter email address!", Toast.LENGTH_SHORT).show();
+                if (TextUtils.isEmpty(fullname)) {
+                    inputFullName.setError("Enter Full Name.");
                     return;
                 }
-
-                if (TextUtils.isEmpty(password)) {
-                    Toast.makeText(getActivity(), "Enter password!", Toast.LENGTH_SHORT).show();
+                else if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+                    inputEmail.setError("Please enter correct email address");
+                    //Toast.makeText(getActivity(), "Enter email address!", Toast.LENGTH_SHORT).show();
                     return;
                 }
-
-                if (password.length() < 6) {
-                    Toast.makeText(getActivity(), "Password too short, enter minimum 6 characters!", Toast.LENGTH_SHORT).show();
+                else if (inputPassword.getText().toString().length()<6) {
+                    inputPassword.setError("Password should be atleast 6 characters");
                     return;
                 }
 

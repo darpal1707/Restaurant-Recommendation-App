@@ -25,26 +25,23 @@ public class PhotoDisplayAdapter extends RecyclerView.Adapter<PhotoDisplayAdapte
 
     private Context mContext;
     private List<Upload> mUploads;
-    boolean isImageFitToScreen;
 
     public PhotoDisplayAdapter(Context mContext, List<Upload> mUploads) {
         this.mContext = mContext;
         this.mUploads = mUploads;
     }
 
-
     @NonNull
     @Override
     public PhotoDisplayAdapter.ImageVH onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View v = LayoutInflater.from(mContext).inflate(R.layout.photo_display_cell, parent, false);
+        View v = LayoutInflater.from(mContext).inflate(R.layout.photo_cell, parent, false);
         return new ImageVH(v);
     }
 
     @Override
     public void onBindViewHolder(@NonNull PhotoDisplayAdapter.ImageVH holder, int position) {
         Upload uploadCurrent = mUploads.get(position);
-        Picasso.get().load(uploadCurrent.getImageUrl()).placeholder(R.mipmap.load).fit()
-                .centerCrop().into(holder.imageView);
+        Picasso.get().load(uploadCurrent.getImageUrl()).placeholder(R.mipmap.load).fit().centerCrop().into(holder.imageView);
     }
 
     @Override
@@ -52,20 +49,20 @@ public class PhotoDisplayAdapter extends RecyclerView.Adapter<PhotoDisplayAdapte
         return mUploads.size();
     }
 
+    @Override
+    public long getItemId(int position) {
+        return position;
+    }
+
     public class ImageVH extends RecyclerView.ViewHolder {
         public ImageView imageView;
         public ImageVH(View itemView) {
             super(itemView);
-            imageView=itemView.findViewById(R.id.image_view_upload);
+            imageView=itemView.findViewById(R.id.photo_iv);
             imageView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    imageView.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
 
-                        }
-                    });
                 }
             });
         }

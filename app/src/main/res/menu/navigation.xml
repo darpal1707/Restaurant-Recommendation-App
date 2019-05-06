@@ -11,10 +11,10 @@
         android:icon="@drawable/search"
         android:title="Search" />
 
-    <item
+  <!--  <item
         android:id="@+id/collection"
         android:icon="@drawable/ic_dashboard_black_24dp"
-        android:title="Collection" />
+        android:title="Collection" />-->
 
     <item
         android:id="@+id/profile"

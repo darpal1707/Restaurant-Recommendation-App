@@ -54,6 +54,12 @@ public class HomeFragment extends Fragment {
         // Required empty public constructor
     }
 
+    public static int[] trendingImage = {R.mipmap.one,R.mipmap.two,R.mipmap.three,R.mipmap.four,R.mipmap.five,
+            R.mipmap.six,R.mipmap.seven,R.mipmap.eight,R.mipmap.nine};
+
+    public static int[] likesImage = {R.mipmap.ten,R.mipmap.one,R.mipmap.two,R.mipmap.three,R.mipmap.four,R.mipmap.five,
+            R.mipmap.six,R.mipmap.seven,R.mipmap.eight,R.mipmap.nine};
+
     Button notDecided;
     EditText search;
     TextView viewmore;
@@ -78,13 +84,6 @@ public class HomeFragment extends Fragment {
 
     List<String> cusineData;
     String data;
-
-    int[] myImageList = {R.drawable.american, R.drawable.asian, R.drawable.bbq, R.drawable.chinese,
-            R.drawable.coffee_tea, R.drawable.deli, R.drawable.desserts_two, R.drawable.european,
-            R.drawable.fast_food, R.drawable.greek, R.drawable.halal, R.drawable.indian,
-            R.drawable.italian, R.drawable.jamaican, R.drawable.japanese, R.drawable.korean,
-            R.drawable.mediterranean, R.drawable.mexican, R.drawable.salads, R.drawable.spanish,
-            R.drawable.sushi, R.drawable.thai, R.drawable.vegan, R.drawable.vegetarian};
 
     @SuppressLint("WrongConstant")
     @Override
@@ -141,7 +140,7 @@ public class HomeFragment extends Fragment {
         likes_recycler = (RecyclerView) view.findViewById(R.id.likes_recyclerview);
 
         trendingList = new ArrayList<>();
-        trendingAdapter = new TrendingAdapter(getContext(), trendingList);
+        trendingAdapter = new TrendingAdapter(getContext(), trendingList, trendingImage);
         showTrendingData();
 
         likesList = new ArrayList<>();
@@ -255,7 +254,7 @@ public class HomeFragment extends Fragment {
                     }
 
                 }
-                likesAdapter = new BasedOnLikesAdapter(getContext(), likesList);
+                likesAdapter = new BasedOnLikesAdapter(getContext(), likesList, likesImage);
                 likes_recycler.setLayoutManager(new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false));
                 likes_recycler.setAdapter(likesAdapter);
             }

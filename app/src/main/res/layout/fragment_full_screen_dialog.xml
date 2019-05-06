@@ -2,30 +2,75 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:paddingBottom="40dp"
+    android:paddingTop="10dp"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical">
+
     <TextView
-        android:layout_width="match_parent"
+        android:id="@+id/ReviewsTitle"
+        android:layout_width="250dp"
         android:layout_height="wrap_content"
-        android:minHeight="?actionBarSize"
-        android:gravity="center_vertical"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="10dp"
+        android:drawablePadding="5dp"
         android:text="Write a Review"
-        android:paddingStart="24dp"
-        android:textAppearance="@style/Base.TextAppearance.AppCompat.Title"
-        android:textColor="#000" />
+        android:textColor="#000"
+        android:textStyle="bold"
+        android:textSize="18sp" />
 
     <EditText
         android:id="@+id/review_dialog"
         android:layout_width="match_parent"
-        android:layout_height="40dp"
+        android:layout_height="wrap_content"
         android:textSize="20sp"
         android:textColor="#000"
         android:hint="Enter maximum of 256 characters"
-        android:layout_margin="20dp"
-        android:background="@android:color/transparent"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+        android:layout_marginTop="10dp"
         android:maxLines="10"
         android:minLines="1"
         android:inputType="textCapSentences|textMultiLine"/>
+
+    <TextView
+        android:id="@+id/StarsTitle"
+        android:layout_width="250dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="10dp"
+        android:drawablePadding="5dp"
+        android:text="Rate Restaurant"
+        android:textColor="#000"
+        android:textStyle="bold"
+        android:textSize="18sp" />
+
+    <androidx.appcompat.widget.AppCompatRatingBar
+        android:id="@+id/ratingBar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:theme="@style/ratingbar"
+        android:layout_marginTop="10dp"/>
+
+    <TextView
+        android:id="@+id/UploadPhotoTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="10dp"
+        android:drawablePadding="5dp"
+        android:text="Upload Photo (Optional)"
+        android:textColor="#000"
+        android:textStyle="bold"
+        android:textSize="18sp" />
+
+    <Button
+        android:id="@+id/uploadbtn"
+        android:layout_width="170dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="10dp"
+        android:drawableStart="@drawable/ic_add_black_24dp"
+        android:text="Upload Photo" />
 
 </LinearLayout>

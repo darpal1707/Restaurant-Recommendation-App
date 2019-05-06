@@ -26,11 +26,12 @@ public class BasedOnLikesAdapter extends RecyclerView.Adapter<BasedOnLikesAdapte
 
     private List<BasedOnLikes> basedOnLikesArrayList;
     Context context;
+    int[] images;
 
-
-    public BasedOnLikesAdapter(Context context, List<BasedOnLikes> based) {
+    public BasedOnLikesAdapter(Context context, List<BasedOnLikes> based, int[] images) {
         this.basedOnLikesArrayList = based;
         this.context = context;
+        this.images = images;
     }
 
     @NonNull
@@ -46,7 +47,8 @@ public class BasedOnLikesAdapter extends RecyclerView.Adapter<BasedOnLikesAdapte
     public void onBindViewHolder(@NonNull BasedOnLikesAdapter.LikesVH holder, int position) {
         BasedOnLikes item = basedOnLikesArrayList.get(position);
         if(item!=null) {
-            holder.resImage.setImageResource(basedOnLikesArrayList.get(position).getImgUrl());
+            int image_id = images[position];
+            holder.resImage.setImageResource(image_id);
             holder.name.setText(basedOnLikesArrayList.get(position).getName());
             holder.address.setText(basedOnLikesArrayList.get(position).getAddress());
             holder.review_count.setText(basedOnLikesArrayList.get(position).getReview_count());

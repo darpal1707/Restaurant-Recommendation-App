@@ -36,6 +36,13 @@
         <item name="itemTextColor">@color/colorPrimary</item>
     </style>
 
+    <style name="forgot" parent="AppTheme">
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:textColor">@color/primary_txt</item>
+    </style>
+
     <style name="LabelStyle" parent="AppTheme">
         <item name="android:layout_height">wrap_content</item>
         <item name="android:layout_width">wrap_content</item>
@@ -46,7 +53,11 @@
     <style name="NotDecidedLabel">
         <item name="android:fontFamily">fonts/Montserrat-Medium.ttf</item>
     </style>
-    
+
+    <style name="ratingbar">
+        <item name="colorControlNormal">#999999</item>
+        <item name="colorControlActivated">@color/colorPrimary</item>
+    </style>
 
 
     <style name="ToolbarStyle">

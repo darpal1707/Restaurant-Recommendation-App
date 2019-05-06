@@ -1,5 +1,6 @@
 package com.darpal.foodlabrinthnew;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
@@ -30,9 +31,9 @@ public class MainActivity extends AppCompatActivity {
                 case R.id.search:
                     loadFragment(new SearchFragment());
                     return true;
-                case R.id.collection:
+               /* case R.id.collection:
                     loadFragment(new CollectionFragment());
-                    return true;
+                    return true;*/
                 case R.id.profile:
                     loadFragment(new LoginFragment());
                     return true;
@@ -46,6 +47,7 @@ public class MainActivity extends AppCompatActivity {
         super.attachBaseContext(CalligraphyContextWrapper.wrap(newBase));
     }
 
+    @SuppressLint("MissingSuperCall")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

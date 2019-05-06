@@ -11,6 +11,7 @@ import androidx.fragment.app.Fragment;
 
 import android.text.TextUtils;
 import android.util.Log;
+import android.util.Patterns;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -44,7 +45,7 @@ public class LoginFragment extends Fragment {
     }
 
     EditText inputEmail, inputPassword;
-    TextView signup;
+    TextView signup, forgot;
     Button sigin;
     private FirebaseAuth auth;
 
@@ -69,6 +70,15 @@ public class LoginFragment extends Fragment {
         signup = (TextView) view.findViewById(R.id.sign_up);
         sigin = (Button) view.findViewById(R.id.btn_login);
         google_loginBtn = (SignInButton) view.findViewById(R.id.Google_sign_in_button);
+        forgot = (TextView) view.findViewById(R.id.forgot_password);
+
+        forgot.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ForgotPasswordFragment loginFragment = new ForgotPasswordFragment();
+                getFragmentManager().beginTransaction().replace(R.id.login_frame, loginFragment).commit();
+            }
+        });
 
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestEmail()
@@ -95,16 +105,17 @@ public class LoginFragment extends Fragment {
                 String email = inputEmail.getText().toString();
                 final String password = inputPassword.getText().toString();
 
-                if (TextUtils.isEmpty(email)) {
-                    Toast.makeText(getActivity(), "Enter email address!", Toast.LENGTH_SHORT).show();
+                if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+                    inputEmail.setError("Please enter correct email address");
+                    //Toast.makeText(getActivity(), "Enter email address!", Toast.LENGTH_SHORT).show();
                     return;
                 }
 
-                if (TextUtils.isEmpty(password)) {
-                    Toast.makeText(getActivity(), "Enter password!", Toast.LENGTH_SHORT).show();
+                if (inputPassword.getText().toString().length()<6) {
+                    inputPassword.setError("Password should be atleast 6 characters");
+                    //Toast.makeText(getActivity(), "Enter password!", Toast.LENGTH_SHORT).show();
                     return;
                 }
-
                 //authenticate user
                 auth.signInWithEmailAndPassword(email, password)
                         .addOnCompleteListener(getActivity(), new OnCompleteListener<AuthResult>() {

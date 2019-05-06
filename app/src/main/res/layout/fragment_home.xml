@@ -86,12 +86,13 @@
 
             <TextView
                 android:id="@+id/trending_lbl"
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_margin="15dp"
                 android:text="Trending"
                 android:textSize="18sp"
                 android:textStyle="bold" />
+
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/trending_recyclerview"

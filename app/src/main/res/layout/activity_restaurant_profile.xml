@@ -194,11 +194,18 @@
                 android:layout_below="@id/cuisineLayout" />
 
             <include
+                android:id="@+id/photos"
+                layout="@layout/photo_grid_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/openHoursLayour" />
+
+            <include
                 android:id="@+id/reviews"
                 layout="@layout/review_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/openHoursLayour" />
+                android:layout_below="@id/photos" />
 
             <Button
                 android:id="@+id/addReview"
