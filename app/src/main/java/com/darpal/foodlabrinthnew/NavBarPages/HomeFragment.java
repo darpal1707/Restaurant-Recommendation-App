@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -111,15 +112,17 @@ public class HomeFragment extends Fragment {
             Toast.makeText(getActivity(), "something went wrong in home fragment shared pref", Toast.LENGTH_SHORT).show();
         }
 
-        EditText searchHome = (EditText) view.findViewById(R.id.searchview_homepage);
-        searchHome.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+        final EditText searchHome = (EditText) view.findViewById(R.id.searchview_homepage);
+
+        searchHome.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
-            public void onFocusChange(View v, boolean hasFocus) {
-                if (hasFocus) {
-                    MainActivity.navigation.setSelectedItemId(R.id.search);
-                    SearchFragment searchFragment = new SearchFragment();
-                    getFragmentManager().beginTransaction().replace(R.id.login_frame, searchFragment).commit();
-                }
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                final String search_home = searchHome.getText().toString();
+                //Toast.makeText(getActivity(), "data is called!!!" + search_home, Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(getActivity(), SearchRestaurantHomePageActivity.class);
+                intent.putExtra("searchHomeValue", search_home);
+                startActivity(intent);
+                return true;
             }
         });
 
@@ -134,7 +137,6 @@ public class HomeFragment extends Fragment {
             }
         });
 
-        search = (EditText) view.findViewById(R.id.searchview_homepage);
         notDecided = (Button) view.findViewById(R.id.notDecided_btn);
         trending_recycler = (RecyclerView) view.findViewById(R.id.trending_recyclerview);
         likes_recycler = (RecyclerView) view.findViewById(R.id.likes_recyclerview);

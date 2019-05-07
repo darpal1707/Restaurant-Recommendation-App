@@ -14,8 +14,8 @@
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.GET_ACCOUNTS"/>
-    <uses-permission android:name="android.permission.AUTHENTICATE_ACCOUNTS"/>
+    <uses-permission android:name="android.permission.GET_ACCOUNTS" />
+    <uses-permission android:name="android.permission.AUTHENTICATE_ACCOUNTS" />
 
     <uses-feature
         android:name="android.hardware.camera"
@@ -32,6 +32,8 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
+        <activity android:name=".NavBarPages.SearchRestaurantHomePageActivity"></activity>
+        <activity android:name=".SearchActivity" />
         <!--
              The API key for Google Maps-based APIs is defined as a string resource.
              (See the file "res/values/google_maps_api.xml").
@@ -54,13 +56,17 @@
         </activity>
         <activity android:name=".MainActivity" />
         <activity android:name=".ToolbarActivity" />
-        <activity android:name=".NotDecided.RestaurantData.NotDecidedOutputActivity"
+        <activity
+            android:name=".NotDecided.RestaurantData.NotDecidedOutputActivity"
             tools:ignore="InnerclassSeparator" />
-        <activity android:name=".NavBarPages.SearchResultDisplayActivity"
+        <activity
+            android:name=".NavBarPages.SearchResultDisplayActivity"
             tools:ignore="InnerclassSeparator" />
-        <activity android:name=".MapView.MapActivity"
+        <activity
+            android:name=".MapView.MapActivity"
             tools:ignore="InnerclassSeparator" />
-        <activity android:name=".NotDecided.NotDecidedActivity"
+        <activity
+            android:name=".NotDecided.NotDecidedActivity"
             tools:ignore="InnerclassSeparator" />
     </application>
 

@@ -50,6 +50,12 @@ public class NotDecidedOutputActivity extends AppCompatActivity {
     public static String hours;
     public String cuisineTransfered;
 
+    public static int[] likesImage = {R.mipmap.ten,R.mipmap.one,R.mipmap.two,R.mipmap.three,R.mipmap.four,R.mipmap.five,
+            R.mipmap.six,R.mipmap.seven,R.mipmap.eight,R.mipmap.nine, R.mipmap.ten,R.mipmap.one,R.mipmap.two,R.mipmap.three,R.mipmap.four,R.mipmap.five,
+            R.mipmap.six,R.mipmap.seven,R.mipmap.eight,R.mipmap.nine, R.mipmap.ten,R.mipmap.one,R.mipmap.two,R.mipmap.three,R.mipmap.four,R.mipmap.five,
+            R.mipmap.six,R.mipmap.seven,R.mipmap.eight,R.mipmap.nine, R.mipmap.ten,R.mipmap.one,R.mipmap.two,R.mipmap.three,R.mipmap.four,R.mipmap.five,
+            R.mipmap.six,R.mipmap.seven,R.mipmap.eight,R.mipmap.nine};
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -76,7 +82,7 @@ public class NotDecidedOutputActivity extends AppCompatActivity {
     private void showNotDecidedData() {
         DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference();
         Query recentPostsQuery = databaseReference.child("business")
-                .limitToFirst(100);
+                .limitToFirst(300);
 
         recentPostsQuery.addValueEventListener(new ValueEventListener() {
             @SuppressLint("WrongConstant")
@@ -120,7 +126,7 @@ public class NotDecidedOutputActivity extends AppCompatActivity {
                         Toast.makeText(SearchResultDisplayActivity.this, "Something went wrong! Please Search Again!", Toast.LENGTH_SHORT).show();
                     }*/
                 }
-                likesAdapter = new NotDecidedAdapter(notDecidedList,NotDecidedOutputActivity.this);
+                likesAdapter = new NotDecidedAdapter(notDecidedList,NotDecidedOutputActivity.this, likesImage);
                 notDecided_recycler.setLayoutManager(new LinearLayoutManager(NotDecidedOutputActivity.this, LinearLayoutManager.VERTICAL, false));
                 notDecided_recycler.setAdapter(likesAdapter);
             }

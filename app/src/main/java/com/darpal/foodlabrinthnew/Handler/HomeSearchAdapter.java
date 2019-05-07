@@ -14,37 +14,39 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.darpal.foodlabrinthnew.Model.BasedOnLikes;
+import com.darpal.foodlabrinthnew.NavBarPages.SearchRestaurantHomePageActivity;
 import com.darpal.foodlabrinthnew.R;
 import com.darpal.foodlabrinthnew.RestaurantProfileActivity;
 import com.darpal.foodlabrinthnew.Util.LikesUtil;
 
 import java.util.List;
 
-public class NotDecidedAdapter extends RecyclerView.Adapter<NotDecidedAdapter.NotVH> {
+public class HomeSearchAdapter extends RecyclerView.Adapter<HomeSearchAdapter.HomeVH> {
+
     private List<BasedOnLikes> searchArrayList;
     Context context;
-    int[] image;
+    private int[] images;
 
-    public NotDecidedAdapter(List<BasedOnLikes> searchArrayList, Context context, int[] image) {
+    public HomeSearchAdapter(List<BasedOnLikes> searchArrayList, SearchRestaurantHomePageActivity context, int[] images) {
         this.searchArrayList = searchArrayList;
         this.context = context;
-        this.image = image;
+        this.images = images;
     }
 
     @NonNull
     @Override
-    public NotDecidedAdapter.NotVH onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public HomeSearchAdapter.HomeVH onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View itemView = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.likes_home_cell, parent, false);
 
-        return new NotDecidedAdapter.NotVH(itemView);
+        return new HomeSearchAdapter.HomeVH(itemView);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull NotDecidedAdapter.NotVH holder, int position) {
+    public void onBindViewHolder(@NonNull HomeSearchAdapter.HomeVH holder, int position) {
         BasedOnLikes item = searchArrayList.get(position);
         if(item!=null) {
-            int image_id = image[position];
+            int image_id = images[position];
             holder.resImage.setImageResource(image_id);
             holder.name.setText(searchArrayList.get(position).getName());
             holder.address.setText(searchArrayList.get(position).getAddress());
@@ -62,7 +64,7 @@ public class NotDecidedAdapter extends RecyclerView.Adapter<NotDecidedAdapter.No
         return searchArrayList.size();
     }
 
-    public class NotVH extends RecyclerView.ViewHolder implements View.OnClickListener {
+    public class HomeVH extends RecyclerView.ViewHolder implements View.OnClickListener {
         private TextView name;
         private ImageView resImage;
         private TextView address;
@@ -71,14 +73,16 @@ public class NotDecidedAdapter extends RecyclerView.Adapter<NotDecidedAdapter.No
         private TextView state;
         private TextView is_open;
 
-        public NotVH(@NonNull View view) {
+        public HomeVH(@NonNull View view) {
             super(view);
+
             resImage = (ImageView) view.findViewById(R.id.res_img);
             name = (TextView) view.findViewById(R.id.res_title);
             address = (TextView) view.findViewById(R.id.res_location);
             review_count = (TextView) view.findViewById(R.id.ratings_value);
             city = (TextView) view.findViewById(R.id.res_city);
             state = (TextView) view.findViewById(R.id.res_state);
+            view.setOnClickListener(this);
 
             Typeface custom_font = Typeface.createFromAsset(context.getAssets(),  "fonts/Montserrat-Medium.ttf");
             name.setTypeface(custom_font);
@@ -86,7 +90,6 @@ public class NotDecidedAdapter extends RecyclerView.Adapter<NotDecidedAdapter.No
             review_count.setTypeface(custom_font);
             city.setTypeface(custom_font);
             state.setTypeface(custom_font);
-            view.setOnClickListener(this);
         }
 
         @Override

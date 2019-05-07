@@ -129,21 +129,7 @@ public class RestaurantProfileActivity extends AppCompatActivity {
         mUploads = new ArrayList<>();
         showPhotos();
 
-        Typeface custom_font = Typeface.createFromAsset(getAssets(), "fonts/Montserrat-Medium.ttf");
-        restName.setTypeface(custom_font);
-        resCuisine.setTypeface(custom_font);
-        addressLocation.setTypeface(custom_font);
-        restCity.setTypeface(custom_font);
-        resState.setTypeface(custom_font);
-        addreview.setTypeface(custom_font);
-        share.setTypeface(custom_font);
-        like.setTypeface(custom_font);
-        categories.setTypeface(custom_font);
-        openHours.setTypeface(custom_font);
-        reviews.setTypeface(custom_font);
-        reshours.setTypeface(custom_font);
-        mapDirectionLabel.setTypeface(custom_font);
-
+        applyTypeFace();
         reviewsRecycler = (RecyclerView) findViewById(R.id.reviewsRecycler);
         reviewsList = new ArrayList<>();
         reviewsAdapter = new ReviewsAdapter(RestaurantProfileActivity.this, reviewsList);
@@ -189,12 +175,6 @@ public class RestaurantProfileActivity extends AppCompatActivity {
                 else {
                     // No user is signed in
                     Snackbar snackbar = Snackbar.make(v, "Please Login to get Custom Recommendations", Snackbar.LENGTH_LONG);
-                    /*snackbar.setAction("Login", new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-
-                        }
-                    });*/
                     snackbar.show();
                 }
             }
@@ -283,12 +263,6 @@ public class RestaurantProfileActivity extends AppCompatActivity {
                 } else {
                     // No user is signed in
                     Snackbar snackbar = Snackbar.make(v, "Login to submit a review", Snackbar.LENGTH_LONG);
-                    /*snackbar.setAction("Login", new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-
-                        }
-                    });*/
                     snackbar.show();
                 }
 
@@ -337,6 +311,23 @@ public class RestaurantProfileActivity extends AppCompatActivity {
             }
         });
 
+    }
+
+    private void applyTypeFace() {
+        Typeface custom_font = Typeface.createFromAsset(getAssets(), "fonts/Montserrat-Medium.ttf");
+        restName.setTypeface(custom_font);
+        resCuisine.setTypeface(custom_font);
+        addressLocation.setTypeface(custom_font);
+        restCity.setTypeface(custom_font);
+        resState.setTypeface(custom_font);
+        addreview.setTypeface(custom_font);
+        share.setTypeface(custom_font);
+        like.setTypeface(custom_font);
+        categories.setTypeface(custom_font);
+        openHours.setTypeface(custom_font);
+        reviews.setTypeface(custom_font);
+        reshours.setTypeface(custom_font);
+        mapDirectionLabel.setTypeface(custom_font);
     }
 
     private void showPhotos() {

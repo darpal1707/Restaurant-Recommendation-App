@@ -79,7 +79,13 @@ public class LoginFragment extends Fragment {
                 getFragmentManager().beginTransaction().replace(R.id.login_frame, loginFragment).commit();
             }
         });
-
+        signup.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                SignupFragment signupFragment = new SignupFragment();
+                getFragmentManager().beginTransaction().replace(R.id.login_frame, signupFragment).commit();
+            }
+        });
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestEmail()
                 .build();
@@ -91,13 +97,7 @@ public class LoginFragment extends Fragment {
                 startActivityForResult(signInIntent, 101);
             }
         });
-        signup.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                SignupFragment signupFragment = new SignupFragment();
-                getFragmentManager().beginTransaction().replace(R.id.login_frame, signupFragment).commit();
-            }
-        });
+
 
         sigin.setOnClickListener(new View.OnClickListener() {
             @Override

@@ -3,6 +3,7 @@ package com.darpal.foodlabrinthnew.NotDecided;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.graphics.Typeface;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -14,6 +15,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.CheckBox;
 import android.widget.GridView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.darpal.foodlabrinthnew.Handler.AmbienceCustomAdapter;
@@ -40,6 +42,7 @@ public class AmbienceQuestionFragment extends Fragment {
     private String meal;
     private String[] stockArr;
     String s1, s2, s3, s4, s5, s6, s7, s8, s9, s10, s11, s12, s13, s14;
+    TextView AmbienceQuestion;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -50,6 +53,10 @@ public class AmbienceQuestionFragment extends Fragment {
         GridView gridView = (GridView) view.findViewById(R.id.ambiencegrid);
         AmbienceCustomAdapter ambienceCustomAdapter = new AmbienceCustomAdapter(getActivity(), array);
         gridView.setAdapter(ambienceCustomAdapter);
+
+        AmbienceQuestion = (TextView) view.findViewById(R.id.AmbienceTitle);
+        Typeface custom_font = Typeface.createFromAsset(getActivity().getAssets(),  "fonts/Montserrat-Medium.ttf");
+        AmbienceQuestion.setTypeface(custom_font);
 
         gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override

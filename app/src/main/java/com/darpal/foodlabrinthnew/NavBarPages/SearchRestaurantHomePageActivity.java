@@ -6,12 +6,15 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Toast;
 
-import com.darpal.foodlabrinthnew.Handler.BasedOnLikesAdapter;
+import com.darpal.foodlabrinthnew.Handler.HomeSearchAdapter;
 import com.darpal.foodlabrinthnew.Handler.SearchFragmentAdapter;
 import com.darpal.foodlabrinthnew.Model.BasedOnLikes;
 import com.darpal.foodlabrinthnew.R;
@@ -26,12 +29,13 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.darpal.foodlabrinthnew.NavBarPages.HomeFragment.likesHours;
+import static com.darpal.foodlabrinthnew.NavBarPages.SearchResultDisplayActivity.searchImage;
 
-public class SearchResultDisplayActivity extends AppCompatActivity {
+public class SearchRestaurantHomePageActivity extends AppCompatActivity {
 
-    private List<BasedOnLikes> likesDetailsList;
-    SearchFragmentAdapter likesAdapter;
+    public static String searchValue;
+    private List<BasedOnLikes> searchList;
+    HomeSearchAdapter likesAdapter;
     public static String business_id;
     public static String categories;
     public static String name;
@@ -41,27 +45,13 @@ public class SearchResultDisplayActivity extends AppCompatActivity {
     public static String city;
     public static String state;
     public static String hours;
-    private RecyclerView likes_recycler;
+    RecyclerView searchRecycler;
 
-    public static String value;
-    public static int[] searchImage = {R.mipmap.ten,R.mipmap.one,R.mipmap.two,R.mipmap.three,R.mipmap.four,R.mipmap.five,
-            R.mipmap.six,R.mipmap.seven,R.mipmap.eight,R.mipmap.nine, R.mipmap.ten,R.mipmap.one,R.mipmap.two,R.mipmap.three,R.mipmap.four,R.mipmap.five,
-            R.mipmap.six,R.mipmap.seven,R.mipmap.eight,R.mipmap.nine, R.mipmap.ten,R.mipmap.one,R.mipmap.two,R.mipmap.three,R.mipmap.four,R.mipmap.five,
-            R.mipmap.six,R.mipmap.seven,R.mipmap.eight,R.mipmap.nine, R.mipmap.ten,R.mipmap.one,R.mipmap.two,R.mipmap.three,R.mipmap.four,R.mipmap.five,
-            R.mipmap.six,R.mipmap.seven,R.mipmap.eight,R.mipmap.nine, R.mipmap.ten,R.mipmap.one,R.mipmap.two,R.mipmap.three,R.mipmap.four,R.mipmap.five,
-            R.mipmap.six,R.mipmap.seven,R.mipmap.eight,R.mipmap.nine, R.mipmap.ten,R.mipmap.one,R.mipmap.two,R.mipmap.three,R.mipmap.four,R.mipmap.five,
-            R.mipmap.six,R.mipmap.seven,R.mipmap.eight,R.mipmap.nine, R.mipmap.ten,R.mipmap.one,R.mipmap.two,R.mipmap.three,R.mipmap.four,R.mipmap.five,
-            R.mipmap.six,R.mipmap.seven,R.mipmap.eight,R.mipmap.nine, R.mipmap.ten,R.mipmap.one,R.mipmap.two,R.mipmap.three,R.mipmap.four,R.mipmap.five,
-            R.mipmap.six,R.mipmap.seven,R.mipmap.eight,R.mipmap.nine, R.mipmap.ten,R.mipmap.one,R.mipmap.two,R.mipmap.three,R.mipmap.four,R.mipmap.five,
-            R.mipmap.six,R.mipmap.seven,R.mipmap.eight,R.mipmap.nine, R.mipmap.ten,R.mipmap.one,R.mipmap.two,R.mipmap.three,R.mipmap.four,R.mipmap.five,
-            R.mipmap.six,R.mipmap.seven,R.mipmap.eight,R.mipmap.nine, R.mipmap.ten,R.mipmap.one,R.mipmap.two,R.mipmap.three,R.mipmap.four,R.mipmap.five,
-            R.mipmap.six,R.mipmap.seven,R.mipmap.eight,R.mipmap.nine, R.mipmap.ten,R.mipmap.one,R.mipmap.two,R.mipmap.three,R.mipmap.four,R.mipmap.five,
-            R.mipmap.six,R.mipmap.seven,R.mipmap.eight,R.mipmap.nine};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_search_result_display);
+        setContentView(R.layout.activity_search_restaurant_home_page);
 
         LikesUtil.searchId.clear();
         LikesUtil.searchName.clear();
@@ -73,14 +63,15 @@ public class SearchResultDisplayActivity extends AppCompatActivity {
         LikesUtil.searchLong.clear();
         LikesUtil.searchHours.clear();
 
-        likes_recycler = findViewById(R.id.likes_detail_recyclerview);
+        searchRecycler = (RecyclerView) findViewById(R.id.searchRecycler);
         Intent intent = getIntent();
-        value = intent.getStringExtra("cuisine_value");
-        likesDetailsList = new ArrayList<BasedOnLikes>();
-        showLikesDetailData();
+        searchValue = intent.getStringExtra("searchHomeValue");
+        //Toast.makeText(this, "value is " + searchValue, Toast.LENGTH_SHORT).show();
+        searchList = new ArrayList<>();
+        showSearchData();
     }
 
-    private void showLikesDetailData() {
+    private void showSearchData() {
         DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference();
         Query recentPostsQuery = databaseReference.child("business")
                 .limitToFirst(400);
@@ -101,7 +92,7 @@ public class SearchResultDisplayActivity extends AppCompatActivity {
                     state = String.valueOf(ds.child("state").getValue());
                     hours = String.valueOf(ds.child("hours").getValue());
 
-                    if(categories.contains(value)) {
+                    if(name.contains(searchValue) || categories.contains(searchValue)) {
                         LikesUtil.searchId.add(business_id);
                         LikesUtil.searchName.add(name);
                         LikesUtil.searchCuisine.add(categories);
@@ -120,17 +111,17 @@ public class SearchResultDisplayActivity extends AppCompatActivity {
                                 String.valueOf(ds.child("categories").getValue()),
                                 String.valueOf(ds.child("hours").getValue()));
 
-                        likesDetailsList.add(basedOnLikes);
+                        searchList.add(basedOnLikes);
                     }
                 }
-                likesAdapter = new SearchFragmentAdapter(SearchResultDisplayActivity.this, likesDetailsList, searchImage);
-                likes_recycler.setLayoutManager(new LinearLayoutManager(SearchResultDisplayActivity.this, LinearLayoutManager.VERTICAL, false));
-                likes_recycler.setAdapter(likesAdapter);
+                likesAdapter = new HomeSearchAdapter(searchList,SearchRestaurantHomePageActivity.this, searchImage);
+                searchRecycler.setLayoutManager(new LinearLayoutManager(SearchRestaurantHomePageActivity.this, LinearLayoutManager.VERTICAL, false));
+                searchRecycler.setAdapter(likesAdapter);
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
-                Toast.makeText(SearchResultDisplayActivity.this, "Didn't get any data in Datasnapshot", Toast.LENGTH_SHORT).show();
+                Toast.makeText(SearchRestaurantHomePageActivity.this, "Didn't get any data in Datasnapshot", Toast.LENGTH_SHORT).show();
             }
         });
     }

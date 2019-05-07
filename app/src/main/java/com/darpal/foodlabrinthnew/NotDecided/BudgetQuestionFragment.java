@@ -2,6 +2,7 @@ package com.darpal.foodlabrinthnew.NotDecided;
 
 
 import android.content.Intent;
+import android.graphics.Typeface;
 import android.os.Bundle;
 
 import androidx.cardview.widget.CardView;
@@ -34,13 +35,17 @@ public class BudgetQuestionFragment extends Fragment {
     private View descriptionLayout;
     String l = "", m = "", h = "", temp = "";
     public String cuisineValue;
-
+    TextView BudgetQuestion;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view =  inflater.inflate(R.layout.fragment_budget_question, container, false);
+        BudgetQuestion = (TextView) view.findViewById(R.id.BudgetQuestion);
+
+        Typeface custom_font = Typeface.createFromAsset(getActivity().getAssets(),  "fonts/Montserrat-Medium.ttf");
+        BudgetQuestion.setTypeface(custom_font);
 
         CardView low = (CardView) view.findViewById(R.id.lowbudget);
         CardView medium = (CardView) view.findViewById(R.id.mediumbudget);

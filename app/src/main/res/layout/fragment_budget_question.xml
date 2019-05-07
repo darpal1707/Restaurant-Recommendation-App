@@ -7,9 +7,11 @@
 
     <!-- TODO: Update blank fragment layout -->
     <TextView
+        android:id="@+id/BudgetQuestion"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="HOW MUCH WOULD YOU LIKE TO SPEND?"
+        android:text="How much would you like to spend?"
+        android:textAllCaps="false"
         android:layout_marginTop="10dp"
         android:textAlignment="center"
         android:textSize="13pt" />

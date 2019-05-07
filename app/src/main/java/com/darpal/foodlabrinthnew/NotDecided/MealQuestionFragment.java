@@ -1,6 +1,7 @@
 package com.darpal.foodlabrinthnew.NotDecided;
 
 
+import android.graphics.Typeface;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -11,6 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.GridView;
 import android.widget.RadioButton;
+import android.widget.TextView;
 
 import com.darpal.foodlabrinthnew.Handler.MealCustomAdapter;
 import com.darpal.foodlabrinthnew.R;
@@ -27,7 +29,7 @@ public class MealQuestionFragment extends Fragment {
 
     private int[] array = new int[]{R.drawable.breakfast, R.drawable.lunch, R.drawable.dinner, R.drawable.coffee, R.drawable.latenight};
     private String arr[] = {"Breakfast", "Lunch", "Dinner", "Cafe", "Late Night"};
-
+    TextView mealTitle;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
@@ -36,6 +38,9 @@ public class MealQuestionFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_first_question, container, false);
 
         GridView gridView = (GridView) view.findViewById(R.id.mealgrid);
+        mealTitle = (TextView) view.findViewById(R.id.mealQuestion);
+        Typeface custom_font = Typeface.createFromAsset(getActivity().getAssets(),  "fonts/Montserrat-Medium.ttf");
+        mealTitle.setTypeface(custom_font);
         final MealCustomAdapter mealCustomAdapter = new MealCustomAdapter(getActivity(), array, arr);
         gridView.setAdapter(mealCustomAdapter);
 

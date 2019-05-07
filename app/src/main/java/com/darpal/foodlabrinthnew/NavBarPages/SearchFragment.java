@@ -32,14 +32,14 @@ public class SearchFragment extends Fragment {
     GridView cuisineGrid;
     public static String posValue;
     String[] cuisines = new String[]{"American", "Asian", "BBQ", "Chinese", "Coffee & Tea", "Deli", "Desserts",
-            "European", "Fast Food", "Greek", "Halal", "Indian", "Italian", "Jamaican", "Japanese", "Korean",
-            "Mediterranean", "Mexican", "Salads", "Spanish", "Sushi", "Thai", "Vegan", "Vegetarian"};
+            "European", "Fast Food", "Greek", "Halal", "Indian", "Italian", "Japanese", "Korean",
+            "Mediterranean", "Mexican", "Salad", "Sushi", "Thai", "Vegan", "Vegetarian"};
 
     public static int[] cuisineImg = {R.drawable.american, R.drawable.asian, R.drawable.bbq, R.drawable.chinese,
             R.drawable.coffee_tea, R.drawable.deli, R.drawable.desserts_two, R.drawable.european,
             R.drawable.fast_food, R.drawable.greek, R.drawable.halal, R.drawable.indian,
-            R.drawable.italian, R.drawable.jamaican, R.drawable.japanese, R.drawable.korean,
-            R.drawable.mediterranean, R.drawable.mexican, R.drawable.salads, R.drawable.spanish,
+            R.drawable.italian, R.drawable.japanese, R.drawable.korean,
+            R.drawable.mediterranean, R.drawable.mexican, R.drawable.salads,
             R.drawable.sushi, R.drawable.thai, R.drawable.vegan, R.drawable.vegetarian};
 
 
