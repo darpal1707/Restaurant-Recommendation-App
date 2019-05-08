@@ -14,11 +14,15 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.darpal.foodlabrinthnew.Model.User;
 import com.darpal.foodlabrinthnew.R;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -34,6 +38,10 @@ public class SignupFragment extends Fragment {
     Button signup;
     FirebaseAuth auth;
     TextView login;
+    private FirebaseDatabase mFirebaseDatabase;
+    private FirebaseAuth mAuth;
+    private FirebaseAuth.AuthStateListener mAuthListener;
+    private DatabaseReference myRef;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -61,24 +69,30 @@ public class SignupFragment extends Fragment {
         signup.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String email = inputEmail.getText().toString().trim();
-                String password = inputPassword.getText().toString().trim();
-                String fullname = inputFullName.getText().toString();
+                final String email = inputEmail.getText().toString().trim();
+                final String password = inputPassword.getText().toString().trim();
+                final String fullname = inputFullName.getText().toString();
 
                 if (TextUtils.isEmpty(fullname)) {
                     inputFullName.setError("Enter Full Name.");
+                    inputFullName.requestFocus();
                     return;
                 }
                 else if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-                    inputEmail.setError("Please enter correct email address");
+                    inputEmail.setError("Please enter a valid email address");
+                    inputEmail.requestFocus();
                     //Toast.makeText(getActivity(), "Enter email address!", Toast.LENGTH_SHORT).show();
                     return;
                 }
                 else if (inputPassword.getText().toString().length()<6) {
                     inputPassword.setError("Password should be atleast 6 characters");
+                    inputEmail.requestFocus();
                     return;
                 }
 
+                mAuth = FirebaseAuth.getInstance();
+                mFirebaseDatabase = FirebaseDatabase.getInstance();
+                myRef = mFirebaseDatabase.getReference();
                 //create user
                 auth.createUserWithEmailAndPassword(email, password)
                         .addOnCompleteListener(getActivity(), new OnCompleteListener<AuthResult>() {
@@ -92,6 +106,10 @@ public class SignupFragment extends Fragment {
                                     Toast.makeText(getActivity(), "Authentication failed." + task.getException(),
                                             Toast.LENGTH_SHORT).show();
                                 } else {
+                                    FirebaseUser user = mAuth.getCurrentUser();
+                                    String userid = user.getUid();
+                                    User user1 = new User(userid,fullname,email,password);
+                                    myRef.child("user").push().setValue(user1);
                                     UserProfileFragment userProfileFragment = new UserProfileFragment();
                                     getFragmentManager().beginTransaction().replace(R.id.login_frame,userProfileFragment).commit();
                                 }

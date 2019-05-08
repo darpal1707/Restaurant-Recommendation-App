@@ -32,7 +32,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
-        <activity android:name=".NavBarPages.SearchRestaurantHomePageActivity"></activity>
+        <activity android:name=".NavBarPages.SearchRestaurantHomePageActivity" />
         <activity android:name=".SearchActivity" />
         <!--
              The API key for Google Maps-based APIs is defined as a string resource.

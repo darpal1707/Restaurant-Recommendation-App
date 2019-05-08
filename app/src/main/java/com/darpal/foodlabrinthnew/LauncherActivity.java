@@ -12,6 +12,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 
+import com.romellfudi.permission.PermissionService;
+
 import static android.Manifest.permission.ACCESS_FINE_LOCATION;
 import static android.Manifest.permission.ACCESS_COARSE_LOCATION;
 import static android.Manifest.permission.ACCESS_NETWORK_STATE;
@@ -36,14 +38,35 @@ public class LauncherActivity extends AppCompatActivity {
         Typeface custom_font = Typeface.createFromAsset(getAssets(),  "fonts/Montserrat-Medium.ttf");
         tx.setTypeface(custom_font);
 
-        new Handler().postDelayed(new Runnable(){
+        new PermissionService(this).request(
+                new String[]{ACCESS_FINE_LOCATION, CAMERA, ACCESS_COARSE_LOCATION,READ_EXTERNAL_STORAGE,WRITE_EXTERNAL_STORAGE},
+                callback);
+
+        /*new Handler().postDelayed(new Runnable(){
             @Override
             public void run() {
-                Intent mainIntent = new Intent(LauncherActivity.this,MainActivity.class);
-                startActivity(mainIntent);
-                finish();
             }
-        }, SPLASH_TIME);
+        }, SPLASH_TIME);*/
 
     }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        callback.handler(permissions, grantResults);
+    }
+
+    private PermissionService.Callback callback = new PermissionService.Callback() {
+        @Override
+        public void onRefuse(ArrayList<String> RefusePermissions) {
+            // todo
+        }
+
+        @Override
+        public void onFinally() {
+            Intent mainIntent = new Intent(LauncherActivity.this,MainActivity.class);
+            startActivity(mainIntent);
+            finish();
+        }
+    };
 }

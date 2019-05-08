@@ -5,6 +5,7 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -13,6 +14,7 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -26,8 +28,6 @@ import android.widget.Toast;
 
 import com.darpal.foodlabrinthnew.Handler.BasedOnLikesAdapter;
 import com.darpal.foodlabrinthnew.Handler.TrendingAdapter;
-import com.darpal.foodlabrinthnew.MainActivity;
-import com.darpal.foodlabrinthnew.MapView.MapActivity;
 import com.darpal.foodlabrinthnew.Model.BasedOnLikes;
 import com.darpal.foodlabrinthnew.Model.Trending;
 import com.darpal.foodlabrinthnew.NotDecided.NotDecidedActivity;
@@ -46,6 +46,9 @@ import com.google.gson.reflect.TypeToken;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+
+import static com.firebase.ui.auth.AuthUI.getApplicationContext;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -59,19 +62,27 @@ public class HomeFragment extends Fragment {
             R.mipmap.six,R.mipmap.seven,R.mipmap.eight,R.mipmap.nine};
 
     public static int[] likesImage = {R.mipmap.ten,R.mipmap.one,R.mipmap.two,R.mipmap.three,R.mipmap.four,R.mipmap.five,
+            R.mipmap.six,R.mipmap.seven,R.mipmap.eight,R.mipmap.nine, R.mipmap.ten,R.mipmap.one,R.mipmap.two,R.mipmap.three,R.mipmap.four,R.mipmap.five,
+            R.mipmap.six,R.mipmap.seven,R.mipmap.eight,R.mipmap.nine, R.mipmap.ten,R.mipmap.one,R.mipmap.two,R.mipmap.three,R.mipmap.four,R.mipmap.five,
+            R.mipmap.six,R.mipmap.seven,R.mipmap.eight,R.mipmap.nine, R.mipmap.ten,R.mipmap.one,R.mipmap.two,R.mipmap.three,R.mipmap.four,R.mipmap.five,
+            R.mipmap.six,R.mipmap.seven,R.mipmap.eight,R.mipmap.nine, R.mipmap.ten,R.mipmap.one,R.mipmap.two,R.mipmap.three,R.mipmap.four,R.mipmap.five,
+            R.mipmap.six,R.mipmap.seven,R.mipmap.eight,R.mipmap.nine, R.mipmap.ten,R.mipmap.one,R.mipmap.two,R.mipmap.three,R.mipmap.four,R.mipmap.five,
+            R.mipmap.six,R.mipmap.seven,R.mipmap.eight,R.mipmap.nine, R.mipmap.ten,R.mipmap.one,R.mipmap.two,R.mipmap.three,R.mipmap.four,R.mipmap.five,
+            R.mipmap.six,R.mipmap.seven,R.mipmap.eight,R.mipmap.nine, R.mipmap.ten,R.mipmap.one,R.mipmap.two,R.mipmap.three,R.mipmap.four,R.mipmap.five,
+            R.mipmap.six,R.mipmap.seven,R.mipmap.eight,R.mipmap.nine, R.mipmap.ten,R.mipmap.one,R.mipmap.two,R.mipmap.three,R.mipmap.four,R.mipmap.five,
+            R.mipmap.six,R.mipmap.seven,R.mipmap.eight,R.mipmap.nine, R.mipmap.ten,R.mipmap.one,R.mipmap.two,R.mipmap.three,R.mipmap.four,R.mipmap.five,
+            R.mipmap.six,R.mipmap.seven,R.mipmap.eight,R.mipmap.nine, R.mipmap.ten,R.mipmap.one,R.mipmap.two,R.mipmap.three,R.mipmap.four,R.mipmap.five,
             R.mipmap.six,R.mipmap.seven,R.mipmap.eight,R.mipmap.nine};
 
-    Button notDecided;
     EditText search;
-    TextView viewmore;
     private RecyclerView trending_recycler;
     private RecyclerView likes_recycler;
 
     private List<Trending> trendingList;
-    TrendingAdapter trendingAdapter;
+    private TrendingAdapter trendingAdapter;
 
     private List<BasedOnLikes> likesList;
-    BasedOnLikesAdapter likesAdapter;
+    private BasedOnLikesAdapter likesAdapter;
 
     public static String business_id, TrendID;
     public static String categories, TrendCuisine;
@@ -84,6 +95,8 @@ public class HomeFragment extends Fragment {
     public static String hours, likesHours;
 
     List<String> cusineData;
+    TextView likesLabel;
+    Set<String> temp;
     String data;
 
     @SuppressLint("WrongConstant")
@@ -93,7 +106,7 @@ public class HomeFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_home, container, false);
 
-        SharedPreferences sharedPreferences = getActivity().getSharedPreferences("cuisinePref", Context.MODE_PRIVATE);
+        /*SharedPreferences sharedPreferences = getActivity().getSharedPreferences("cuisinePref", Context.MODE_PRIVATE);
         try {
             Gson gson = new Gson();
             String json = sharedPreferences.getString("cuisine", "");
@@ -110,10 +123,10 @@ public class HomeFragment extends Fragment {
         } catch (Exception e) {
             Log.e("exception shared pref", String.valueOf(e));
             Toast.makeText(getActivity(), "something went wrong in home fragment shared pref", Toast.LENGTH_SHORT).show();
-        }
+        }*/
 
+        likesLabel = (TextView) view.findViewById(R.id.likes_lbl);
         final EditText searchHome = (EditText) view.findViewById(R.id.searchview_homepage);
-
         searchHome.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
@@ -131,13 +144,17 @@ public class HomeFragment extends Fragment {
         toolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
-                Intent intent = new Intent(getActivity(), MapActivity.class);
-                startActivity(intent);
+               /* Intent intent = new Intent(getActivity(), MapWebViewActivity.class);
+                startActivity(intent);*/
+                String url = "https://spittin-hot-geofire.firebaseapp.com/";
+                Intent i = new Intent(Intent.ACTION_VIEW);
+                i.setData(Uri.parse(url));
+                startActivity(i);
                 return true;
             }
         });
 
-        notDecided = (Button) view.findViewById(R.id.notDecided_btn);
+        Button notDecided = (Button) view.findViewById(R.id.notDecided_btn);
         trending_recycler = (RecyclerView) view.findViewById(R.id.trending_recyclerview);
         likes_recycler = (RecyclerView) view.findViewById(R.id.likes_recyclerview);
 
@@ -146,6 +163,7 @@ public class HomeFragment extends Fragment {
         showTrendingData();
 
         likesList = new ArrayList<>();
+
         showLikesData();
         notDecided.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -217,6 +235,13 @@ public class HomeFragment extends Fragment {
         Query recentPostsQuery = databaseReference.child("business")
                 .limitToFirst(100);
 
+        @SuppressLint("RestrictedApi") SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        temp= sharedPreferences.getStringSet("likedCuisine",null);
+        Log.e("temp home", String.valueOf(temp));
+        if (temp == null) {
+            likesLabel.setVisibility(View.INVISIBLE);
+            Log.e("error", "no prev liked items found");}
+
         recentPostsQuery.addValueEventListener(new ValueEventListener() {
             @SuppressLint("WrongConstant")
             @Override
@@ -233,28 +258,33 @@ public class HomeFragment extends Fragment {
                     state = String.valueOf(ds.child("state").getValue());
                     likesHours = String.valueOf(ds.child("hours").getValue());
 
-                    if(categories.contains(data)) {
-                        LikesUtil.businessIdArraryList.add(business_id);
-                        LikesUtil.businessNameArrayList.add(name);
-                        LikesUtil.businessCuisineArrayList.add(categories);
-                        LikesUtil.businessAddressArrayList.add(address);
-                        LikesUtil.businessCityArrayList.add(city);
-                        LikesUtil.businessStateArrayList.add(state);
-                        LikesUtil.businessLatArrayList.add(latitude);
-                        LikesUtil.businessLongArrayList.add(longitude);
-                        LikesUtil.businessHoursArrayList.add(likesHours);
+                    if (temp != null) {
+                        likesLabel.setVisibility(View.VISIBLE);
+                        for (String lc : temp) { // if set contains Indian, chinese etc check for each value
+                            // very heavy operation but as the no of liked restaurants are gonna be less so it wont cause any problem
+                            if (categories.contains(lc)) {
+                                LikesUtil.businessIdArraryList.add(business_id);
+                                LikesUtil.businessNameArrayList.add(name);
+                                LikesUtil.businessCuisineArrayList.add(categories);
+                                LikesUtil.businessAddressArrayList.add(address);
+                                LikesUtil.businessCityArrayList.add(city);
+                                LikesUtil.businessStateArrayList.add(state);
+                                LikesUtil.businessLatArrayList.add(latitude);
+                                LikesUtil.businessLongArrayList.add(longitude);
+                                LikesUtil.businessHoursArrayList.add(likesHours);
 
-                        BasedOnLikes basedOnLikes = new BasedOnLikes(String.valueOf(ds.child("name").getValue()),
-                                String.valueOf(ds.child("address").getValue()),
-                                String.valueOf(ds.child("review_count").getValue()),
-                                String.valueOf(ds.child("city").getValue()),
-                                String.valueOf(ds.child("state").getValue()),
-                                String.valueOf(ds.child("categories").getValue()),
-                                String.valueOf(ds.child("hours").getValue()));
+                                BasedOnLikes basedOnLikes = new BasedOnLikes(String.valueOf(ds.child("name").getValue()),
+                                        String.valueOf(ds.child("address").getValue()),
+                                        String.valueOf(ds.child("review_count").getValue()),
+                                        String.valueOf(ds.child("city").getValue()),
+                                        String.valueOf(ds.child("state").getValue()),
+                                        String.valueOf(ds.child("categories").getValue()),
+                                        String.valueOf(ds.child("hours").getValue()));
 
-                        likesList.add(basedOnLikes);
+                                likesList.add(basedOnLikes);
+                            }
+                        }
                     }
-
                 }
                 likesAdapter = new BasedOnLikesAdapter(getContext(), likesList, likesImage);
                 likes_recycler.setLayoutManager(new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false));
@@ -263,7 +293,7 @@ public class HomeFragment extends Fragment {
 
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
-                Toast.makeText(getActivity(), "Didn't get any data in Datasnapshot", Toast.LENGTH_SHORT).show();
+
             }
         });
     }

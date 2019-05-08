@@ -63,7 +63,7 @@
                 android:drawableLeft="@drawable/search"
                 android:drawablePadding="22dp"
                 android:gravity="left|center"
-                android:hint="Search by name, cuisine, city"
+                android:hint="Search by name, cuisine, state"
                 android:imeOptions="actionSearch"
                 android:inputType="textCapSentences"
                 android:padding="10dp"
@@ -132,6 +132,7 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@id/likes_recyclerview"
                 android:layout_marginTop="20dp"
+
                 android:background="@drawable/semicircle"
                 android:backgroundTint="@color/colorAccent">
 

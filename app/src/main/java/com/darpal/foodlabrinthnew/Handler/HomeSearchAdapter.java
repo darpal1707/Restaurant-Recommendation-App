@@ -71,7 +71,6 @@ public class HomeSearchAdapter extends RecyclerView.Adapter<HomeSearchAdapter.Ho
         private TextView review_count;
         private TextView city;
         private TextView state;
-        private TextView is_open;
 
         public HomeVH(@NonNull View view) {
             super(view);
@@ -82,6 +81,7 @@ public class HomeSearchAdapter extends RecyclerView.Adapter<HomeSearchAdapter.Ho
             review_count = (TextView) view.findViewById(R.id.ratings_value);
             city = (TextView) view.findViewById(R.id.res_city);
             state = (TextView) view.findViewById(R.id.res_state);
+
             view.setOnClickListener(this);
 
             Typeface custom_font = Typeface.createFromAsset(context.getAssets(),  "fonts/Montserrat-Medium.ttf");

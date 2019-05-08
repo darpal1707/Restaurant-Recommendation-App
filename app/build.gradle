@@ -49,6 +49,8 @@ dependencies {
     implementation 'com.flaviofaria:kenburnsview:1.0.7'
     implementation 'de.hdodenhof:circleimageview:2.0.0'
     implementation 'com.google.code.gson:gson:2.8.5'
+    implementation 'com.romellfudi.permission:fudi-permission:1.0.a'
+    implementation 'com.facebook.shimmer:shimmer:0.1.0@aar'
     implementation 'com.google.android.gms:play-services-maps:16.1.0'
 
     implementation 'com.google.firebase:firebase-auth:16.2.1'

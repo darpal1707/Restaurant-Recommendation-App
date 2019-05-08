@@ -22,7 +22,9 @@ import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import android.preference.PreferenceManager;
 import android.provider.MediaStore;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -73,7 +75,9 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class RestaurantProfileActivity extends AppCompatActivity {
 
@@ -163,16 +167,20 @@ public class RestaurantProfileActivity extends AppCompatActivity {
             public void onClick(View v) {
                 user = FirebaseAuth.getInstance().getCurrentUser();
                 if (user != null) {
-                    SharedPreferences preferences = getSharedPreferences("cuisinePref", Context.MODE_PRIVATE);
-                    Toast.makeText(RestaurantProfileActivity.this, "Cuisine clicked is " + cuisineClicked, Toast.LENGTH_SHORT).show();
-                    LikesUtil.likedCuisine.add(cuisineClicked);
-                    Gson gson = new Gson();
-                    String json = gson.toJson(LikesUtil.likedCuisine);
-                    SharedPreferences.Editor editor = preferences.edit();
-                    editor.putString("cuisine", json);
-                    editor.apply();
-                }
-                else {
+
+                    SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+                    Set<String> temp = sharedPreferences.getStringSet("likedCuisine", null);
+
+                    if (temp == null) temp = new HashSet<String>();// if null create new
+                    temp.add(cuisineClicked); //add data anyway
+                    Log.e("cuisineClicked",cuisineClicked);
+                    SharedPreferences.Editor editor = sharedPreferences.edit();
+                    editor.putStringSet("likedCuisine", temp);
+                    editor.commit();
+                    Log.e("temp updated", String.valueOf(sharedPreferences.getStringSet("likedCuisine",null)));
+                    Toast.makeText(RestaurantProfileActivity.this, "" + temp, Toast.LENGTH_SHORT).show();
+
+                } else {
                     // No user is signed in
                     Snackbar snackbar = Snackbar.make(v, "Please Login to get Custom Recommendations", Snackbar.LENGTH_LONG);
                     snackbar.show();
@@ -236,6 +244,7 @@ public class RestaurantProfileActivity extends AppCompatActivity {
                             startActivityForResult(intent, 1);
                         }
                     });
+
                     alertDialogBuilder
                             .setCancelable(false)
                             .setPositiveButton("OK",
@@ -251,6 +260,7 @@ public class RestaurantProfileActivity extends AppCompatActivity {
                                             Reviews reviews = new Reviews(resid, formatDate, reviewText, userid, stars);
                                             mReference.child("reviews").push().setValue(reviews);
                                         }
+
                                     })
                             .setNegativeButton("Cancel",
                                     new DialogInterface.OnClickListener() {
@@ -345,6 +355,7 @@ public class RestaurantProfileActivity extends AppCompatActivity {
                 photos.setLayoutManager(new LinearLayoutManager(RestaurantProfileActivity.this, LinearLayoutManager.HORIZONTAL, false));
                 photos.setAdapter(photoDisplayAdapter);
             }
+
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
                 Toast.makeText(RestaurantProfileActivity.this, databaseError.getMessage(), Toast.LENGTH_SHORT).show();
@@ -370,7 +381,7 @@ public class RestaurantProfileActivity extends AppCompatActivity {
                     userid = String.valueOf(dataSnapshot1.child("userid").getValue());
                     res_stars = String.valueOf(dataSnapshot1.child("stars").getValue());
 
-                    if(business_id.equals(resid)) {
+                    if (business_id.equals(resid)) {
                         //Toast.makeText(RestaurantProfileActivity.this, "business id" + business_id, Toast.LENGTH_SHORT).show();
                         Reviews review = new Reviews(String.valueOf(dataSnapshot1.child("business_id").getValue()),
                                 String.valueOf(dataSnapshot1.child("date").getValue()),

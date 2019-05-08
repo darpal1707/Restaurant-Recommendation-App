@@ -12,6 +12,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.darpal.foodlabrinthnew.Handler.HomeSearchAdapter;
@@ -46,6 +47,7 @@ public class SearchRestaurantHomePageActivity extends AppCompatActivity {
     public static String state;
     public static String hours;
     RecyclerView searchRecycler;
+    ImageView noData;
 
 
     @Override
@@ -63,6 +65,7 @@ public class SearchRestaurantHomePageActivity extends AppCompatActivity {
         LikesUtil.searchLong.clear();
         LikesUtil.searchHours.clear();
 
+        noData = (ImageView) findViewById(R.id.noDataImage);
         searchRecycler = (RecyclerView) findViewById(R.id.searchRecycler);
         Intent intent = getIntent();
         searchValue = intent.getStringExtra("searchHomeValue");
@@ -92,7 +95,7 @@ public class SearchRestaurantHomePageActivity extends AppCompatActivity {
                     state = String.valueOf(ds.child("state").getValue());
                     hours = String.valueOf(ds.child("hours").getValue());
 
-                    if(name.contains(searchValue) || categories.contains(searchValue)) {
+                    if(name.contains(searchValue) || categories.contains(searchValue) || state.contains(searchValue)) {
                         LikesUtil.searchId.add(business_id);
                         LikesUtil.searchName.add(name);
                         LikesUtil.searchCuisine.add(categories);
@@ -113,6 +116,10 @@ public class SearchRestaurantHomePageActivity extends AppCompatActivity {
 
                         searchList.add(basedOnLikes);
                     }
+                    /*else {
+                        searchRecycler.setVisibility(View.INVISIBLE);
+                        noData.setVisibility(View.VISIBLE);
+                    }*/
                 }
                 likesAdapter = new HomeSearchAdapter(searchList,SearchRestaurantHomePageActivity.this, searchImage);
                 searchRecycler.setLayoutManager(new LinearLayoutManager(SearchRestaurantHomePageActivity.this, LinearLayoutManager.VERTICAL, false));

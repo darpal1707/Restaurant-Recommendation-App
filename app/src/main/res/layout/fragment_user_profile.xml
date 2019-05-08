@@ -55,7 +55,7 @@
 
     <androidx.cardview.widget.CardView
         android:layout_width="150dp"
-        android:layout_height="100dp"
+        android:layout_height="130dp"
         android:layout_margin="20dp"
         android:layout_centerInParent="true"
         android:layout_below="@+id/username"
@@ -66,15 +66,15 @@
             android:layout_width="30dp"
             android:layout_height="30dp"
             android:layout_gravity="center"
-            android:src="@drawable/ic_photo_camera_black_24dp"/>
+            android:src="@drawable/ic_history_black_24dp"/>
 
         <TextView
             android:id="@+id/photos"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Upload Photo"
+            android:text="Recently Viewed Cuisine"
             android:textAlignment="center"
-            android:layout_marginTop="25dp"
+            android:layout_marginTop="35dp"
             android:layout_gravity="center"
             android:textColor="#000000"/>
 

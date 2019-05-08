@@ -5,6 +5,7 @@ import android.graphics.Typeface;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -41,6 +42,7 @@ public class ReviewsAdapter extends RecyclerView.Adapter<ReviewsAdapter.ReviewVH
             // Log.e("pos",trendingData.get(i).getName()+" "+i);
             holder.review.setText(reviewsData.get(position).getText());
             holder.date.setText(reviewsData.get(position).getDate());
+            holder.resRating.setRating(Float.parseFloat(reviewsData.get(position).getStars()));
         }
         else {
             Toast.makeText(context, "Something went wrong in Adapter!", Toast.LENGTH_SHORT).show();
@@ -56,11 +58,13 @@ public class ReviewsAdapter extends RecyclerView.Adapter<ReviewsAdapter.ReviewVH
 
         private TextView review;
         private TextView date;
+        private RatingBar resRating;
 
         public ReviewVH(@NonNull View itemView) {
             super(itemView);
             review = (TextView) itemView.findViewById(R.id.review_text);
             date = (TextView) itemView.findViewById(R.id.review_date);
+            resRating = (RatingBar) itemView.findViewById(R.id.resRating);
 
             Typeface custom_font = Typeface.createFromAsset(context.getAssets(),  "fonts/Montserrat-Medium.ttf");
             review.setTypeface(custom_font);

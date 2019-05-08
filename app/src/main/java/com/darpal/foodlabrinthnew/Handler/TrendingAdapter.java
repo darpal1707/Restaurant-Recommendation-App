@@ -99,7 +99,7 @@ public class TrendingAdapter extends RecyclerView.Adapter<TrendingAdapter.Trendi
             Intent intent = new Intent(context, RestaurantProfileActivity.class);
             intent.putExtra("business_id", TrendingUtil.businessIdArraryList.get(position));
             intent.putExtra("name", TrendingUtil.businessNameArrayList.get(position));
-            intent.putExtra("cuisine", LikesUtil.businessCuisineArrayList.get(position));
+            intent.putExtra("cuisine", TrendingUtil.businessCuisineArrayList.get(position));
             intent.putExtra("address", TrendingUtil.businessAddressArrayList.get(position));
             intent.putExtra("city", TrendingUtil.businessCityArrayList.get(position));
             intent.putExtra("state", TrendingUtil.businessStateArrayList.get(position));

@@ -31,11 +31,11 @@ public class SearchFragment extends Fragment {
     }
     GridView cuisineGrid;
     public static String posValue;
-    String[] cuisines = new String[]{"American", "Asian", "BBQ", "Chinese", "Coffee & Tea", "Deli", "Desserts",
+    String[] cuisines = new String[]{"American", "Asian", "Chinese", "Coffee & Tea", "Deli", "Desserts",
             "European", "Fast Food", "Greek", "Halal", "Indian", "Italian", "Japanese", "Korean",
             "Mediterranean", "Mexican", "Salad", "Sushi", "Thai", "Vegan", "Vegetarian"};
 
-    public static int[] cuisineImg = {R.drawable.american, R.drawable.asian, R.drawable.bbq, R.drawable.chinese,
+    public static int[] cuisineImg = {R.drawable.american, R.drawable.asian, R.drawable.chinese,
             R.drawable.coffee_tea, R.drawable.deli, R.drawable.desserts_two, R.drawable.european,
             R.drawable.fast_food, R.drawable.greek, R.drawable.halal, R.drawable.indian,
             R.drawable.italian, R.drawable.japanese, R.drawable.korean,
@@ -62,7 +62,6 @@ public class SearchFragment extends Fragment {
                 startActivity(intent);
             }
         });
-
 
         return view;
     }

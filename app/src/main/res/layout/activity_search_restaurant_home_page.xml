@@ -19,5 +19,12 @@
         android:paddingStart="20dp"
         android:paddingEnd="20dp" />
 
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:src="@drawable/no_data_found"
+        android:id="@+id/noDataImage"
+        android:visibility="gone"/>
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>
