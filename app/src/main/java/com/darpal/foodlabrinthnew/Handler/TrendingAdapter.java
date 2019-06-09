@@ -16,6 +16,7 @@ import android.widget.Toast;
 import com.darpal.foodlabrinthnew.Model.Trending;
 import com.darpal.foodlabrinthnew.R;
 import com.darpal.foodlabrinthnew.RestaurantProfileActivity;
+import com.darpal.foodlabrinthnew.RestaurantProfile_HomeActivity;
 import com.darpal.foodlabrinthnew.Util.LikesUtil;
 import com.darpal.foodlabrinthnew.Util.TrendingUtil;
 
@@ -96,7 +97,7 @@ public class TrendingAdapter extends RecyclerView.Adapter<TrendingAdapter.Trendi
         public void onClick(View v) {
             int  position = (getAdapterPosition());
             //Toast.makeText(context, "Position: " + position, Toast.LENGTH_SHORT).show();
-            Intent intent = new Intent(context, RestaurantProfileActivity.class);
+            Intent intent = new Intent(context, RestaurantProfile_HomeActivity.class);
             intent.putExtra("business_id", TrendingUtil.businessIdArraryList.get(position));
             intent.putExtra("name", TrendingUtil.businessNameArrayList.get(position));
             intent.putExtra("cuisine", TrendingUtil.businessCuisineArrayList.get(position));

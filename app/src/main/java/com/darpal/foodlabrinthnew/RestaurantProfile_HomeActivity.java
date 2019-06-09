@@ -1,22 +1,20 @@
 package com.darpal.foodlabrinthnew;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.AppCompatRatingBar;
+import androidx.core.app.ActivityCompat;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import android.Manifest;
 import android.annotation.SuppressLint;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.widget.AppCompatRatingBar;
-import androidx.core.app.ActivityCompat;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.graphics.Bitmap;
 import android.graphics.Typeface;
 import android.net.Uri;
@@ -24,7 +22,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.provider.MediaStore;
-import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -38,9 +35,7 @@ import com.darpal.foodlabrinthnew.Handler.PhotoDisplayAdapter;
 import com.darpal.foodlabrinthnew.Handler.ReviewsAdapter;
 import com.darpal.foodlabrinthnew.Model.Reviews;
 import com.darpal.foodlabrinthnew.Model.Upload;
-import com.darpal.foodlabrinthnew.NavBarPages.ProfileFragment;
 import com.darpal.foodlabrinthnew.NavBarPages.SearchResultDisplayActivity;
-import com.darpal.foodlabrinthnew.Util.LikesUtil;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
@@ -66,10 +61,8 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
-import com.google.gson.Gson;
 
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -79,7 +72,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public class RestaurantProfileActivity extends AppCompatActivity {
+public class RestaurantProfile_HomeActivity extends AppCompatActivity {
 
     MapView mapView;
     GoogleMap map;
@@ -88,7 +81,7 @@ public class RestaurantProfileActivity extends AppCompatActivity {
     TextView categories, openHours, reviews;
     double lat, longi;
     FloatingActionButton mapLink;
-    Button share, addreview, like;
+    Button share, addreview;
     RecyclerView reviewsRecycler;
     private List<Reviews> reviewsList;
     ReviewsAdapter reviewsAdapter;
@@ -108,10 +101,11 @@ public class RestaurantProfileActivity extends AppCompatActivity {
     List<Upload> mUploads;
     PhotoDisplayAdapter photoDisplayAdapter;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_restaurant_profile);
+        setContentView(R.layout.activity_restaurant_profile__home);
 
         restName = (TextView) findViewById(R.id.tvName);
         resCuisine = (TextView) findViewById(R.id.cuisines);
@@ -120,7 +114,6 @@ public class RestaurantProfileActivity extends AppCompatActivity {
         resState = (TextView) findViewById(R.id.resState);
         reshours = (TextView) findViewById(R.id.hours_time);
         addreview = (Button) findViewById(R.id.addReview);
-        like = (Button) findViewById(R.id.likeBtn);
         categories = (TextView) findViewById(R.id.CategoriesTitle);
         openHours = (TextView) findViewById(R.id.OpenHoursTitle);
         reviews = (TextView) findViewById(R.id.ReviewsTitle);
@@ -136,7 +129,7 @@ public class RestaurantProfileActivity extends AppCompatActivity {
         applyTypeFace();
         reviewsRecycler = (RecyclerView) findViewById(R.id.reviewsRecycler);
         reviewsList = new ArrayList<>();
-        reviewsAdapter = new ReviewsAdapter(RestaurantProfileActivity.this, reviewsList);
+        reviewsAdapter = new ReviewsAdapter(RestaurantProfile_HomeActivity.this, reviewsList);
         mReference = FirebaseDatabase.getInstance().getReference();
         showReviews();
 
@@ -160,33 +153,6 @@ public class RestaurantProfileActivity extends AppCompatActivity {
             reshours.setText(hours);
         }
 
-        //Likes user clicked value
-        final String cuisineClicked = SearchResultDisplayActivity.value;
-        like.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                user = FirebaseAuth.getInstance().getCurrentUser();
-                if (user != null) {
-
-                    SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-                    Set<String> temp = sharedPreferences.getStringSet("likedCuisine", null);
-
-                    if (temp == null) temp = new HashSet<String>();// if null create new
-                    temp.add(cuisineClicked); //add data anyway
-                    Log.e("cuisineClicked",cuisineClicked);
-                    SharedPreferences.Editor editor = sharedPreferences.edit();
-                    editor.putStringSet("likedCuisine", temp);
-                    editor.commit();
-                    Log.e("temp updated", String.valueOf(sharedPreferences.getStringSet("likedCuisine",null)));
-                    Toast.makeText(RestaurantProfileActivity.this, "" + temp, Toast.LENGTH_SHORT).show();
-
-                } else {
-                    // No user is signed in
-                    Snackbar snackbar = Snackbar.make(v, "Please Login to get Custom Recommendations", Snackbar.LENGTH_LONG);
-                    snackbar.show();
-                }
-            }
-        });
 
         //share button code
         final String mapUrl = "http://maps.google.com/maps?&daddr=" + lat + "," + longi;
@@ -223,8 +189,8 @@ public class RestaurantProfileActivity extends AppCompatActivity {
                     String email = user.getEmail();
                     String Uid = user.getUid();
                     AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
-                            RestaurantProfileActivity.this);
-                    LayoutInflater li = LayoutInflater.from(RestaurantProfileActivity.this);
+                            RestaurantProfile_HomeActivity.this);
+                    LayoutInflater li = LayoutInflater.from(RestaurantProfile_HomeActivity.this);
                     View promptsView = li.inflate(R.layout.fragment_full_screen_dialog, null);
                     alertDialogBuilder.setView(promptsView);
                     final EditText userInput = (EditText) promptsView
@@ -295,9 +261,9 @@ public class RestaurantProfileActivity extends AppCompatActivity {
             public void onMapReady(GoogleMap mMap) {
                 map = mMap;
                 // For showing a move to my location button
-                if (ActivityCompat.checkSelfPermission(RestaurantProfileActivity.this,
+                if (ActivityCompat.checkSelfPermission(RestaurantProfile_HomeActivity.this,
                         Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
-                        ActivityCompat.checkSelfPermission(RestaurantProfileActivity.this,
+                        ActivityCompat.checkSelfPermission(RestaurantProfile_HomeActivity.this,
                                 Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
                     // TODO: Consider calling
                     //    ActivityCompat#requestPermissions
@@ -320,7 +286,6 @@ public class RestaurantProfileActivity extends AppCompatActivity {
                 mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(sydney, zoomLevel));
             }
         });
-
     }
 
     private void applyTypeFace() {
@@ -332,7 +297,6 @@ public class RestaurantProfileActivity extends AppCompatActivity {
         resState.setTypeface(custom_font);
         addreview.setTypeface(custom_font);
         share.setTypeface(custom_font);
-        like.setTypeface(custom_font);
         categories.setTypeface(custom_font);
         openHours.setTypeface(custom_font);
         reviews.setTypeface(custom_font);
@@ -352,14 +316,14 @@ public class RestaurantProfileActivity extends AppCompatActivity {
                     mUploads.add(upload);
                     Log.e("photo url", String.valueOf(postSnapshot));
                 }
-                photoDisplayAdapter = new PhotoDisplayAdapter(RestaurantProfileActivity.this, mUploads);
-                photos.setLayoutManager(new LinearLayoutManager(RestaurantProfileActivity.this, LinearLayoutManager.HORIZONTAL, false));
+                photoDisplayAdapter = new PhotoDisplayAdapter(RestaurantProfile_HomeActivity.this, mUploads);
+                photos.setLayoutManager(new LinearLayoutManager(RestaurantProfile_HomeActivity.this, LinearLayoutManager.HORIZONTAL, false));
                 photos.setAdapter(photoDisplayAdapter);
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
-                Toast.makeText(RestaurantProfileActivity.this, databaseError.getMessage(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(RestaurantProfile_HomeActivity.this, databaseError.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -383,7 +347,7 @@ public class RestaurantProfileActivity extends AppCompatActivity {
                     res_stars = String.valueOf(dataSnapshot1.child("stars").getValue());
 
                     if (business_id.equals(resid)) {
-                        //Toast.makeText(RestaurantProfileActivity.this, "business id" + business_id, Toast.LENGTH_SHORT).show();
+                        //Toast.makeText(RestaurantProfile_HomeActivity.this, "business id" + business_id, Toast.LENGTH_SHORT).show();
                         Reviews review = new Reviews(String.valueOf(dataSnapshot1.child("business_id").getValue()),
                                 String.valueOf(dataSnapshot1.child("date").getValue()),
                                 String.valueOf(dataSnapshot1.child("text").getValue()),
@@ -394,14 +358,14 @@ public class RestaurantProfileActivity extends AppCompatActivity {
                     }
 
                 }
-                reviewsAdapter = new ReviewsAdapter(RestaurantProfileActivity.this, reviewsList);
-                reviewsRecycler.setLayoutManager(new LinearLayoutManager(RestaurantProfileActivity.this, LinearLayoutManager.VERTICAL, false));
+                reviewsAdapter = new ReviewsAdapter(RestaurantProfile_HomeActivity.this, reviewsList);
+                reviewsRecycler.setLayoutManager(new LinearLayoutManager(RestaurantProfile_HomeActivity.this, LinearLayoutManager.VERTICAL, false));
                 reviewsRecycler.setAdapter(reviewsAdapter);
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
-                Toast.makeText(RestaurantProfileActivity.this, "Didn't get any data in Datasnapshot", Toast.LENGTH_SHORT).show();
+                Toast.makeText(RestaurantProfile_HomeActivity.this, "Didn't get any data in Datasnapshot", Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -412,7 +376,7 @@ public class RestaurantProfileActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == 1 && resultCode == RESULT_OK) {
             final String user_id = user.getUid();
-            Toast.makeText(RestaurantProfileActivity.this, "Uploading Now", Toast.LENGTH_SHORT).show();
+            Toast.makeText(RestaurantProfile_HomeActivity.this, "Uploading Now", Toast.LENGTH_SHORT).show();
 
             Bundle extras = data.getExtras();
             Bitmap bitmap = (Bitmap) data.getExtras().get("data");
@@ -420,7 +384,7 @@ public class RestaurantProfileActivity extends AppCompatActivity {
             bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
             byte[] dataBAOS = baos.toByteArray();
 
-            FirebaseApp.initializeApp(RestaurantProfileActivity.this);
+            FirebaseApp.initializeApp(RestaurantProfile_HomeActivity.this);
 
             StorageReference storageRef = FirebaseStorage.getInstance().getReferenceFromUrl("gs://foodlabrinthnew.appspot.com/");
             StorageReference imagesRef = storageRef.child("photos" + new Date().getTime());
@@ -433,7 +397,7 @@ public class RestaurantProfileActivity extends AppCompatActivity {
             uploadTask.addOnFailureListener(new OnFailureListener() {
                 @Override
                 public void onFailure(@NonNull Exception exception) {
-                    Toast.makeText(RestaurantProfileActivity.this, "Sending failed. Please try again", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(RestaurantProfile_HomeActivity.this, "Sending failed. Please try again", Toast.LENGTH_SHORT).show();
                 }
             }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                 @Override
@@ -445,7 +409,7 @@ public class RestaurantProfileActivity extends AppCompatActivity {
                             //mProgressBar.setProgress(0);
                         }
                     }, 500);
-                    Toast.makeText(RestaurantProfileActivity.this, "Upload successful", Toast.LENGTH_LONG).show();
+                    Toast.makeText(RestaurantProfile_HomeActivity.this, "Upload successful", Toast.LENGTH_LONG).show();
 
                     Task<Uri> urlTask = taskSnapshot.getStorage().getDownloadUrl();
                     while (!urlTask.isSuccessful()) ;
@@ -465,7 +429,7 @@ public class RestaurantProfileActivity extends AppCompatActivity {
                 }
             });
         } else {
-            Toast.makeText(RestaurantProfileActivity.this, "No file selected", Toast.LENGTH_SHORT).show();
+            Toast.makeText(RestaurantProfile_HomeActivity.this, "No file selected", Toast.LENGTH_SHORT).show();
         }
     }
 

@@ -14,6 +14,7 @@ import com.darpal.foodlabrinthnew.ImageLinks;
 import com.darpal.foodlabrinthnew.Model.BasedOnLikes;
 import com.darpal.foodlabrinthnew.R;
 import com.darpal.foodlabrinthnew.RestaurantProfileActivity;
+import com.darpal.foodlabrinthnew.RestaurantProfile_HomeActivity;
 import com.darpal.foodlabrinthnew.Util.LikesUtil;
 import com.squareup.picasso.Picasso;
 
@@ -98,7 +99,7 @@ public class BasedOnLikesAdapter extends RecyclerView.Adapter<BasedOnLikesAdapte
         public void onClick(View v) {
             int  position = (getAdapterPosition());
             //Toast.makeText(context, "Position: " + position, Toast.LENGTH_SHORT).show();
-            Intent intent = new Intent(context, RestaurantProfileActivity.class);
+            Intent intent = new Intent(context, RestaurantProfile_HomeActivity.class);
             intent.putExtra("business_id", LikesUtil.businessIdArraryList.get(position));
             intent.putExtra("name", LikesUtil.businessNameArrayList.get(position));
             intent.putExtra("cuisine", LikesUtil.businessCuisineArrayList.get(position));

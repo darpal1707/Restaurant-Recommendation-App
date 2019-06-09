@@ -1,0 +1,28 @@
+<LinearLayout android:id="@+id/btnLayout"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_below="@id/resState"
+    android:orientation="horizontal"
+    android:layout_gravity="end"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+
+
+    <Button
+        android:id="@+id/ShareBtn"
+        android:layout_width="0dp"
+        android:layout_height="fill_parent"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="16dp"
+        android:layout_weight="1"
+        android:background="#fff"
+        android:drawableStart="@drawable/ic_share_black_24dp"
+        android:paddingStart="65dp"
+        android:paddingEnd="60dp"
+        android:stateListAnimator="@null"
+        android:text="Share"
+        android:textAllCaps="false"
+        android:textColor="#000"
+        android:textSize="16sp" />
+
+</LinearLayout>
