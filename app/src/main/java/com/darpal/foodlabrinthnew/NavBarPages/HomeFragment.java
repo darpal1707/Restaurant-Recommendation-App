@@ -34,6 +34,7 @@ import com.darpal.foodlabrinthnew.NotDecided.NotDecidedActivity;
 import com.darpal.foodlabrinthnew.R;
 import com.darpal.foodlabrinthnew.Util.LikesUtil;
 import com.darpal.foodlabrinthnew.Util.TrendingUtil;
+import com.facebook.shimmer.ShimmerFrameLayout;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -93,6 +94,7 @@ public class HomeFragment extends Fragment {
     public static String city, Trendcity;
     public static String state, Trendstate;
     public static String hours, likesHours;
+    private ShimmerFrameLayout mShimmerViewContainer, likeShimmer;
 
     List<String> cusineData;
     TextView likesLabel;
@@ -106,24 +108,10 @@ public class HomeFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_home, container, false);
 
-        /*SharedPreferences sharedPreferences = getActivity().getSharedPreferences("cuisinePref", Context.MODE_PRIVATE);
-        try {
-            Gson gson = new Gson();
-            String json = sharedPreferences.getString("cuisine", "");
-            if (json.isEmpty()) {
-                Toast.makeText(getActivity(), " didnt get any data", Toast.LENGTH_SHORT).show();
-            } else {
-                Type type = new TypeToken<List<String>>() {
-                }.getType();
-                cusineData = gson.fromJson(json, type);
-                data = cusineData.toString();
-                data = data.substring(1,data.length()-1);
-                Toast.makeText(getActivity(), "cusine liked are " + data, Toast.LENGTH_SHORT).show();
-            }
-        } catch (Exception e) {
-            Log.e("exception shared pref", String.valueOf(e));
-            Toast.makeText(getActivity(), "something went wrong in home fragment shared pref", Toast.LENGTH_SHORT).show();
-        }*/
+        mShimmerViewContainer = view.findViewById(R.id.shimmer_view_container);
+        likeShimmer = view.findViewById(R.id.likeShimmer);
+        mShimmerViewContainer.startShimmerAnimation();
+        likeShimmer.startShimmerAnimation();
 
         likesLabel = (TextView) view.findViewById(R.id.likes_lbl);
         final EditText searchHome = (EditText) view.findViewById(R.id.searchview_homepage);
@@ -221,6 +209,9 @@ public class HomeFragment extends Fragment {
                 }
                 trending_recycler.setLayoutManager(new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL, false));
                 trending_recycler.setAdapter(trendingAdapter);
+
+                mShimmerViewContainer.stopShimmerAnimation();
+                mShimmerViewContainer.setVisibility(View.GONE);
             }
 
             @Override
@@ -289,6 +280,9 @@ public class HomeFragment extends Fragment {
                 likesAdapter = new BasedOnLikesAdapter(getContext(), likesList, likesImage);
                 likes_recycler.setLayoutManager(new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false));
                 likes_recycler.setAdapter(likesAdapter);
+
+                likeShimmer.stopShimmerAnimation();
+                likeShimmer.setVisibility(View.GONE);
             }
 
             @Override

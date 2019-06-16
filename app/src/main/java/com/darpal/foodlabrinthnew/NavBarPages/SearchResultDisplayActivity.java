@@ -9,6 +9,7 @@ import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.widget.Toast;
 
 import com.darpal.foodlabrinthnew.Handler.BasedOnLikesAdapter;
@@ -16,6 +17,7 @@ import com.darpal.foodlabrinthnew.Handler.SearchFragmentAdapter;
 import com.darpal.foodlabrinthnew.Model.BasedOnLikes;
 import com.darpal.foodlabrinthnew.R;
 import com.darpal.foodlabrinthnew.Util.LikesUtil;
+import com.facebook.shimmer.ShimmerFrameLayout;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -42,6 +44,7 @@ public class SearchResultDisplayActivity extends AppCompatActivity {
     public static String state;
     public static String hours;
     private RecyclerView likes_recycler;
+    ShimmerFrameLayout search;
 
     public static String value;
     public static int[] searchImage = {R.mipmap.ten,R.mipmap.one,R.mipmap.two,R.mipmap.three,R.mipmap.four,R.mipmap.five,
@@ -62,6 +65,9 @@ public class SearchResultDisplayActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search_result_display);
+
+        search = (ShimmerFrameLayout) findViewById(R.id.searchShimmer);
+        search.startShimmerAnimation();
 
         LikesUtil.searchId.clear();
         LikesUtil.searchName.clear();
@@ -126,6 +132,9 @@ public class SearchResultDisplayActivity extends AppCompatActivity {
                 likesAdapter = new SearchFragmentAdapter(SearchResultDisplayActivity.this, likesDetailsList, searchImage);
                 likes_recycler.setLayoutManager(new LinearLayoutManager(SearchResultDisplayActivity.this, LinearLayoutManager.VERTICAL, false));
                 likes_recycler.setAdapter(likesAdapter);
+
+                search.stopShimmerAnimation();
+                search.setVisibility(View.GONE);
             }
 
             @Override
