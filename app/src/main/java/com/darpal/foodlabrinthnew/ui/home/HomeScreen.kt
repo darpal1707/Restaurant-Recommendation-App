@@ -1,10 +1,15 @@
 package com.darpal.foodlabrinthnew.ui.home
 
+import android.Manifest
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -20,22 +25,31 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.ArrowDropDown
 import androidx.compose.material.icons.rounded.AutoAwesome
 import androidx.compose.material.icons.rounded.Casino
 import androidx.compose.material.icons.rounded.FavoriteBorder
+import androidx.compose.material.icons.rounded.LocationCity
+import androidx.compose.material.icons.rounded.MyLocation
+import androidx.compose.material.icons.rounded.Place
+import androidx.compose.material3.AssistChip
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SuggestionChip
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -49,12 +63,15 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.darpal.foodlabrinthnew.R
+import com.darpal.foodlabrinthnew.data.model.Area
 import com.darpal.foodlabrinthnew.data.model.Cuisine
 import com.darpal.foodlabrinthnew.ui.appViewModelFactory
 import com.darpal.foodlabrinthnew.ui.components.CardPlaceholder
 import com.darpal.foodlabrinthnew.ui.components.CuisineImages
+import com.darpal.foodlabrinthnew.ui.components.EmptyState
 import com.darpal.foodlabrinthnew.ui.components.ErrorState
 import com.darpal.foodlabrinthnew.ui.components.ListItemPlaceholder
+import com.darpal.foodlabrinthnew.ui.components.OsmAttribution
 import com.darpal.foodlabrinthnew.ui.components.RestaurantCard
 import com.darpal.foodlabrinthnew.ui.components.RestaurantListItem
 import com.darpal.foodlabrinthnew.ui.components.SearchField
@@ -67,14 +84,22 @@ fun HomeScreen(
     onSearch: (String) -> Unit,
     onOpenCuisine: (String) -> Unit,
     onOpenCuisines: (title: String, names: Collection<String>) -> Unit,
+    onSeeAll: (title: String) -> Unit,
     onDecide: () -> Unit,
     viewModel: HomeViewModel = viewModel(
-        factory = appViewModelFactory { HomeViewModel(it.restaurantRepository, it.preferencesRepository, it.authRepository) },
+        factory = appViewModelFactory { HomeViewModel(it.restaurantRepository, it.preferencesRepository) },
     ),
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     var query by rememberSaveable { mutableStateOf("") }
     val forYouTitle = stringResource(R.string.home_for_you)
+    val moreTitle = stringResource(R.string.home_more)
+    val permissionLauncher = rememberLauncherForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { result ->
+        viewModel.onLocationPermissionResult(result.values.any { it })
+    }
+    val requestLocation = {
+        permissionLauncher.launch(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION))
+    }
 
     PullToRefreshBox(
         isRefreshing = state.isRefreshing,
@@ -83,31 +108,19 @@ fun HomeScreen(
     ) {
         LazyColumn(
             modifier = Modifier.fillMaxSize(),
-            contentPadding = PaddingValues(bottom = 24.dp),
+            contentPadding = PaddingValues(bottom = 8.dp),
             verticalArrangement = Arrangement.spacedBy(20.dp),
         ) {
             item {
                 Column(Modifier.statusBarsPadding().padding(horizontal = 20.dp).padding(top = 16.dp)) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Column(Modifier.weight(1f)) {
-                            Text(
-                                text = state.userName?.let { stringResource(R.string.home_greeting, it) }
-                                    ?: stringResource(R.string.home_greeting_guest),
-                                style = MaterialTheme.typography.headlineMedium,
-                            )
-                            Text(
-                                stringResource(R.string.home_subtitle),
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            )
+                            Text(stringResource(R.string.home_greeting_guest), style = MaterialTheme.typography.headlineMedium)
+                            AreaPicker(state.area, onSelect = viewModel::selectArea)
                         }
-                        Image(
-                            painter = painterResource(R.drawable.logo),
-                            contentDescription = null,
-                            modifier = Modifier.size(48.dp),
-                        )
+                        Image(painterResource(R.drawable.logo), contentDescription = null, modifier = Modifier.size(48.dp))
                     }
-                    Spacer(Modifier.height(16.dp))
+                    Spacer(Modifier.height(12.dp))
                     SearchField(
                         value = query,
                         onValueChange = { query = it },
@@ -135,17 +148,27 @@ fun HomeScreen(
 
             when {
                 state.isLoading -> item { LoadingSections() }
+                state.needsLocation -> item {
+                    LocationPrompt(onAllow = requestLocation, onPickCity = viewModel::selectArea, modifier = Modifier.padding(horizontal = 20.dp))
+                }
                 state.error != null -> item { ErrorState(state.error, onRetry = viewModel::refresh) }
+                state.totalCount == 0 -> item {
+                    EmptyState(
+                        icon = Icons.Rounded.Place,
+                        title = stringResource(R.string.home_nothing_title),
+                        body = stringResource(R.string.home_nothing_body),
+                    )
+                }
                 else -> {
                     item {
                         Column {
-                            SectionHeader(stringResource(R.string.home_trending), Modifier.padding(horizontal = 20.dp))
+                            SectionHeader(stringResource(R.string.home_closest), Modifier.padding(horizontal = 20.dp))
                             Spacer(Modifier.height(8.dp))
                             LazyRow(
                                 contentPadding = PaddingValues(horizontal = 20.dp),
                                 horizontalArrangement = Arrangement.spacedBy(14.dp),
                             ) {
-                                items(state.trending, key = { it.id }) { restaurant ->
+                                items(state.closest, key = { it.id }) { restaurant ->
                                     RestaurantCard(
                                         restaurant = restaurant,
                                         isFavorite = restaurant.id in state.favoriteIds,
@@ -180,17 +203,82 @@ fun HomeScreen(
                         )
                     }
 
-                    item { SectionHeader(stringResource(R.string.home_top_rated), Modifier.padding(horizontal = 20.dp)) }
-                    items(state.topRated, key = { "top-${it.id}" }) { restaurant ->
-                        RestaurantListItem(
-                            restaurant = restaurant,
-                            isFavorite = restaurant.id in state.favoriteIds,
-                            onClick = { onOpenRestaurant(restaurant.id) },
-                            onToggleFavorite = { viewModel.toggleFavorite(restaurant) },
-                            modifier = Modifier.padding(horizontal = 20.dp),
-                        )
+                    if (state.more.isNotEmpty()) {
+                        item {
+                            SectionHeader(
+                                title = moreTitle,
+                                modifier = Modifier.padding(start = 20.dp, end = 8.dp),
+                                action = stringResource(R.string.see_all_count, state.totalCount),
+                                onAction = { onSeeAll(moreTitle) },
+                            )
+                        }
+                        items(state.more, key = { "more-${it.id}" }) { restaurant ->
+                            RestaurantListItem(
+                                restaurant = restaurant,
+                                isFavorite = restaurant.id in state.favoriteIds,
+                                onClick = { onOpenRestaurant(restaurant.id) },
+                                onToggleFavorite = { viewModel.toggleFavorite(restaurant) },
+                                modifier = Modifier.padding(horizontal = 20.dp),
+                            )
+                        }
                     }
                 }
+            }
+
+            item { OsmAttribution(Modifier.padding(horizontal = 12.dp)) }
+        }
+    }
+}
+
+@Composable
+private fun AreaPicker(area: Area, onSelect: (Area) -> Unit) {
+    var expanded by remember { mutableStateOf(false) }
+    Box {
+        AssistChip(
+            onClick = { expanded = true },
+            label = { Text(area.label) },
+            leadingIcon = {
+                Icon(
+                    if (area.isNearby) Icons.Rounded.MyLocation else Icons.Rounded.LocationCity,
+                    contentDescription = null,
+                    modifier = Modifier.size(18.dp),
+                )
+            },
+            trailingIcon = { Icon(Icons.Rounded.ArrowDropDown, contentDescription = stringResource(R.string.area_change)) },
+        )
+        DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
+            (listOf(Area.NEARBY) + Area.CITIES).forEach { option ->
+                DropdownMenuItem(
+                    text = { Text(option.label) },
+                    leadingIcon = {
+                        Icon(if (option.isNearby) Icons.Rounded.MyLocation else Icons.Rounded.LocationCity, contentDescription = null)
+                    },
+                    onClick = {
+                        expanded = false
+                        onSelect(option)
+                    },
+                )
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+private fun LocationPrompt(onAllow: () -> Unit, onPickCity: (Area) -> Unit, modifier: Modifier = Modifier) {
+    Surface(shape = MaterialTheme.shapes.extraLarge, color = MaterialTheme.colorScheme.secondaryContainer, modifier = modifier.fillMaxWidth()) {
+        Column(Modifier.padding(20.dp)) {
+            Icon(Icons.Rounded.MyLocation, contentDescription = null, tint = MaterialTheme.colorScheme.onSecondaryContainer)
+            Spacer(Modifier.height(8.dp))
+            Text(stringResource(R.string.location_title), style = MaterialTheme.typography.titleLarge, color = MaterialTheme.colorScheme.onSecondaryContainer)
+            Text(stringResource(R.string.location_body), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSecondaryContainer)
+            Spacer(Modifier.height(12.dp))
+            Button(onClick = onAllow) { Text(stringResource(R.string.location_allow)) }
+            Spacer(Modifier.height(12.dp))
+            Text(stringResource(R.string.location_or_city), style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.onSecondaryContainer)
+            Spacer(Modifier.height(4.dp))
+            FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                Area.CITIES.forEach { city -> SuggestionChip(onClick = { onPickCity(city) }, label = { Text(city.label) }) }
             }
         }
     }

@@ -30,8 +30,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.darpal.foodlabrinthnew.R
+import com.darpal.foodlabrinthnew.data.PlacesState
 import com.darpal.foodlabrinthnew.data.PreferencesRepository
-import com.darpal.foodlabrinthnew.data.Resource
 import com.darpal.foodlabrinthnew.data.RestaurantRepository
 import com.darpal.foodlabrinthnew.data.model.Cuisine
 import com.darpal.foodlabrinthnew.data.model.Restaurant
@@ -54,13 +54,15 @@ data class SavedUiState(
 
 class SavedViewModel(restaurants: RestaurantRepository, private val preferences: PreferencesRepository) : ViewModel() {
     val uiState: StateFlow<SavedUiState> = combine(
-        restaurants.restaurants,
-        preferences.favoriteIds,
+        restaurants.state,
+        preferences.savedRestaurants,
         preferences.likedCuisines,
-    ) { resource, favorites, liked ->
+    ) { state, saved, liked ->
+        // Snapshots are stored without distance; add it when we know where the user is looking.
+        val center = (state as? PlacesState.Ready)?.center
         SavedUiState(
-            isLoading = resource is Resource.Loading,
-            saved = (resource as? Resource.Success)?.data?.filter { it.id in favorites }.orEmpty(),
+            isLoading = false,
+            saved = if (center == null) saved else saved.map { it.withDistanceFrom(center) },
             likedCuisines = liked,
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), SavedUiState())

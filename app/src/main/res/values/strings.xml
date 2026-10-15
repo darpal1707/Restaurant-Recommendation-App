@@ -17,18 +17,28 @@
     <string name="sign_in">Sign in</string>
 
     <!-- Home -->
-    <string name="home_greeting">Hungry, %1$s?</string>
     <string name="home_greeting_guest">What are you craving?</string>
-    <string name="home_subtitle">Discover great places to eat around you</string>
     <string name="home_decide_title">Can\'t decide?</string>
-    <string name="home_decide_body">Answer four quick questions and we\'ll pick restaurants for you.</string>
+    <string name="home_decide_body">Answer three quick questions and we\'ll pick places for you.</string>
     <string name="home_decide_action">Help me choose</string>
     <string name="home_cuisines">Browse by cuisine</string>
-    <string name="home_trending">Trending now</string>
+    <string name="home_closest">Closest to you</string>
     <string name="home_for_you">Picked for you</string>
     <string name="home_for_you_hint">Tap ♥ on restaurants you like and we\'ll recommend similar places here.</string>
-    <string name="home_top_rated">Top rated</string>
+    <string name="home_more">More around you</string>
+    <string name="home_nothing_title">No places found here</string>
+    <string name="home_nothing_body">OpenStreetMap has no restaurants mapped near this spot yet. Try another city.</string>
     <string name="see_all">See all</string>
+    <string name="see_all_count">See all %1$d</string>
+
+    <!-- Area &amp; location -->
+    <string name="area_change">Change area</string>
+    <string name="location_title">Find places near you</string>
+    <string name="location_body">Allow location access to see restaurants around you. Your location is only used to search OpenStreetMap.</string>
+    <string name="location_allow">Use my location</string>
+    <string name="location_or_city">Or explore a city</string>
+    <string name="location_from_home">Allow location or pick a city on the Home tab.</string>
+    <string name="osm_attribution">Restaurant data © OpenStreetMap contributors</string>
 
     <!-- Explore -->
     <string name="explore_title">Explore</string>
@@ -38,12 +48,14 @@
     <string name="results_count">%1$d places</string>
     <string name="results_empty_title">No restaurants found</string>
     <string name="results_empty_body">Try a different search or another cuisine.</string>
-    <string name="results_search_title">“%1$s”</string>
     <string name="results_decide_title">Your picks</string>
 
     <!-- Detail -->
     <string name="detail_directions">Directions</string>
     <string name="detail_share">Share</string>
+    <string name="detail_call">Call</string>
+    <string name="detail_website">Website</string>
+    <string name="detail_view_osm">Open on OpenStreetMap</string>
     <string name="detail_review">Review</string>
     <string name="detail_save">Save</string>
     <string name="detail_saved">Saved</string>
@@ -83,12 +95,10 @@
     <string name="decide_meal_question">Which meal are you planning?</string>
     <string name="decide_cuisine_question">What cuisines sound good?</string>
     <string name="decide_cuisine_hint">Pick one or more</string>
-    <string name="decide_ambience_question">What kind of vibe?</string>
-    <string name="decide_budget_question">What\'s your budget?</string>
+    <string name="decide_distance_question">How far are you willing to go?</string>
     <string name="decide_next">Next</string>
-    <string name="decide_surprise">Surprise me</string>
     <string name="decide_any">Any</string>
-    <string name="decide_any_body">Show me everything</string>
+    <string name="decide_any_body">Anywhere nearby</string>
 
     <!-- Map -->
     <string name="map_permission_rationale">Allow location to see restaurants around you</string>

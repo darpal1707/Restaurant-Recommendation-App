@@ -2,7 +2,7 @@ package com.darpal.foodlabrinthnew.data.model
 
 /**
  * A cuisine the user can browse or like. [terms] are matched (case-insensitively, as substrings)
- * against a restaurant's Yelp categories, e.g. "BBQ" also matches the Yelp category "Barbeque".
+ * against a restaurant's categories, which come from the OSM `cuisine` and `diet:*` tags.
  */
 data class Cuisine(val name: String, val terms: List<String> = listOf(name)) {
     fun matches(restaurant: Restaurant): Boolean =
@@ -10,24 +10,24 @@ data class Cuisine(val name: String, val terms: List<String> = listOf(name)) {
 
     companion object {
         val ALL: List<Cuisine> = listOf(
-            Cuisine("American", listOf("American")),
+            Cuisine("American", listOf("American", "Burger", "Steak")),
             Cuisine("Asian", listOf("Asian")),
-            Cuisine("BBQ", listOf("BBQ", "Barbeque", "Barbecue")),
+            Cuisine("BBQ", listOf("BBQ", "Barbecue", "Barbeque")),
             Cuisine("Chinese"),
-            Cuisine("Coffee & Tea", listOf("Coffee", "Tea")),
-            Cuisine("Deli", listOf("Deli")),
-            Cuisine("Desserts", listOf("Dessert", "Ice Cream", "Bakeries")),
-            Cuisine("European", listOf("European", "French", "German", "British")),
-            Cuisine("Fast Food"),
+            Cuisine("Coffee & Tea", listOf("Coffee", "Tea", "Cafe")),
+            Cuisine("Deli", listOf("Deli", "Sandwich", "Bagel")),
+            Cuisine("Desserts", listOf("Dessert", "Ice Cream", "Cake", "Donut", "Bakery")),
+            Cuisine("European", listOf("European", "French", "German", "British", "Portuguese")),
+            Cuisine("Fast Food", listOf("Fast Food", "Burger", "Chicken")),
             Cuisine("Greek"),
             Cuisine("Halal"),
             Cuisine("Indian"),
-            Cuisine("Italian", listOf("Italian", "Pizza")),
+            Cuisine("Italian", listOf("Italian", "Pizza", "Pasta")),
             Cuisine("Jamaican", listOf("Jamaican", "Caribbean")),
             Cuisine("Japanese", listOf("Japanese", "Ramen")),
             Cuisine("Korean"),
-            Cuisine("Mediterranean"),
-            Cuisine("Mexican", listOf("Mexican", "Tex-Mex", "Tacos")),
+            Cuisine("Mediterranean", listOf("Mediterranean", "Lebanese", "Turkish", "Kebab")),
+            Cuisine("Mexican", listOf("Mexican", "Tex-Mex", "Taco", "Burrito")),
             Cuisine("Salad"),
             Cuisine("Spanish", listOf("Spanish", "Tapas")),
             Cuisine("Sushi"),

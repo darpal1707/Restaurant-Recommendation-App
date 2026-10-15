@@ -27,6 +27,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.darpal.foodlabrinthnew.FeatureFlags
 import com.darpal.foodlabrinthnew.ui.decide.DecideScreen
 import com.darpal.foodlabrinthnew.ui.detail.RestaurantDetailScreen
 import com.darpal.foodlabrinthnew.ui.explore.ExploreScreen
@@ -43,7 +44,7 @@ fun FoodLabrinthApp() {
     val navController = rememberNavController()
     val backStackEntry by navController.currentBackStackEntryAsState()
     val destination = backStackEntry?.destination
-    val showBottomBar = TopLevelDestination.entries.any { tab ->
+    val showBottomBar = TopLevelDestination.visible.any { tab ->
         destination?.hierarchy?.any { it.route == tab.route } == true
     }
 
@@ -55,7 +56,7 @@ fun FoodLabrinthApp() {
                 exit = slideOutVertically { it } + fadeOut(),
             ) {
                 NavigationBar {
-                    TopLevelDestination.entries.forEach { tab ->
+                    TopLevelDestination.visible.forEach { tab ->
                         val selected = destination?.hierarchy?.any { it.route == tab.route } == true
                         NavigationBarItem(
                             selected = selected,
@@ -88,6 +89,7 @@ fun FoodLabrinthApp() {
                     onSearch = { navController.navigate(Routes.search(it)) },
                     onOpenCuisine = { navController.navigate(Routes.cuisine(it)) },
                     onOpenCuisines = { title, names -> navController.navigate(Routes.cuisines(title, names)) },
+                    onSeeAll = { title -> navController.navigate(Routes.allNearby(title)) },
                     onDecide = { navController.navigate(Routes.DECIDE) },
                 )
             }
@@ -101,7 +103,9 @@ fun FoodLabrinthApp() {
             composable(Routes.SAVED) {
                 SavedScreen(onOpenRestaurant = openRestaurant, onExplore = { navController.navigateToTab(Routes.EXPLORE) })
             }
-            composable(Routes.PROFILE) { ProfileScreen() }
+            if (FeatureFlags.ACCOUNTS_ENABLED) {
+                composable(Routes.PROFILE) { ProfileScreen() }
+            }
             composable(Routes.DECIDE) {
                 DecideScreen(
                     onBack = back,
@@ -126,7 +130,7 @@ fun FoodLabrinthApp() {
             ) {
                 RestaurantDetailScreen(
                     onBack = back,
-                    onSignIn = { navController.navigateToTab(Routes.PROFILE) },
+                    onSignIn = { if (FeatureFlags.ACCOUNTS_ENABLED) navController.navigateToTab(Routes.PROFILE) },
                 )
             }
         }

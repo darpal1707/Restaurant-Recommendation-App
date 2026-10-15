@@ -24,6 +24,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Clear
 import androidx.compose.material.icons.rounded.Favorite
+import androidx.compose.material.icons.rounded.Place
 import androidx.compose.material.icons.rounded.FavoriteBorder
 import androidx.compose.material.icons.rounded.Search
 import androidx.compose.material.icons.rounded.Star
@@ -63,7 +64,6 @@ import com.darpal.foodlabrinthnew.R
 import com.darpal.foodlabrinthnew.data.model.Cuisine
 import com.darpal.foodlabrinthnew.data.model.Restaurant
 import com.darpal.foodlabrinthnew.ui.theme.StarGold
-import java.util.Locale
 
 @Composable
 fun RestaurantImage(restaurant: Restaurant, modifier: Modifier = Modifier) {
@@ -76,24 +76,17 @@ fun RestaurantImage(restaurant: Restaurant, modifier: Modifier = Modifier) {
     )
 }
 
-/** "★ 4.5 · 120 reviews" */
+/** "Restaurant · 350 m" */
 @Composable
-fun RatingLabel(stars: Double?, reviewCount: Int, modifier: Modifier = Modifier, color: Color = MaterialTheme.colorScheme.onSurfaceVariant) {
+fun PlaceMeta(restaurant: Restaurant, modifier: Modifier = Modifier, color: Color = MaterialTheme.colorScheme.onSurfaceVariant) {
     Row(modifier = modifier, verticalAlignment = Alignment.CenterVertically) {
-        Icon(Icons.Rounded.Star, contentDescription = null, tint = StarGold, modifier = Modifier.size(16.dp))
-        Spacer(Modifier.width(4.dp))
-        Text(
-            text = stars?.let { String.format(Locale.getDefault(), "%.1f", it) } ?: "–",
-            style = MaterialTheme.typography.labelLarge,
-            color = color,
-        )
-        if (reviewCount > 0) {
-            Text(
-                text = " · " + stringResource(R.string.detail_reviews_count, reviewCount),
-                style = MaterialTheme.typography.labelMedium,
-                color = color,
-            )
+        restaurant.distanceLabel?.let { distance ->
+            Icon(Icons.Rounded.Place, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(16.dp))
+            Spacer(Modifier.width(2.dp))
+            Text(distance, style = MaterialTheme.typography.labelLarge, color = color)
+            Text(" · ", style = MaterialTheme.typography.labelMedium, color = color)
         }
+        Text(restaurant.kind.label, style = MaterialTheme.typography.labelMedium, color = color)
     }
 }
 
@@ -164,28 +157,19 @@ fun RestaurantCard(
         Box(Modifier.height(156.dp).fillMaxWidth()) {
             RestaurantImage(restaurant, Modifier.fillMaxSize())
             FavoriteButton(isFavorite, onToggleFavorite, Modifier.align(Alignment.TopEnd).padding(10.dp))
-            restaurant.priceLabel?.let { price ->
-                Surface(
-                    shape = MaterialTheme.shapes.small,
-                    color = MaterialTheme.colorScheme.surface.copy(alpha = 0.9f),
-                    modifier = Modifier.align(Alignment.BottomStart).padding(10.dp),
-                ) {
-                    Text(price, style = MaterialTheme.typography.labelMedium, modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp))
-                }
-            }
         }
         Column(Modifier.padding(horizontal = 14.dp, vertical = 12.dp)) {
             Text(restaurant.name, style = MaterialTheme.typography.titleMedium, maxLines = 1, overflow = TextOverflow.Ellipsis)
             Spacer(Modifier.height(2.dp))
             Text(
-                restaurant.categories.take(3).joinToString(" · "),
+                restaurant.cuisineLabel,
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
             )
             Spacer(Modifier.height(6.dp))
-            RatingLabel(restaurant.stars, restaurant.reviewCount)
+            PlaceMeta(restaurant)
         }
     }
 }
@@ -210,22 +194,24 @@ fun RestaurantListItem(
             Column(Modifier.weight(1f).padding(horizontal = 14.dp)) {
                 Text(restaurant.name, style = MaterialTheme.typography.titleMedium, maxLines = 1, overflow = TextOverflow.Ellipsis)
                 Text(
-                    restaurant.categories.take(3).joinToString(" · "),
+                    restaurant.cuisineLabel,
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                 )
                 Spacer(Modifier.height(6.dp))
-                RatingLabel(restaurant.stars, restaurant.reviewCount)
-                Spacer(Modifier.height(2.dp))
-                Text(
-                    listOfNotNull(restaurant.priceLabel, restaurant.cityState.takeIf { it.isNotBlank() }).joinToString(" · "),
-                    style = MaterialTheme.typography.labelMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                )
+                PlaceMeta(restaurant)
+                restaurant.address.takeIf { it.isNotBlank() }?.let {
+                    Spacer(Modifier.height(2.dp))
+                    Text(
+                        it,
+                        style = MaterialTheme.typography.labelMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                    )
+                }
             }
             IconButton(onClick = onToggleFavorite) {
                 Icon(
@@ -272,7 +258,7 @@ fun CuisineTile(
                 ) {
                     Box(contentAlignment = Alignment.Center) {
                         Icon(
-                            androidx.compose.material.icons.Icons.Rounded.Favorite,
+                            Icons.Rounded.Favorite,
                             contentDescription = null,
                             tint = MaterialTheme.colorScheme.onPrimary,
                             modifier = Modifier.size(16.dp),
@@ -423,5 +409,18 @@ fun Avatar(name: String, modifier: Modifier = Modifier, size: Int = 40) {
                 color = MaterialTheme.colorScheme.onTertiaryContainer,
             )
         }
+    }
+}
+
+/** Attribution required by the OpenStreetMap licence (ODbL). */
+@Composable
+fun OsmAttribution(modifier: Modifier = Modifier) {
+    val uriHandler = androidx.compose.ui.platform.LocalUriHandler.current
+    TextButton(onClick = { uriHandler.openUri("https://www.openstreetmap.org/copyright") }, modifier = modifier) {
+        Text(
+            stringResource(R.string.osm_attribution),
+            style = MaterialTheme.typography.labelSmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
     }
 }

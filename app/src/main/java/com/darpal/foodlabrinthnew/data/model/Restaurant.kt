@@ -1,33 +1,29 @@
 package com.darpal.foodlabrinthnew.data.model
 
-/**
- * A restaurant from the `business` node of the Realtime Database (Yelp-style records).
- *
- * The database stores loosely typed values (numbers may arrive as Long, Double or String),
- * so [fromMap] parses defensively instead of relying on Firebase's reflection-based mapping.
- */
+/** A place to eat, built from an OpenStreetMap element (see [OsmParser]). */
 data class Restaurant(
+    /** OSM type initial + id, e.g. "n123456" for node 123456. */
     val id: String,
     val name: String,
+    val latitude: Double,
+    val longitude: Double,
+    val kind: PlaceKind = PlaceKind.RESTAURANT,
+    /** Cuisines and diets, e.g. ["Italian", "Pizza", "Vegan"]. */
+    val categories: List<String> = emptyList(),
     val address: String = "",
     val city: String = "",
     val state: String = "",
     val postalCode: String = "",
-    val latitude: Double? = null,
-    val longitude: Double? = null,
-    val stars: Double? = null,
-    val reviewCount: Int = 0,
-    val categories: List<String> = emptyList(),
-    val hours: List<OpeningHours> = emptyList(),
-    val isOpen: Boolean? = null,
-    /** Yelp `RestaurantsPriceRange2`, 1 (cheap) to 4 (expensive). */
-    val priceRange: Int? = null,
-    /** Keys of Yelp `GoodForMeal` that are true, e.g. "lunch", "dinner". */
-    val goodForMeal: Set<String> = emptySet(),
-    /** Keys of Yelp `Ambience` that are true, e.g. "romantic", "casual". */
-    val ambience: Set<String> = emptySet(),
+    /** Raw OSM `opening_hours` value, e.g. "Mo-Fr 11:00-22:00; Sa 12:00-23:00". */
+    val openingHours: String? = null,
+    val phone: String? = null,
+    val website: String? = null,
+    /** Amenities such as "Outdoor seating" or "Takeaway". */
+    val features: List<String> = emptyList(),
+    /** Distance from the current search centre; filled in by the repository. */
+    val distanceMeters: Int? = null,
 ) {
-    val hasLocation: Boolean get() = latitude != null && longitude != null
+    val location: GeoPoint get() = GeoPoint(latitude, longitude)
 
     val cityState: String get() = listOf(city, state).filter { it.isNotBlank() }.joinToString(", ")
 
@@ -36,89 +32,60 @@ data class Restaurant(
             .filter { it.isNotBlank() }
             .joinToString(", ")
 
-    val priceLabel: String? get() = priceRange?.takeIf { it in 1..4 }?.let { "$".repeat(it) }
+    val hours: List<OpeningHours> get() = OpeningHours.parse(openingHours)
+
+    /** Cuisines only, without the generic kind label, for compact subtitles. */
+    val cuisineLabel: String
+        get() = categories.filterNot { it.equals(kind.label, ignoreCase = true) }.take(3).joinToString(" · ")
+            .ifBlank { kind.label }
+
+    val distanceLabel: String? get() = distanceMeters?.let(::formatDistance)
+
+    /** Link to this element on openstreetmap.org. */
+    val osmUrl: String?
+        get() {
+            val type = when (id.firstOrNull()) {
+                'n' -> "node"
+                'w' -> "way"
+                'r' -> "relation"
+                else -> return null
+            }
+            return "https://www.openstreetmap.org/$type/${id.drop(1)}"
+        }
+
+    fun withDistanceFrom(center: GeoPoint): Restaurant =
+        copy(distanceMeters = GeoPoint.distanceMeters(center, location))
+}
+
+enum class PlaceKind(val osmValue: String, val label: String) {
+    RESTAURANT("restaurant", "Restaurant"),
+    CAFE("cafe", "Cafe"),
+    FAST_FOOD("fast_food", "Fast food"),
+    ;
 
     companion object {
-        private val WEEK = listOf("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday")
-        private val TRUE_KEY = Regex("""['"]?(\w+)['"]?\s*[:=]\s*True""", RegexOption.IGNORE_CASE)
-
-        fun fromMap(key: String?, map: Map<*, *>): Restaurant? {
-            val name = map.string("name") ?: return null
-            val id = map.string("business_id") ?: key ?: return null
-            val attributes = map["attributes"] as? Map<*, *>
-            return Restaurant(
-                id = id,
-                name = name,
-                address = map.string("address").orEmpty(),
-                city = map.string("city").orEmpty(),
-                state = map.string("state").orEmpty(),
-                postalCode = map.string("postal_code").orEmpty(),
-                latitude = map.double("latitude")?.takeIf { it in -90.0..90.0 },
-                longitude = map.double("longitude")?.takeIf { it in -180.0..180.0 },
-                stars = map.double("stars"),
-                reviewCount = map.double("review_count")?.toInt() ?: 0,
-                categories = parseCategories(map["categories"]),
-                hours = parseHours(map["hours"]),
-                isOpen = map.string("is_open")?.let { it == "1" || it.equals("true", ignoreCase = true) },
-                priceRange = attributes?.string("RestaurantsPriceRange2")?.toDoubleOrNull()?.toInt(),
-                goodForMeal = parseTrueKeys(attributes?.get("GoodForMeal")),
-                ambience = parseTrueKeys(attributes?.get("Ambience")),
-            )
-        }
-
-        internal fun parseCategories(value: Any?): List<String> = when (value) {
-            is String -> value.split(',')
-            is List<*> -> value.map { it.toString() }
-            is Map<*, *> -> value.values.map { it.toString() }
-            else -> emptyList()
-        }.map { it.trim() }.filter { it.isNotEmpty() && it != "null" }
-
-        internal fun parseHours(value: Any?): List<OpeningHours> {
-            val pairs: List<Pair<String, String>> = when (value) {
-                is Map<*, *> -> value.entries.map { it.key.toString() to it.value.toString() }
-                // Older imports stored the map's toString(), e.g. "{Monday=9:0-17:0, Tuesday=...}".
-                is String -> value.trim().removePrefix("{").removeSuffix("}")
-                    .split(',')
-                    .mapNotNull { part ->
-                        val idx = part.indexOfFirst { it == '=' || it == ':' }
-                        if (idx <= 0) null else part.substring(0, idx).trim().trim('\'', '"') to
-                            part.substring(idx + 1).trim().trim('\'', '"')
-                    }
-                else -> emptyList()
-            }
-            return pairs
-                .filter { (day, time) -> day.isNotBlank() && time.isNotBlank() && time != "null" }
-                .map { (day, time) -> OpeningHours(day, formatTimeRange(time)) }
-                .sortedBy { WEEK.indexOf(it.day).let { i -> if (i < 0) Int.MAX_VALUE else i } }
-        }
-
-        /** Yelp writes "9:0-17:30"; show it as "09:00 – 17:30". Anything else is shown as is. */
-        internal fun formatTimeRange(raw: String): String {
-            val parts = raw.split('-')
-            if (parts.size != 2) return raw
-            val formatted = parts.map { part ->
-                val hm = part.trim().split(':')
-                val h = hm.getOrNull(0)?.toIntOrNull() ?: return raw
-                val m = hm.getOrNull(1)?.toIntOrNull() ?: 0
-                "%02d:%02d".format(h, m)
-            }
-            return if (formatted[0] == "00:00" && formatted[1] == "00:00") "Open 24 hours"
-            else "${formatted[0]} – ${formatted[1]}"
-        }
-
-        /** Accepts either a nested map or a Python-dict string such as "{'lunch': True, 'dinner': False}". */
-        internal fun parseTrueKeys(value: Any?): Set<String> = when (value) {
-            is Map<*, *> -> value.filterValues { it == true || it.toString().equals("true", ignoreCase = true) }
-                .keys.map { it.toString().lowercase() }.toSet()
-            is String -> TRUE_KEY.findAll(value).map { it.groupValues[1].lowercase() }.toSet()
-            else -> emptySet()
-        }
-
-        private fun Map<*, *>.string(key: String): String? =
-            this[key]?.toString()?.trim()?.takeIf { it.isNotEmpty() && it != "null" }
-
-        private fun Map<*, *>.double(key: String): Double? = string(key)?.toDoubleOrNull()
+        fun fromOsm(value: String?): PlaceKind? = entries.firstOrNull { it.osmValue == value }
     }
 }
 
-data class OpeningHours(val day: String, val time: String)
+data class GeoPoint(val latitude: Double, val longitude: Double) {
+    companion object {
+        private const val EARTH_RADIUS_M = 6_371_000.0
+
+        /** Great-circle (haversine) distance in metres. */
+        fun distanceMeters(a: GeoPoint, b: GeoPoint): Int {
+            val dLat = Math.toRadians(b.latitude - a.latitude)
+            val dLon = Math.toRadians(b.longitude - a.longitude)
+            val h = Math.sin(dLat / 2).let { it * it } +
+                Math.cos(Math.toRadians(a.latitude)) * Math.cos(Math.toRadians(b.latitude)) *
+                Math.sin(dLon / 2).let { it * it }
+            return (2 * EARTH_RADIUS_M * Math.asin(Math.sqrt(h))).toInt()
+        }
+    }
+}
+
+fun formatDistance(meters: Int): String = when {
+    meters < 1000 -> "${(meters / 10) * 10} m"
+    meters < 10_000 -> String.format(java.util.Locale.US, "%.1f km", meters / 1000.0)
+    else -> "${meters / 1000} km"
+}

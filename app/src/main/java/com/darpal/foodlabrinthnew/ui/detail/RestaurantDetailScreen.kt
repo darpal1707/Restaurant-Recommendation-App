@@ -34,7 +34,11 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
+import androidx.compose.material.icons.rounded.Call
+import androidx.compose.material.icons.rounded.Check
 import androidx.compose.material.icons.rounded.Edit
+import androidx.compose.material.icons.rounded.Public
+import androidx.compose.material.icons.rounded.Language
 import androidx.compose.material.icons.rounded.Favorite
 import androidx.compose.material.icons.rounded.FavoriteBorder
 import androidx.compose.material.icons.rounded.Map
@@ -63,6 +67,7 @@ import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.SuggestionChip
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberModalBottomSheetState
@@ -91,6 +96,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.createSavedStateHandle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
+import com.darpal.foodlabrinthnew.FeatureFlags
 import com.darpal.foodlabrinthnew.R
 import com.darpal.foodlabrinthnew.data.model.Photo
 import com.darpal.foodlabrinthnew.data.model.Restaurant
@@ -98,7 +104,8 @@ import com.darpal.foodlabrinthnew.data.model.Review
 import com.darpal.foodlabrinthnew.ui.appViewModelFactory
 import com.darpal.foodlabrinthnew.ui.components.Avatar
 import com.darpal.foodlabrinthnew.ui.components.ErrorState
-import com.darpal.foodlabrinthnew.ui.components.RatingLabel
+import com.darpal.foodlabrinthnew.ui.components.OsmAttribution
+import com.darpal.foodlabrinthnew.ui.components.PlaceMeta
 import com.darpal.foodlabrinthnew.ui.components.RestaurantImage
 import com.darpal.foodlabrinthnew.ui.components.StarRatingInput
 import com.darpal.foodlabrinthnew.ui.components.StarRow
@@ -119,11 +126,11 @@ fun RestaurantDetailScreen(
     viewModel: RestaurantDetailViewModel = viewModel(
         factory = appViewModelFactory {
             RestaurantDetailViewModel(
-                createSavedStateHandle(),
-                it.restaurantRepository,
-                it.reviewRepository,
-                it.preferencesRepository,
-                it.authRepository,
+                savedState = createSavedStateHandle(),
+                restaurantRepository = it.restaurantRepository,
+                preferences = it.preferencesRepository,
+                reviewRepository = if (FeatureFlags.ACCOUNTS_ENABLED) it.reviewRepository else null,
+                authRepository = if (FeatureFlags.ACCOUNTS_ENABLED) it.authRepository else null,
             )
         },
     ),
@@ -165,6 +172,9 @@ fun RestaurantDetailScreen(
                 onBack = onBack,
                 onToggleFavorite = viewModel::toggleFavorite,
                 onShare = { share(context, restaurant) },
+                onCall = { restaurant.phone?.let { phone -> openIntent(context, Intent(Intent.ACTION_DIAL, Uri.parse("tel:" + Uri.encode(phone)))) } },
+                onWebsite = { restaurant.website?.let { site -> openIntent(context, Intent(Intent.ACTION_VIEW, Uri.parse(site))) } },
+                onOpenOsm = { restaurant.osmUrl?.let { url -> openIntent(context, Intent(Intent.ACTION_VIEW, Uri.parse(url))) } },
                 onDirections = {
                     if (!openDirections(context, restaurant)) {
                         scope.launch { snackbar.showSnackbar(context.getString(R.string.detail_no_maps_app)) }
@@ -216,6 +226,9 @@ private fun DetailContent(
     onBack: () -> Unit,
     onToggleFavorite: () -> Unit,
     onShare: () -> Unit,
+    onCall: () -> Unit,
+    onWebsite: () -> Unit,
+    onOpenOsm: () -> Unit,
     onDirections: () -> Unit,
     onWriteReview: () -> Unit,
     onTakePhoto: () -> Unit,
@@ -232,17 +245,24 @@ private fun DetailContent(
                 Column(Modifier.padding(horizontal = 20.dp, vertical = 16.dp)) {
                     Text(restaurant.name, style = MaterialTheme.typography.headlineMedium)
                     Spacer(Modifier.height(8.dp))
-                    RatingLabel(restaurant.stars, restaurant.reviewCount)
-                    val meta = listOfNotNull(restaurant.priceLabel, restaurant.cityState.takeIf { it.isNotBlank() })
-                    if (meta.isNotEmpty()) {
+                    PlaceMeta(restaurant)
+                    if (restaurant.cityState.isNotBlank()) {
                         Spacer(Modifier.height(4.dp))
-                        Text(meta.joinToString(" · "), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        Text(restaurant.cityState, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
                     }
-                    if (restaurant.categories.isNotEmpty()) {
+                    val cuisines = restaurant.categories.filterNot { it == restaurant.kind.label }
+                    if (cuisines.isNotEmpty() || restaurant.features.isNotEmpty()) {
                         Spacer(Modifier.height(12.dp))
                         FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                            restaurant.categories.forEach { category ->
+                            cuisines.forEach { category ->
                                 SuggestionChip(onClick = {}, label = { Text(category) })
+                            }
+                            restaurant.features.forEach { feature ->
+                                SuggestionChip(
+                                    onClick = {},
+                                    label = { Text(feature) },
+                                    icon = { Icon(Icons.Rounded.Check, contentDescription = null, modifier = Modifier.size(16.dp)) },
+                                )
                             }
                         }
                     }
@@ -256,8 +276,10 @@ private fun DetailContent(
                         horizontalArrangement = Arrangement.SpaceEvenly,
                     ) {
                         ActionButton(Icons.Rounded.Map, stringResource(R.string.detail_directions), onDirections)
+                        if (restaurant.phone != null) ActionButton(Icons.Rounded.Call, stringResource(R.string.detail_call), onCall)
+                        if (restaurant.website != null) ActionButton(Icons.Rounded.Language, stringResource(R.string.detail_website), onWebsite)
                         ActionButton(Icons.Rounded.Share, stringResource(R.string.detail_share), onShare)
-                        ActionButton(Icons.Rounded.Edit, stringResource(R.string.detail_review), onWriteReview)
+                        if (state.socialEnabled) ActionButton(Icons.Rounded.Edit, stringResource(R.string.detail_review), onWriteReview)
                         ActionButton(
                             if (state.isFavorite) Icons.Rounded.Favorite else Icons.Rounded.FavoriteBorder,
                             stringResource(if (state.isFavorite) R.string.detail_saved else R.string.detail_save),
@@ -270,45 +292,60 @@ private fun DetailContent(
 
             item { LocationSection(restaurant, onDirections) }
             item { HoursSection(restaurant) }
-            item { PhotosSection(state.photos, state.isUploading, onTakePhoto, onPickPhoto) }
+            if (state.socialEnabled) {
+                item { PhotosSection(state.photos, state.isUploading, onTakePhoto, onPickPhoto) }
 
-            item {
-                Row(
-                    Modifier.fillMaxWidth().padding(start = 20.dp, end = 20.dp, top = 8.dp, bottom = 8.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    Column(Modifier.weight(1f)) {
-                        Text(stringResource(R.string.detail_reviews), style = MaterialTheme.typography.titleLarge)
-                        state.averageUserRating?.let {
-                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                StarRow(it)
-                                Spacer(Modifier.width(6.dp))
-                                Text(
-                                    stringResource(R.string.detail_reviews_count, state.reviews.size),
-                                    style = MaterialTheme.typography.labelMedium,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                )
+                item {
+                    Row(
+                        Modifier.fillMaxWidth().padding(start = 20.dp, end = 20.dp, top = 8.dp, bottom = 8.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        Column(Modifier.weight(1f)) {
+                            Text(stringResource(R.string.detail_reviews), style = MaterialTheme.typography.titleLarge)
+                            state.averageUserRating?.let {
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    StarRow(it)
+                                    Spacer(Modifier.width(6.dp))
+                                    Text(
+                                        stringResource(R.string.detail_reviews_count, state.reviews.size),
+                                        style = MaterialTheme.typography.labelMedium,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    )
+                                }
                             }
                         }
+                        FilledTonalButton(onClick = onWriteReview) {
+                            Icon(Icons.Rounded.Edit, contentDescription = null, modifier = Modifier.size(18.dp))
+                            Spacer(Modifier.width(6.dp))
+                            Text(stringResource(R.string.detail_write_review))
+                        }
                     }
-                    FilledTonalButton(onClick = onWriteReview) {
-                        Icon(Icons.Rounded.Edit, contentDescription = null, modifier = Modifier.size(18.dp))
-                        Spacer(Modifier.width(6.dp))
-                        Text(stringResource(R.string.detail_write_review))
+                }
+                if (state.reviews.isEmpty()) {
+                    item {
+                        Text(
+                            stringResource(R.string.detail_reviews_empty),
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.padding(horizontal = 20.dp),
+                        )
                     }
+                } else {
+                    items(state.reviews, key = { it.id }) { review -> ReviewItem(review) }
                 }
             }
-            if (state.reviews.isEmpty()) {
-                item {
-                    Text(
-                        stringResource(R.string.detail_reviews_empty),
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        modifier = Modifier.padding(horizontal = 20.dp),
-                    )
+
+            item {
+                Column(Modifier.padding(horizontal = 12.dp, vertical = 8.dp)) {
+                    if (restaurant.osmUrl != null) {
+                        TextButton(onClick = onOpenOsm) {
+                            Icon(Icons.Rounded.Public, contentDescription = null, modifier = Modifier.size(18.dp))
+                            Spacer(Modifier.width(8.dp))
+                            Text(stringResource(R.string.detail_view_osm))
+                        }
+                    }
+                    OsmAttribution()
                 }
-            } else {
-                items(state.reviews, key = { it.id }) { review -> ReviewItem(review) }
             }
         }
 
@@ -427,10 +464,8 @@ private fun LocationSection(restaurant: Restaurant, onDirections: () -> Unit) {
             shape = MaterialTheme.shapes.large,
             colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerLow),
         ) {
-            val lat = restaurant.latitude
-            val lng = restaurant.longitude
-            if (lat != null && lng != null) {
-                val latLng = LatLng(lat, lng)
+            run {
+                val latLng = LatLng(restaurant.latitude, restaurant.longitude)
                 val camera = rememberCameraPositionState { position = CameraPosition.fromLatLngZoom(latLng, 15f) }
                 GoogleMap(
                     modifier = Modifier.fillMaxWidth().height(180.dp),
@@ -609,20 +644,26 @@ private fun ReviewSheet(
 }
 
 private fun mapsUrl(restaurant: Restaurant): String {
-    val target = if (restaurant.hasLocation) "${restaurant.latitude},${restaurant.longitude}"
-    else Uri.encode("${restaurant.name} ${restaurant.fullAddress}")
+    val target = "${restaurant.latitude},${restaurant.longitude}"
     return "https://www.google.com/maps/search/?api=1&query=$target"
 }
 
 private fun openDirections(context: Context, restaurant: Restaurant): Boolean {
-    val destination = if (restaurant.hasLocation) "${restaurant.latitude},${restaurant.longitude}"
-    else Uri.encode("${restaurant.name} ${restaurant.fullAddress}")
+    val destination = "${restaurant.latitude},${restaurant.longitude}"
     val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://www.google.com/maps/dir/?api=1&destination=$destination"))
     return try {
         context.startActivity(intent)
         true
     } catch (e: ActivityNotFoundException) {
         false
+    }
+}
+
+private fun openIntent(context: Context, intent: Intent) {
+    try {
+        context.startActivity(intent)
+    } catch (e: ActivityNotFoundException) {
+        // Nothing can handle it (e.g. no dialer on a tablet); ignore.
     }
 }
 

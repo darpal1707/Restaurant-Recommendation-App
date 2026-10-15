@@ -8,6 +8,7 @@ object RestaurantFilters {
         if (terms.isEmpty()) return true
         val haystack = buildString {
             append(restaurant.name).append(' ')
+            append(restaurant.address).append(' ')
             append(restaurant.city).append(' ')
             append(restaurant.state).append(' ')
             restaurant.categories.joinTo(this, " ")
@@ -18,47 +19,33 @@ object RestaurantFilters {
     fun matchesAnyCuisine(restaurant: Restaurant, cuisines: Collection<Cuisine>): Boolean =
         cuisines.isEmpty() || cuisines.any { it.matches(restaurant) }
 
-    /** Restaurants without price data are kept: excluding them would hide most of the dataset. */
-    fun matchesBudget(restaurant: Restaurant, budget: Budget?): Boolean =
-        budget == null || restaurant.priceRange == null || restaurant.priceRange in budget.priceRanges
+    /** Places without a known distance are kept. */
+    fun withinDistance(restaurant: Restaurant, distance: Distance?): Boolean =
+        distance == null || (restaurant.distanceMeters ?: 0) <= distance.maxMeters
 
-    fun byRating(): Comparator<Restaurant> =
-        compareByDescending<Restaurant> { it.stars ?: 0.0 }.thenByDescending { it.reviewCount }
+    fun byDistance(): Comparator<Restaurant> =
+        compareBy<Restaurant, Int?>(nullsLast()) { it.distanceMeters }.thenBy { it.name }
 
-    fun trending(all: List<Restaurant>, limit: Int = 10): List<Restaurant> =
-        all.sortedWith(compareByDescending<Restaurant> { it.reviewCount }.thenByDescending { it.stars ?: 0.0 })
-            .take(limit)
+    fun nearest(all: List<Restaurant>, limit: Int = 10): List<Restaurant> = all.sortedWith(byDistance()).take(limit)
 
-    fun topRated(all: List<Restaurant>, limit: Int = 10, minReviews: Int = 5): List<Restaurant> =
-        all.filter { it.reviewCount >= minReviews }.sortedWith(byRating()).take(limit)
-
-    fun recommended(all: List<Restaurant>, likedCuisineNames: Set<String>, exclude: Set<String> = emptySet()): List<Restaurant> {
+    fun recommended(all: List<Restaurant>, likedCuisineNames: Set<String>): List<Restaurant> {
         val liked = likedCuisineNames.mapNotNull { Cuisine.byName(it) }
         if (liked.isEmpty()) return emptyList()
-        return all.filter { it.id !in exclude && matchesAnyCuisine(it, liked) }.sortedWith(byRating())
+        return all.filter { matchesAnyCuisine(it, liked) }.sortedWith(byDistance())
     }
 
     /**
-     * Questionnaire results: cuisine is a hard filter, while meal, vibe and budget only rank results,
-     * because many records lack those attributes and filtering on them would usually return nothing.
+     * Questionnaire results: cuisine and distance filter; the meal only ranks results, because many
+     * OSM entries have no `opening_hours` and filtering on it would hide them.
      */
-    fun decide(
-        all: List<Restaurant>,
-        cuisines: Collection<Cuisine>,
-        meal: Meal?,
-        ambience: Ambience?,
-        budget: Budget?,
-    ): List<Restaurant> = all
-        .filter { matchesAnyCuisine(it, cuisines) }
-        .sortedWith(
-            compareByDescending<Restaurant> { matchScore(it, meal, ambience, budget) }.then(byRating()),
-        )
+    fun decide(all: List<Restaurant>, cuisines: Collection<Cuisine>, meal: Meal?, distance: Distance?): List<Restaurant> =
+        all.filter { matchesAnyCuisine(it, cuisines) && withinDistance(it, distance) }
+            .sortedWith(compareByDescending<Restaurant> { mealScore(it, meal) }.then(byDistance()))
 
-    fun matchScore(restaurant: Restaurant, meal: Meal?, ambience: Ambience?, budget: Budget?): Int {
-        var score = 0
-        if (meal != null && restaurant.goodForMeal.any { it in meal.keys }) score++
-        if (ambience != null && restaurant.ambience.any { it in ambience.keys }) score++
-        if (budget != null && restaurant.priceRange in budget.priceRanges) score++
-        return score
+    fun mealScore(restaurant: Restaurant, meal: Meal?): Int = when {
+        meal == null -> 0
+        meal == Meal.CAFE -> if (restaurant.kind == PlaceKind.CAFE || restaurant.categories.any { it.contains("Coffee", true) }) 1 else 0
+        OpeningHours.isOpenAt(restaurant.openingHours, meal.minuteOfDay!!) == true -> 1
+        else -> 0
     }
 }

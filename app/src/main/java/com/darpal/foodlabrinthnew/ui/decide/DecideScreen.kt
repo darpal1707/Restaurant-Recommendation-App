@@ -23,17 +23,15 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
+import androidx.compose.material.icons.rounded.DirectionsBike
+import androidx.compose.material.icons.rounded.DirectionsWalk
+import androidx.compose.material.icons.rounded.DirectionsCar
 import androidx.compose.material.icons.rounded.AutoAwesome
 import androidx.compose.material.icons.rounded.Fastfood
-import androidx.compose.material.icons.rounded.Favorite
 import androidx.compose.material.icons.rounded.FreeBreakfast
-import androidx.compose.material.icons.rounded.Groups
 import androidx.compose.material.icons.rounded.LocalCafe
 import androidx.compose.material.icons.rounded.NightsStay
 import androidx.compose.material.icons.rounded.Restaurant
-import androidx.compose.material.icons.rounded.Shuffle
-import androidx.compose.material.icons.rounded.Weekend
-import androidx.compose.material.icons.rounded.Whatshot
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -57,9 +55,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.createSavedStateHandle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.darpal.foodlabrinthnew.R
-import com.darpal.foodlabrinthnew.data.model.Ambience
-import com.darpal.foodlabrinthnew.data.model.Budget
 import com.darpal.foodlabrinthnew.data.model.Cuisine
+import com.darpal.foodlabrinthnew.data.model.Distance
 import com.darpal.foodlabrinthnew.data.model.Meal
 import com.darpal.foodlabrinthnew.ui.appViewModelFactory
 import com.darpal.foodlabrinthnew.ui.components.CuisineTile
@@ -74,7 +71,6 @@ fun DecideScreen(
     val step by viewModel.step.collectAsStateWithLifecycle()
     val selectedMeal by viewModel.meal.collectAsStateWithLifecycle()
     val selectedCuisines by viewModel.cuisines.collectAsStateWithLifecycle()
-    val selectedAmbience by viewModel.ambience.collectAsStateWithLifecycle()
     val goBack = { if (!viewModel.back()) onBack() }
 
     BackHandler(enabled = step > 0) { viewModel.back() }
@@ -134,17 +130,13 @@ fun DecideScreen(
                     options = Meal.entries.map { Option(it.label, null, mealIcon(it), it.name == selectedMeal) { viewModel.selectMeal(it) } },
                 )
                 DecideStep.CUISINE -> CuisineStep(selectedCuisines, viewModel::toggleCuisine)
-                DecideStep.AMBIENCE -> OptionGrid(
-                    question = stringResource(R.string.decide_ambience_question),
-                    options = Ambience.entries.map {
-                        Option(it.label, null, ambienceIcon(it), it.name == selectedAmbience) { viewModel.selectAmbience(it) }
-                    } + Option(stringResource(R.string.decide_surprise), null, Icons.Rounded.Shuffle, false) { viewModel.selectAmbience(null) },
-                )
-                DecideStep.BUDGET -> OptionGrid(
-                    question = stringResource(R.string.decide_budget_question),
-                    options = Budget.entries.map {
-                        Option(it.label, it.description, Icons.Rounded.Restaurant, false) { onShowResults(viewModel.resultsRoute(it)) }
-                    } + Option(stringResource(R.string.decide_any), stringResource(R.string.decide_any_body), Icons.Rounded.AutoAwesome, false) { onShowResults(viewModel.resultsRoute(null)) },
+                DecideStep.DISTANCE -> OptionGrid(
+                    question = stringResource(R.string.decide_distance_question),
+                    options = Distance.entries.map {
+                        Option(it.label, it.description, distanceIcon(it), false) { onShowResults(viewModel.resultsRoute(it)) }
+                    } + Option(stringResource(R.string.decide_any), stringResource(R.string.decide_any_body), Icons.Rounded.AutoAwesome, false) {
+                        onShowResults(viewModel.resultsRoute(null))
+                    },
                 )
             }
         }
@@ -244,10 +236,8 @@ private fun mealIcon(meal: Meal): ImageVector = when (meal) {
     Meal.LATE_NIGHT -> Icons.Rounded.NightsStay
 }
 
-private fun ambienceIcon(ambience: Ambience): ImageVector = when (ambience) {
-    Ambience.LUXURY -> Icons.Rounded.AutoAwesome
-    Ambience.ROMANTIC -> Icons.Rounded.Favorite
-    Ambience.TRENDY -> Icons.Rounded.Whatshot
-    Ambience.CASUAL -> Icons.Rounded.Weekend
-    Ambience.HANGOUT -> Icons.Rounded.Groups
+private fun distanceIcon(distance: Distance): ImageVector = when (distance) {
+    Distance.WALK -> Icons.Rounded.DirectionsWalk
+    Distance.SHORT_TRIP -> Icons.Rounded.DirectionsBike
+    Distance.FURTHER -> Icons.Rounded.DirectionsCar
 }

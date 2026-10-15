@@ -46,9 +46,10 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.darpal.foodlabrinthnew.R
+import com.darpal.foodlabrinthnew.data.PlacesState
 import com.darpal.foodlabrinthnew.data.PreferencesRepository
-import com.darpal.foodlabrinthnew.data.Resource
 import com.darpal.foodlabrinthnew.data.RestaurantRepository
+import com.darpal.foodlabrinthnew.data.model.GeoPoint
 import com.darpal.foodlabrinthnew.data.model.Restaurant
 import com.darpal.foodlabrinthnew.ui.appViewModelFactory
 import com.darpal.foodlabrinthnew.ui.components.RestaurantListItem
@@ -70,18 +71,26 @@ import kotlinx.coroutines.launch
 
 data class MapUiState(
     val isLoading: Boolean = true,
+    val needsLocation: Boolean = false,
+    val center: GeoPoint? = null,
     val restaurants: List<Restaurant> = emptyList(),
     val favoriteIds: Set<String> = emptySet(),
 )
 
-class MapViewModel(restaurants: RestaurantRepository, private val preferences: PreferencesRepository) : ViewModel() {
-    val uiState: StateFlow<MapUiState> = combine(restaurants.restaurants, preferences.favoriteIds) { resource, favorites ->
+class MapViewModel(private val repository: RestaurantRepository, private val preferences: PreferencesRepository) : ViewModel() {
+    val uiState: StateFlow<MapUiState> = combine(repository.state, preferences.favoriteIds) { state, favorites ->
         MapUiState(
-            isLoading = resource is Resource.Loading,
-            restaurants = (resource as? Resource.Success)?.data?.filter { it.hasLocation }.orEmpty(),
+            isLoading = state is PlacesState.Loading,
+            needsLocation = state is PlacesState.NeedsLocation,
+            center = (state as? PlacesState.Ready)?.center,
+            restaurants = (state as? PlacesState.Ready)?.restaurants.orEmpty(),
             favoriteIds = favorites,
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), MapUiState())
+
+    fun onLocationPermissionResult(granted: Boolean) {
+        if (granted) repository.refresh()
+    }
 
     fun toggleFavorite(restaurant: Restaurant) {
         viewModelScope.launch { preferences.toggleFavorite(restaurant) }
@@ -102,6 +111,7 @@ fun MapScreen(
     var hasLocationPermission by remember { mutableStateOf(granted()) }
     val permissionLauncher = rememberLauncherForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { result ->
         hasLocationPermission = result.values.any { it }
+        viewModel.onLocationPermissionResult(hasLocationPermission)
     }
 
     // The id is kept after the card is dismissed so it can animate out with its content.
@@ -113,16 +123,25 @@ fun MapScreen(
         position = CameraPosition.fromLatLngZoom(LatLng(39.5, -98.35), 3f)
     }
     var mapLoaded by remember { mutableStateOf(false) }
-    var fitted by rememberSaveable { mutableStateOf(false) }
+    var framedCenter by rememberSaveable { mutableStateOf<String?>(null) }
 
-    // Frame all restaurants once, after the map has a size (required by newLatLngBounds).
-    LaunchedEffect(mapLoaded, state.restaurants) {
-        if (!mapLoaded || fitted || state.restaurants.isEmpty()) return@LaunchedEffect
-        val bounds = LatLngBounds.builder().apply {
-            state.restaurants.forEach { include(LatLng(it.latitude!!, it.longitude!!)) }
-        }.build()
-        runCatching { cameraState.animate(CameraUpdateFactory.newLatLngBounds(bounds, 120), 900) }
-        fitted = true
+    // Frame the restaurants whenever the search centre changes, once the map has a size
+    // (required by newLatLngBounds).
+    LaunchedEffect(mapLoaded, state.center, state.restaurants) {
+        val center = state.center ?: return@LaunchedEffect
+        val key = "${center.latitude},${center.longitude}"
+        if (!mapLoaded || framedCenter == key) return@LaunchedEffect
+        val update = if (state.restaurants.isEmpty()) {
+            CameraUpdateFactory.newLatLngZoom(LatLng(center.latitude, center.longitude), 14f)
+        } else {
+            val bounds = LatLngBounds.builder().apply {
+                include(LatLng(center.latitude, center.longitude))
+                state.restaurants.take(60).forEach { include(LatLng(it.latitude, it.longitude)) }
+            }.build()
+            CameraUpdateFactory.newLatLngBounds(bounds, 120)
+        }
+        runCatching { cameraState.animate(update, 900) }
+        framedCenter = key
     }
 
     Box(Modifier.fillMaxSize()) {
@@ -142,7 +161,7 @@ fun MapScreen(
             state.restaurants.forEach { restaurant ->
                 key(restaurant.id) {
                     Marker(
-                        state = rememberMarkerState(position = LatLng(restaurant.latitude!!, restaurant.longitude!!)),
+                        state = rememberMarkerState(position = LatLng(restaurant.latitude, restaurant.longitude)),
                         title = restaurant.name,
                         snippet = restaurant.cityState,
                         onClick = {
@@ -169,7 +188,7 @@ fun MapScreen(
                     Text(stringResource(R.string.map_loading), style = MaterialTheme.typography.labelLarge)
                 }
             }
-        } else if (!hasLocationPermission) {
+        } else if (state.needsLocation || !hasLocationPermission) {
             Surface(
                 shape = MaterialTheme.shapes.extraLarge,
                 tonalElevation = 3.dp,
@@ -187,6 +206,21 @@ fun MapScreen(
                     }) { Text(stringResource(R.string.map_permission_action)) }
                 }
             }
+        }
+
+        // OSM data attribution (ODbL); lifted above the preview card when it is showing.
+        Surface(
+            shape = MaterialTheme.shapes.small,
+            color = MaterialTheme.colorScheme.surface.copy(alpha = 0.85f),
+            modifier = Modifier
+                .align(Alignment.BottomEnd)
+                .padding(end = 8.dp, bottom = if (showCard && selected != null) 136.dp else 8.dp),
+        ) {
+            Text(
+                stringResource(R.string.osm_attribution),
+                style = MaterialTheme.typography.labelSmall,
+                modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp),
+            )
         }
 
         AnimatedVisibility(

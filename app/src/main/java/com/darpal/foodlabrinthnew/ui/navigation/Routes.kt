@@ -15,8 +15,8 @@ import androidx.compose.material.icons.rounded.Map
 import androidx.compose.material.icons.rounded.Person
 import androidx.compose.ui.graphics.vector.ImageVector
 import com.darpal.foodlabrinthnew.R
-import com.darpal.foodlabrinthnew.data.model.Ambience
-import com.darpal.foodlabrinthnew.data.model.Budget
+import com.darpal.foodlabrinthnew.FeatureFlags
+import com.darpal.foodlabrinthnew.data.model.Distance
 import com.darpal.foodlabrinthnew.data.model.Meal
 
 object Routes {
@@ -36,9 +36,8 @@ object Routes {
     const val ARG_CUISINE = "cuisine"
     const val ARG_CUISINES = "cuisines"
     const val ARG_MEAL = "meal"
-    const val ARG_AMBIENCE = "ambience"
-    const val ARG_BUDGET = "budget"
-    val RESULTS_ARGS = listOf(ARG_TITLE, ARG_QUERY, ARG_CUISINE, ARG_CUISINES, ARG_MEAL, ARG_AMBIENCE, ARG_BUDGET)
+    const val ARG_DISTANCE = "distance"
+    val RESULTS_ARGS = listOf(ARG_TITLE, ARG_QUERY, ARG_CUISINE, ARG_CUISINES, ARG_MEAL, ARG_DISTANCE)
     val RESULTS = "results?" + RESULTS_ARGS.joinToString("&") { "$it={$it}" }
 
     const val CUISINE_SEPARATOR = "|"
@@ -48,11 +47,12 @@ object Routes {
     fun cuisines(title: String, names: Collection<String>) =
         results(ARG_TITLE to title, ARG_CUISINES to names.joinToString(CUISINE_SEPARATOR))
 
-    fun decideResults(meal: Meal?, cuisines: Collection<String>, ambience: Ambience?, budget: Budget?) = results(
+    fun allNearby(title: String) = results(ARG_TITLE to title)
+
+    fun decideResults(meal: Meal?, cuisines: Collection<String>, distance: Distance?) = results(
         ARG_CUISINES to cuisines.joinToString(CUISINE_SEPARATOR),
         ARG_MEAL to meal?.name,
-        ARG_AMBIENCE to ambience?.name,
-        ARG_BUDGET to budget?.name,
+        ARG_DISTANCE to distance?.name,
     )
 
     private fun results(vararg args: Pair<String, String?>): String =
@@ -70,4 +70,11 @@ enum class TopLevelDestination(
     MAP(Routes.MAP, R.string.nav_map, Icons.Rounded.Map, Icons.Outlined.Map),
     SAVED(Routes.SAVED, R.string.nav_saved, Icons.Rounded.Favorite, Icons.Outlined.FavoriteBorder),
     PROFILE(Routes.PROFILE, R.string.nav_profile, Icons.Rounded.Person, Icons.Outlined.Person),
+    ;
+
+    companion object {
+        /** Tabs shown in the bottom bar; Profile (sign-in) is hidden while accounts are disabled. */
+        val visible: List<TopLevelDestination> =
+            entries.filter { it != PROFILE || FeatureFlags.ACCOUNTS_ENABLED }
+    }
 }

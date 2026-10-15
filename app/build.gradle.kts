@@ -73,5 +73,6 @@ dependencies {
     implementation(libs.coil.compose)
 
     testImplementation(libs.junit)
+    testImplementation(libs.org.json)
     testImplementation(libs.kotlinx.coroutines.test)
 }

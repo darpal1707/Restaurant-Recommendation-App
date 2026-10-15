@@ -8,6 +8,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
+import androidx.compose.material.icons.rounded.MyLocation
 import androidx.compose.material.icons.rounded.SearchOff
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -32,6 +33,7 @@ import com.darpal.foodlabrinthnew.ui.appViewModelFactory
 import com.darpal.foodlabrinthnew.ui.components.EmptyState
 import com.darpal.foodlabrinthnew.ui.components.ErrorState
 import com.darpal.foodlabrinthnew.ui.components.ListItemPlaceholder
+import com.darpal.foodlabrinthnew.ui.components.OsmAttribution
 import com.darpal.foodlabrinthnew.ui.components.RestaurantListItem
 import com.darpal.foodlabrinthnew.ui.components.SearchField
 
@@ -94,6 +96,13 @@ fun ResultsScreen(
             when {
                 state.isLoading -> items(6) { ListItemPlaceholder() }
                 state.error != null -> item { ErrorState(state.error, onRetry = viewModel::retry) }
+                state.needsLocation -> item {
+                    EmptyState(
+                        icon = Icons.Rounded.MyLocation,
+                        title = stringResource(R.string.location_title),
+                        body = stringResource(R.string.location_from_home),
+                    )
+                }
                 state.results.isEmpty() -> item {
                     EmptyState(
                         icon = Icons.Rounded.SearchOff,
@@ -110,6 +119,7 @@ fun ResultsScreen(
                     )
                 }
             }
+            item { OsmAttribution() }
         }
     }
 }

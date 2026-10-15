@@ -2,10 +2,10 @@ package com.darpal.foodlabrinthnew.ui.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.darpal.foodlabrinthnew.data.AuthRepository
+import com.darpal.foodlabrinthnew.data.PlacesState
 import com.darpal.foodlabrinthnew.data.PreferencesRepository
-import com.darpal.foodlabrinthnew.data.Resource
 import com.darpal.foodlabrinthnew.data.RestaurantRepository
+import com.darpal.foodlabrinthnew.data.model.Area
 import com.darpal.foodlabrinthnew.data.model.Restaurant
 import com.darpal.foodlabrinthnew.data.model.RestaurantFilters
 import kotlinx.coroutines.Dispatchers
@@ -17,13 +17,15 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 data class HomeUiState(
+    val area: Area = Area.NEARBY,
     val isLoading: Boolean = true,
+    val needsLocation: Boolean = false,
     val error: String? = null,
     val isRefreshing: Boolean = false,
-    val userName: String? = null,
-    val trending: List<Restaurant> = emptyList(),
+    val closest: List<Restaurant> = emptyList(),
     val forYou: List<Restaurant> = emptyList(),
-    val topRated: List<Restaurant> = emptyList(),
+    val more: List<Restaurant> = emptyList(),
+    val totalCount: Int = 0,
     val likedCuisines: Set<String> = emptySet(),
     val favoriteIds: Set<String> = emptySet(),
 )
@@ -31,30 +33,29 @@ data class HomeUiState(
 class HomeViewModel(
     private val restaurantRepository: RestaurantRepository,
     private val preferences: PreferencesRepository,
-    authRepository: AuthRepository,
 ) : ViewModel() {
 
     val uiState: StateFlow<HomeUiState> = combine(
-        restaurantRepository.restaurants,
+        restaurantRepository.state,
         restaurantRepository.isRefreshing,
+        preferences.area,
         preferences.likedCuisines,
         preferences.favoriteIds,
-        authRepository.user,
-    ) { resource, refreshing, liked, favorites, user ->
-        when (resource) {
-            Resource.Loading -> HomeUiState(isLoading = true, userName = user?.label)
-            is Resource.Error -> HomeUiState(isLoading = false, error = resource.message, userName = user?.label)
-            is Resource.Success -> {
-                val all = resource.data
-                HomeUiState(
+    ) { state, refreshing, area, liked, favorites ->
+        val base = HomeUiState(area = area, isRefreshing = refreshing, likedCuisines = liked, favoriteIds = favorites)
+        when (state) {
+            PlacesState.Loading -> base.copy(isLoading = true)
+            PlacesState.NeedsLocation -> base.copy(isLoading = false, needsLocation = true)
+            is PlacesState.Error -> base.copy(isLoading = false, error = state.message)
+            is PlacesState.Ready -> {
+                val all = state.restaurants
+                val closest = RestaurantFilters.nearest(all, limit = 10)
+                base.copy(
                     isLoading = false,
-                    isRefreshing = refreshing,
-                    userName = user?.label,
-                    trending = RestaurantFilters.trending(all),
+                    closest = closest,
                     forYou = RestaurantFilters.recommended(all, liked).take(6),
-                    topRated = RestaurantFilters.topRated(all, limit = 8),
-                    likedCuisines = liked,
-                    favoriteIds = favorites,
+                    more = RestaurantFilters.nearest(all, limit = 25).drop(closest.size),
+                    totalCount = all.size,
                 )
             }
         }
@@ -63,6 +64,14 @@ class HomeViewModel(
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), HomeUiState())
 
     fun refresh() = restaurantRepository.refresh()
+
+    fun selectArea(area: Area) {
+        viewModelScope.launch { preferences.setArea(area) }
+    }
+
+    fun onLocationPermissionResult(granted: Boolean) {
+        if (granted) restaurantRepository.refresh()
+    }
 
     fun toggleFavorite(restaurant: Restaurant) {
         viewModelScope.launch { preferences.toggleFavorite(restaurant) }

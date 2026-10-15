@@ -1,25 +1,19 @@
 package com.darpal.foodlabrinthnew.data.model
 
-/** Answers for the "Help me choose" questionnaire. */
-enum class Meal(val label: String, val keys: Set<String>) {
-    BREAKFAST("Breakfast", setOf("breakfast", "brunch")),
-    LUNCH("Lunch", setOf("lunch")),
-    DINNER("Dinner", setOf("dinner")),
-    CAFE("Cafe", setOf("dessert", "brunch")),
-    LATE_NIGHT("Late night", setOf("latenight")),
+/**
+ * Meal answer for the "Help me choose" questionnaire. Ranked by whether OSM `opening_hours`
+ * covers [minuteOfDay]; [CAFE] instead prefers cafés and coffee places.
+ */
+enum class Meal(val label: String, val minuteOfDay: Int?) {
+    BREAKFAST("Breakfast", 8 * 60 + 30),
+    LUNCH("Lunch", 12 * 60 + 30),
+    DINNER("Dinner", 19 * 60 + 30),
+    CAFE("Cafe", null),
+    LATE_NIGHT("Late night", 23 * 60 + 30),
 }
 
-/** Mapped onto Yelp `Ambience` keys; the mapping is a best-effort heuristic. */
-enum class Ambience(val label: String, val keys: Set<String>) {
-    LUXURY("Luxury", setOf("upscale", "classy")),
-    ROMANTIC("Romantic", setOf("romantic", "intimate")),
-    TRENDY("Trendy", setOf("trendy", "hipster")),
-    CASUAL("Casual", setOf("casual")),
-    HANGOUT("Hangout", setOf("casual", "divey")),
-}
-
-enum class Budget(val label: String, val description: String, val priceRanges: Set<Int>) {
-    LOW("$", "Easy on the wallet", setOf(1)),
-    MEDIUM("$$", "Mid-range", setOf(2)),
-    HIGH("$$$", "Treat yourself", setOf(3, 4)),
+enum class Distance(val label: String, val description: String, val maxMeters: Int) {
+    WALK("Walking distance", "Within 1 km", 1_000),
+    SHORT_TRIP("Short trip", "Within 3 km", 3_000),
+    FURTHER("A bit further", "Within 10 km", 10_000),
 }

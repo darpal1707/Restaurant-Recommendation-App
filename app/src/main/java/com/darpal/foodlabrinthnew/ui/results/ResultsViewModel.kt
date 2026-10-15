@@ -3,12 +3,11 @@ package com.darpal.foodlabrinthnew.ui.results
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.darpal.foodlabrinthnew.data.PlacesState
 import com.darpal.foodlabrinthnew.data.PreferencesRepository
-import com.darpal.foodlabrinthnew.data.Resource
 import com.darpal.foodlabrinthnew.data.RestaurantRepository
-import com.darpal.foodlabrinthnew.data.model.Ambience
-import com.darpal.foodlabrinthnew.data.model.Budget
 import com.darpal.foodlabrinthnew.data.model.Cuisine
+import com.darpal.foodlabrinthnew.data.model.Distance
 import com.darpal.foodlabrinthnew.data.model.Meal
 import com.darpal.foodlabrinthnew.data.model.Restaurant
 import com.darpal.foodlabrinthnew.data.model.RestaurantFilters
@@ -28,6 +27,7 @@ enum class ResultsMode { SEARCH, CUISINE, DECIDE }
 data class ResultsUiState(
     val isLoading: Boolean = true,
     val error: String? = null,
+    val needsLocation: Boolean = false,
     val results: List<Restaurant> = emptyList(),
     val favoriteIds: Set<String> = emptySet(),
 )
@@ -45,8 +45,7 @@ class ResultsViewModel(
         ?.mapNotNull(Cuisine::byName)
         .orEmpty()
     private val meal = savedState.get<String>(Routes.ARG_MEAL)?.let { runCatching { Meal.valueOf(it) }.getOrNull() }
-    private val ambience = savedState.get<String>(Routes.ARG_AMBIENCE)?.let { runCatching { Ambience.valueOf(it) }.getOrNull() }
-    private val budget = savedState.get<String>(Routes.ARG_BUDGET)?.let { runCatching { Budget.valueOf(it) }.getOrNull() }
+    private val distance = savedState.get<String>(Routes.ARG_DISTANCE)?.let { runCatching { Distance.valueOf(it) }.getOrNull() }
 
     val mode: ResultsMode = when {
         cuisines.isNotEmpty() -> ResultsMode.DECIDE
@@ -58,16 +57,17 @@ class ResultsViewModel(
     val query: StateFlow<String> = _query.asStateFlow()
 
     val uiState: StateFlow<ResultsUiState> = combine(
-        restaurantRepository.restaurants,
+        restaurantRepository.state,
         _query,
         preferences.favoriteIds,
-    ) { resource, query, favorites ->
-        when (resource) {
-            Resource.Loading -> ResultsUiState(isLoading = true)
-            is Resource.Error -> ResultsUiState(isLoading = false, error = resource.message)
-            is Resource.Success -> ResultsUiState(
+    ) { state, query, favorites ->
+        when (state) {
+            PlacesState.Loading -> ResultsUiState(isLoading = true)
+            PlacesState.NeedsLocation -> ResultsUiState(isLoading = false, needsLocation = true)
+            is PlacesState.Error -> ResultsUiState(isLoading = false, error = state.message)
+            is PlacesState.Ready -> ResultsUiState(
                 isLoading = false,
-                results = filter(resource.data, query),
+                results = filter(state.restaurants, query),
                 favoriteIds = favorites,
             )
         }
@@ -76,11 +76,11 @@ class ResultsViewModel(
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), ResultsUiState())
 
     private fun filter(all: List<Restaurant>, query: String): List<Restaurant> = when (mode) {
-        ResultsMode.DECIDE -> RestaurantFilters.decide(all, cuisines, meal, ambience, budget)
+        ResultsMode.DECIDE -> RestaurantFilters.decide(all, cuisines, meal, distance)
         ResultsMode.CUISINE -> all.filter { cuisine!!.matches(it) && RestaurantFilters.matchesQuery(it, query) }
-            .sortedWith(RestaurantFilters.byRating())
+            .sortedWith(RestaurantFilters.byDistance())
         ResultsMode.SEARCH -> all.filter { RestaurantFilters.matchesQuery(it, query) }
-            .sortedWith(RestaurantFilters.byRating())
+            .sortedWith(RestaurantFilters.byDistance())
     }
 
     fun onQueryChange(value: String) {
