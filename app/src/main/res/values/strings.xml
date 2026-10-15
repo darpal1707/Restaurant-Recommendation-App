@@ -38,7 +38,7 @@
     <string name="location_allow">Use my location</string>
     <string name="location_or_city">Or explore a city</string>
     <string name="location_from_home">Allow location or pick a city on the Home tab.</string>
-    <string name="osm_attribution">Restaurant data © OpenStreetMap contributors</string>
+    <string name="osm_attribution">Map &amp; data © OpenStreetMap contributors</string>
 
     <!-- Explore -->
     <string name="explore_title">Explore</string>
@@ -104,6 +104,7 @@
     <string name="map_permission_rationale">Allow location to see restaurants around you</string>
     <string name="map_permission_action">Allow</string>
     <string name="map_loading">Loading restaurants…</string>
+    <string name="map_recenter">Show all results</string>
 
     <!-- Saved -->
     <string name="saved_title">Saved</string>

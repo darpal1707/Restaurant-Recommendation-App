@@ -5,7 +5,8 @@ A restaurant discovery and recommendation app for Android, written in **Kotlin**
 
 Restaurant data comes from **OpenStreetMap** through the free
 [Overpass API](https://wiki.openstreetmap.org/wiki/Overpass_API): no account, server or API key is
-needed for it.
+needed for it. Maps use OpenStreetMap tiles via [osmdroid](https://github.com/osmdroid/osmdroid),
+so the app needs **no API keys at all**.
 
 ## Features
 
@@ -13,7 +14,7 @@ needed for it.
 | --- | --- |
 | **Home** | Area picker (“Near me” or a preset city), search, “Help me choose”, cuisine shortcuts, closest places, “Picked for you” and more places around you. Pull to refresh. |
 | **Explore** | Search plus a grid of 24 cuisines. |
-| **Map** | Every place on a Google Map; tap a pin for a preview card. Optional “my location”. |
+| **Map** | Every place on an OpenStreetMap map; tap a pin for a preview card. Optional “my location” dot and a button to re-frame the results. |
 | **Saved** | Places you hearted (kept even when you switch area) and the cuisines you like, which drive recommendations. |
 
 Restaurant detail: place type and distance, cuisines, amenities (outdoor seating, takeaway, Wi-Fi…),
@@ -46,7 +47,7 @@ is available again.
 - OpenStreetMap / Overpass API over plain `HttpURLConnection`, platform `LocationManager`
 - Firebase Auth, Realtime Database, Cloud Storage (kept for the disabled accounts feature)
 - Credential Manager for Google sign-in
-- Maps Compose, Coil, DataStore (Preferences), SplashScreen API
+- osmdroid (OpenStreetMap tiles), Coil, DataStore (Preferences), SplashScreen API
 - Gradle Kotlin DSL with a version catalog (`gradle/libs.versions.toml`)
 
 ## Project structure
@@ -77,12 +78,15 @@ Requirements: Android Studio (Ladybug or newer) or JDK 17 + Android SDK 35.
 
 GitHub Actions (`.github/workflows/android.yml`) runs both on every push.
 
-### Google Maps key
+### Map tiles
 
-The map uses the key in `app/src/debug|release/res/values/google_maps_api.xml`. It must have the
-*Maps SDK for Android* enabled and allow this package + your signing SHA-1
-(`./gradlew signingReport`). If that key belonged to the old Firebase/Google Cloud project and is
-gone, map tiles will be blank; everything else still works.
+Tiles are loaded from `tile.openstreetmap.org`, which is free for light use under the
+[OSM tile usage policy](https://operations.osmfoundation.org/policies/tiles/). osmdroid sends the
+app's package name as User-Agent and caches tiles in app storage, as the policy asks. For a
+published app with real traffic, switch `TileSourceFactory.MAPNIK` in
+`ui/components/OsmMap.kt` to a tile provider meant for production use.
 
-> The Maps key and `app/google-services.json` were already committed in the original repository.
-> Consider restricting or rotating them.
+In dark mode the tiles are colour-inverted, since OSM doesn't offer dark tiles.
+
+> `app/google-services.json` (used only by the disabled Firebase features) was already committed in
+> the original repository. Consider restricting or rotating its keys.

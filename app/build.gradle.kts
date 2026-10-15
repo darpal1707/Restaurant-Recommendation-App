@@ -69,7 +69,7 @@ dependencies {
     implementation(libs.androidx.credentials.play.services)
     implementation(libs.googleid)
 
-    implementation(libs.maps.compose)
+    implementation(libs.osmdroid)
     implementation(libs.coil.compose)
 
     testImplementation(libs.junit)

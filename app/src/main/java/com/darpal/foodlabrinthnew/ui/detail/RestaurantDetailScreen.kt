@@ -11,6 +11,7 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -72,6 +73,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
@@ -92,6 +94,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.viewinterop.AndroidView
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.createSavedStateHandle
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -109,14 +113,10 @@ import com.darpal.foodlabrinthnew.ui.components.PlaceMeta
 import com.darpal.foodlabrinthnew.ui.components.RestaurantImage
 import com.darpal.foodlabrinthnew.ui.components.StarRatingInput
 import com.darpal.foodlabrinthnew.ui.components.StarRow
-import com.google.android.gms.maps.model.CameraPosition
-import com.google.android.gms.maps.model.LatLng
-import com.google.maps.android.compose.GoogleMap
-import com.google.maps.android.compose.MapUiSettings
-import com.google.maps.android.compose.Marker
-import com.google.maps.android.compose.rememberCameraPositionState
-import com.google.maps.android.compose.rememberMarkerState
+import com.darpal.foodlabrinthnew.ui.components.rememberOsmMapView
+import com.darpal.foodlabrinthnew.ui.components.toOsm
 import kotlinx.coroutines.launch
+import org.osmdroid.views.overlay.Marker
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -464,29 +464,9 @@ private fun LocationSection(restaurant: Restaurant, onDirections: () -> Unit) {
             shape = MaterialTheme.shapes.large,
             colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerLow),
         ) {
-            run {
-                val latLng = LatLng(restaurant.latitude, restaurant.longitude)
-                val camera = rememberCameraPositionState { position = CameraPosition.fromLatLngZoom(latLng, 15f) }
-                GoogleMap(
-                    modifier = Modifier.fillMaxWidth().height(180.dp),
-                    cameraPositionState = camera,
-                    uiSettings = MapUiSettings(
-                        compassEnabled = false,
-                        mapToolbarEnabled = false,
-                        myLocationButtonEnabled = false,
-                        rotationGesturesEnabled = false,
-                        scrollGesturesEnabled = false,
-                        tiltGesturesEnabled = false,
-                        zoomControlsEnabled = false,
-                        zoomGesturesEnabled = false,
-                    ),
-                    onMapClick = { onDirections() },
-                ) {
-                    Marker(state = rememberMarkerState(position = latLng), title = restaurant.name)
-                }
-            }
+            PreviewMap(restaurant, onClick = onDirections)
             Text(
-                restaurant.fullAddress.ifBlank { restaurant.cityState },
+                restaurant.fullAddress.ifBlank { restaurant.cityState }.ifBlank { "%.5f, %.5f".format(restaurant.latitude, restaurant.longitude) },
                 style = MaterialTheme.typography.bodyLarge,
                 modifier = Modifier.padding(16.dp),
             )
@@ -640,6 +620,30 @@ private fun ReviewSheet(
                 else Text(stringResource(R.string.review_submit))
             }
         }
+    }
+}
+
+/** Non-interactive OpenStreetMap preview with one pin; tapping it opens directions. */
+@Composable
+private fun PreviewMap(restaurant: Restaurant, onClick: () -> Unit) {
+    val context = LocalContext.current
+    val mapView = rememberOsmMapView(interactive = false)
+    DisposableEffect(mapView, restaurant.id) {
+        val marker = Marker(mapView).apply {
+            position = restaurant.location.toOsm()
+            setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
+            setIcon(ContextCompat.getDrawable(context, R.drawable.ic_map_pin))
+        }
+        mapView.overlays.add(marker)
+        mapView.controller.setZoom(17.0)
+        mapView.controller.setCenter(restaurant.location.toOsm())
+        mapView.invalidate()
+        onDispose { mapView.overlays.remove(marker) }
+    }
+    Box(Modifier.fillMaxWidth().height(180.dp)) {
+        AndroidView(factory = { mapView }, modifier = Modifier.fillMaxSize())
+        // Transparent layer: the map itself ignores touches, so the whole preview acts as a button.
+        Box(Modifier.fillMaxSize().clickable(onClick = onClick))
     }
 }
 
