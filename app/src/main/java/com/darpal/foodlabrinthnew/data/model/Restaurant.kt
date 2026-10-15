@@ -39,7 +39,7 @@ data class Restaurant(
         get() = categories.filterNot { it.equals(kind.label, ignoreCase = true) }.take(3).joinToString(" · ")
             .ifBlank { kind.label }
 
-    val distanceLabel: String? get() = distanceMeters?.let(::formatDistance)
+    fun distanceLabel(units: UnitSystem): String? = distanceMeters?.let { formatDistance(it, units) }
 
     /** Link to this element on openstreetmap.org. */
     val osmUrl: String?
@@ -82,10 +82,4 @@ data class GeoPoint(val latitude: Double, val longitude: Double) {
             return (2 * EARTH_RADIUS_M * Math.asin(Math.sqrt(h))).toInt()
         }
     }
-}
-
-fun formatDistance(meters: Int): String = when {
-    meters < 1000 -> "${(meters / 10) * 10} m"
-    meters < 10_000 -> String.format(java.util.Locale.US, "%.1f km", meters / 1000.0)
-    else -> "${meters / 1000} km"
 }

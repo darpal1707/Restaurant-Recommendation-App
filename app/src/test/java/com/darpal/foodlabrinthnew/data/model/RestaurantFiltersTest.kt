@@ -55,7 +55,24 @@ class RestaurantFiltersTest {
         assertEquals(listOf("n1", "n2"), RestaurantFilters.decide(all, cuisines, Meal.LUNCH, null).map { it.id })
         // Within 1 km only the sushi place remains.
         assertEquals(listOf("n2"), RestaurantFilters.decide(all, cuisines, Meal.LUNCH, Distance.WALK).map { it.id })
+        // 0.5 mi is about 805 m, so the 800 m sushi place still qualifies in miles.
+        assertEquals(
+            listOf("n2"),
+            RestaurantFilters.decide(all, cuisines, Meal.LUNCH, Distance.WALK, UnitSystem.IMPERIAL).map { it.id },
+        )
         // Cafe prefers cafés.
         assertEquals("n3", RestaurantFilters.decide(all, emptyList(), Meal.CAFE, null).first().id)
+    }
+
+    @Test
+    fun `distance options are round numbers in each unit and fit the search radius`() {
+        assertEquals("Within 0.5 mi", Distance.WALK.description(UnitSystem.IMPERIAL))
+        assertEquals("Within 0.25 mi", Distance.AROUND_THE_CORNER.description(UnitSystem.IMPERIAL))
+        assertEquals("Within 500 m", Distance.AROUND_THE_CORNER.description(UnitSystem.METRIC))
+        assertEquals("Within 2 km", Distance.SHORT_TRIP.description(UnitSystem.METRIC))
+        assertEquals(1_609, Distance.SHORT_TRIP.maxMeters(UnitSystem.IMPERIAL))
+        Distance.entries.forEach { d ->
+            UnitSystem.entries.forEach { u -> assertTrue(d.maxMeters(u) <= SEARCH_RADIUS_METERS) }
+        }
     }
 }

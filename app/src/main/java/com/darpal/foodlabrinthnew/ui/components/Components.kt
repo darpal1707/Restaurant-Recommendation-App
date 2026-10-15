@@ -47,6 +47,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
@@ -66,7 +67,11 @@ import androidx.compose.ui.unit.dp
 import com.darpal.foodlabrinthnew.R
 import com.darpal.foodlabrinthnew.data.model.Cuisine
 import com.darpal.foodlabrinthnew.data.model.Restaurant
+import com.darpal.foodlabrinthnew.data.model.UnitSystem
 import com.darpal.foodlabrinthnew.ui.theme.StarGold
+
+/** Distance units for the UI; provided from the device region in MainActivity. */
+val LocalUnitSystem = staticCompositionLocalOf { UnitSystem.METRIC }
 
 @Composable
 fun RestaurantImage(restaurant: Restaurant, modifier: Modifier = Modifier) {
@@ -83,7 +88,7 @@ fun RestaurantImage(restaurant: Restaurant, modifier: Modifier = Modifier) {
 @Composable
 fun PlaceMeta(restaurant: Restaurant, modifier: Modifier = Modifier, color: Color = MaterialTheme.colorScheme.onSurfaceVariant) {
     Row(modifier = modifier, verticalAlignment = Alignment.CenterVertically) {
-        restaurant.distanceLabel?.let { distance ->
+        restaurant.distanceLabel(LocalUnitSystem.current)?.let { distance ->
             Icon(Icons.Rounded.Place, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(16.dp))
             Spacer(Modifier.width(2.dp))
             Text(distance, style = MaterialTheme.typography.labelLarge, color = color)

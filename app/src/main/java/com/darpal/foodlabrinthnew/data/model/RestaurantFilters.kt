@@ -20,8 +20,8 @@ object RestaurantFilters {
         cuisines.isEmpty() || cuisines.any { it.matches(restaurant) }
 
     /** Places without a known distance are kept. */
-    fun withinDistance(restaurant: Restaurant, distance: Distance?): Boolean =
-        distance == null || (restaurant.distanceMeters ?: 0) <= distance.maxMeters
+    fun withinDistance(restaurant: Restaurant, distance: Distance?, units: UnitSystem): Boolean =
+        distance == null || (restaurant.distanceMeters ?: 0) <= distance.maxMeters(units)
 
     fun byDistance(): Comparator<Restaurant> =
         compareBy<Restaurant, Int?>(nullsLast()) { it.distanceMeters }.thenBy { it.name }
@@ -38,8 +38,14 @@ object RestaurantFilters {
      * Questionnaire results: cuisine and distance filter; the meal only ranks results, because many
      * OSM entries have no `opening_hours` and filtering on it would hide them.
      */
-    fun decide(all: List<Restaurant>, cuisines: Collection<Cuisine>, meal: Meal?, distance: Distance?): List<Restaurant> =
-        all.filter { matchesAnyCuisine(it, cuisines) && withinDistance(it, distance) }
+    fun decide(
+        all: List<Restaurant>,
+        cuisines: Collection<Cuisine>,
+        meal: Meal?,
+        distance: Distance?,
+        units: UnitSystem = UnitSystem.METRIC,
+    ): List<Restaurant> =
+        all.filter { matchesAnyCuisine(it, cuisines) && withinDistance(it, distance, units) }
             .sortedWith(compareByDescending<Restaurant> { mealScore(it, meal) }.then(byDistance()))
 
     fun mealScore(restaurant: Restaurant, meal: Meal?): Int = when {

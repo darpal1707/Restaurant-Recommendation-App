@@ -73,4 +73,20 @@ class OsmParserTest {
         assertEquals("1.2 km", formatDistance(1_234))
         assertEquals("15 km", formatDistance(15_400))
     }
+
+    @Test
+    fun `imperial distances use feet and miles`() {
+        assertEquals("250 ft", formatDistance(80, UnitSystem.IMPERIAL)) // 262 ft, rounded down to 50
+        assertEquals("0.8 mi", formatDistance(1_234, UnitSystem.IMPERIAL))
+        assertEquals("1.0 mi", formatDistance(1_609, UnitSystem.IMPERIAL))
+        assertEquals("12 mi", formatDistance(20_000, UnitSystem.IMPERIAL))
+    }
+
+    @Test
+    fun `unit system follows the region`() {
+        assertEquals(UnitSystem.IMPERIAL, UnitSystem.forCountry("US"))
+        assertEquals(UnitSystem.IMPERIAL, UnitSystem.forCountry("gb"))
+        assertEquals(UnitSystem.METRIC, UnitSystem.forCountry("CA"))
+        assertEquals(UnitSystem.METRIC, UnitSystem.forCountry(""))
+    }
 }

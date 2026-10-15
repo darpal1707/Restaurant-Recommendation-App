@@ -26,7 +26,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material.icons.rounded.DirectionsBike
 import androidx.compose.material.icons.rounded.DirectionsWalk
-import androidx.compose.material.icons.rounded.DirectionsCar
+import androidx.compose.material.icons.rounded.LocationOn
 import androidx.compose.material.icons.rounded.AutoAwesome
 import androidx.compose.material.icons.rounded.Fastfood
 import androidx.compose.material.icons.rounded.FreeBreakfast
@@ -63,6 +63,7 @@ import com.darpal.foodlabrinthnew.data.model.Distance
 import com.darpal.foodlabrinthnew.data.model.Meal
 import com.darpal.foodlabrinthnew.ui.appViewModelFactory
 import com.darpal.foodlabrinthnew.ui.components.CuisineTile
+import com.darpal.foodlabrinthnew.ui.components.LocalUnitSystem
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -75,6 +76,7 @@ fun DecideScreen(
     val selectedMeal by viewModel.meal.collectAsStateWithLifecycle()
     val selectedCuisines by viewModel.cuisines.collectAsStateWithLifecycle()
     val goBack = { if (!viewModel.back()) onBack() }
+    val units = LocalUnitSystem.current
 
     BackHandler(enabled = step > 0) { viewModel.back() }
 
@@ -136,7 +138,7 @@ fun DecideScreen(
                 DecideStep.DISTANCE -> OptionGrid(
                     question = stringResource(R.string.decide_distance_question),
                     options = Distance.entries.map {
-                        Option(it.label, it.description, distanceIcon(it), false) { onShowResults(viewModel.resultsRoute(it)) }
+                        Option(it.label, it.description(units), distanceIcon(it), false) { onShowResults(viewModel.resultsRoute(it)) }
                     } + Option(stringResource(R.string.decide_any), stringResource(R.string.decide_any_body), Icons.Rounded.AutoAwesome, false) {
                         onShowResults(viewModel.resultsRoute(null))
                     },
@@ -256,7 +258,7 @@ private fun mealIcon(meal: Meal): ImageVector = when (meal) {
 }
 
 private fun distanceIcon(distance: Distance): ImageVector = when (distance) {
+    Distance.AROUND_THE_CORNER -> Icons.Rounded.LocationOn
     Distance.WALK -> Icons.Rounded.DirectionsWalk
     Distance.SHORT_TRIP -> Icons.Rounded.DirectionsBike
-    Distance.FURTHER -> Icons.Rounded.DirectionsCar
 }

@@ -5,6 +5,7 @@ import com.darpal.foodlabrinthnew.R
 import com.darpal.foodlabrinthnew.data.model.Area
 import com.darpal.foodlabrinthnew.data.model.GeoPoint
 import com.darpal.foodlabrinthnew.data.model.Restaurant
+import com.darpal.foodlabrinthnew.data.model.SEARCH_RADIUS_METERS
 import com.darpal.foodlabrinthnew.data.osm.OverpassApi
 import com.darpal.foodlabrinthnew.data.osm.PlacesCache
 import kotlinx.coroutines.CoroutineScope
@@ -92,7 +93,7 @@ class RestaurantRepository(
             }
 
             try {
-                val body = api.fetchNearby(center, RADIUS_M)
+                val body = api.fetchNearby(center, SEARCH_RADIUS_METERS)
                 val restaurants = parse(body, center)
                 cache.write(PlacesCache.Entry(area.id, center, System.currentTimeMillis(), body))
                 _state.value = PlacesState.Ready(area, center, restaurants)
@@ -114,7 +115,6 @@ class RestaurantRepository(
     }
 
     private companion object {
-        const val RADIUS_M = 3_000
         const val SAME_PLACE_M = 1_000
         const val CACHE_TTL_MS = 24 * 60 * 60 * 1000L
     }

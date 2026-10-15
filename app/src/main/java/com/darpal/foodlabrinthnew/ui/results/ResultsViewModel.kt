@@ -12,6 +12,7 @@ import com.darpal.foodlabrinthnew.data.model.Distance
 import com.darpal.foodlabrinthnew.data.model.Meal
 import com.darpal.foodlabrinthnew.data.model.Restaurant
 import com.darpal.foodlabrinthnew.data.model.RestaurantFilters
+import com.darpal.foodlabrinthnew.data.model.UnitSystem
 import com.darpal.foodlabrinthnew.ui.navigation.Routes
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -77,7 +78,7 @@ class ResultsViewModel(
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), ResultsUiState())
 
     private fun filter(all: List<Restaurant>, query: String): List<Restaurant> = when (mode) {
-        ResultsMode.DECIDE -> RestaurantFilters.decide(all, cuisines, meal, distance)
+        ResultsMode.DECIDE -> RestaurantFilters.decide(all, cuisines, meal, distance, UnitSystem.forDefaultLocale())
         ResultsMode.CUISINE -> all.filter { cuisine!!.matches(it) && RestaurantFilters.matchesQuery(it, query) }
             .sortedWith(RestaurantFilters.byDistance())
         ResultsMode.SEARCH -> all.filter { RestaurantFilters.matchesQuery(it, query) }
