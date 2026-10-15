@@ -38,6 +38,9 @@
     <string name="location_allow">Use my location</string>
     <string name="location_or_city">Or explore a city</string>
     <string name="location_from_home">Allow location or pick a city on the Home tab.</string>
+    <string name="error_osm_busy">The free OpenStreetMap servers are busy right now. Please try again in a minute.</string>
+    <string name="error_offline">You\'re offline. Connect to the internet and try again.</string>
+    <string name="error_location">Couldn\'t get your location. Try again or pick a city.</string>
     <string name="osm_attribution">Map &amp; data © OpenStreetMap contributors</string>
 
     <!-- Explore -->

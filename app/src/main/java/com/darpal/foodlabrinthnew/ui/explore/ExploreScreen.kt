@@ -1,6 +1,7 @@
 package com.darpal.foodlabrinthnew.ui.explore
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
@@ -25,41 +26,45 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.darpal.foodlabrinthnew.R
 import com.darpal.foodlabrinthnew.data.model.Cuisine
+import com.darpal.foodlabrinthnew.ui.components.StatusBarScrim
 import com.darpal.foodlabrinthnew.ui.components.CuisineTile
 import com.darpal.foodlabrinthnew.ui.components.SearchField
 
 @Composable
 fun ExploreScreen(onSearch: (String) -> Unit, onOpenCuisine: (String) -> Unit) {
     var query by rememberSaveable { mutableStateOf("") }
-    LazyVerticalGrid(
-        columns = GridCells.Adaptive(minSize = 156.dp),
-        modifier = Modifier.fillMaxSize(),
-        contentPadding = PaddingValues(start = 20.dp, end = 20.dp, bottom = 24.dp),
-        horizontalArrangement = Arrangement.spacedBy(14.dp),
-        verticalArrangement = Arrangement.spacedBy(14.dp),
-    ) {
-        item(span = { GridItemSpan(maxLineSpan) }) {
-            Column(Modifier.statusBarsPadding().padding(top = 16.dp)) {
-                Text(stringResource(R.string.explore_title), style = MaterialTheme.typography.headlineMedium)
-                Text(
-                    stringResource(R.string.explore_subtitle),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-                Spacer(Modifier.height(16.dp))
-                SearchField(
-                    value = query,
-                    onValueChange = { query = it },
-                    onSearch = { if (it.isNotBlank()) onSearch(it.trim()) },
+    Box(Modifier.fillMaxSize()) {
+        LazyVerticalGrid(
+            columns = GridCells.Adaptive(minSize = 156.dp),
+            modifier = Modifier.fillMaxSize(),
+            contentPadding = PaddingValues(start = 20.dp, end = 20.dp, bottom = 24.dp),
+            horizontalArrangement = Arrangement.spacedBy(14.dp),
+            verticalArrangement = Arrangement.spacedBy(14.dp),
+        ) {
+            item(span = { GridItemSpan(maxLineSpan) }) {
+                Column(Modifier.statusBarsPadding().padding(top = 16.dp)) {
+                    Text(stringResource(R.string.explore_title), style = MaterialTheme.typography.headlineMedium)
+                    Text(
+                        stringResource(R.string.explore_subtitle),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                    Spacer(Modifier.height(16.dp))
+                    SearchField(
+                        value = query,
+                        onValueChange = { query = it },
+                        onSearch = { if (it.isNotBlank()) onSearch(it.trim()) },
+                    )
+                }
+            }
+            items(Cuisine.ALL, key = { it.name }) { cuisine ->
+                CuisineTile(
+                    cuisine = cuisine,
+                    onClick = { onOpenCuisine(cuisine.name) },
+                    modifier = Modifier.aspectRatio(1.1f),
                 )
             }
         }
-        items(Cuisine.ALL, key = { it.name }) { cuisine ->
-            CuisineTile(
-                cuisine = cuisine,
-                onClick = { onOpenCuisine(cuisine.name) },
-                modifier = Modifier.aspectRatio(1.1f),
-            )
-        }
+        StatusBarScrim()
     }
 }

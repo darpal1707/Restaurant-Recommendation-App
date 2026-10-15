@@ -76,6 +76,7 @@ import com.darpal.foodlabrinthnew.ui.components.RestaurantCard
 import com.darpal.foodlabrinthnew.ui.components.RestaurantListItem
 import com.darpal.foodlabrinthnew.ui.components.SearchField
 import com.darpal.foodlabrinthnew.ui.components.SectionHeader
+import com.darpal.foodlabrinthnew.ui.components.StatusBarScrim
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -151,7 +152,7 @@ fun HomeScreen(
                 state.needsLocation -> item {
                     LocationPrompt(onAllow = requestLocation, onPickCity = viewModel::selectArea, modifier = Modifier.padding(horizontal = 20.dp))
                 }
-                state.error != null -> item { ErrorState(state.error, onRetry = viewModel::refresh) }
+                state.error != null -> item { ErrorState(stringResource(state.error!!), onRetry = viewModel::refresh) }
                 state.totalCount == 0 -> item {
                     EmptyState(
                         icon = Icons.Rounded.Place,
@@ -227,6 +228,7 @@ fun HomeScreen(
 
             item { OsmAttribution(Modifier.padding(horizontal = 12.dp)) }
         }
+        StatusBarScrim()
     }
 }
 

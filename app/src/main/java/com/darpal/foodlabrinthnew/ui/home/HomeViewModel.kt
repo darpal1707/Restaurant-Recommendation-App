@@ -1,5 +1,6 @@
 package com.darpal.foodlabrinthnew.ui.home
 
+import androidx.annotation.StringRes
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.darpal.foodlabrinthnew.data.PlacesState
@@ -20,7 +21,7 @@ data class HomeUiState(
     val area: Area = Area.NEARBY,
     val isLoading: Boolean = true,
     val needsLocation: Boolean = false,
-    val error: String? = null,
+    @StringRes val error: Int? = null,
     val isRefreshing: Boolean = false,
     val closest: List<Restaurant> = emptyList(),
     val forYou: List<Restaurant> = emptyList(),

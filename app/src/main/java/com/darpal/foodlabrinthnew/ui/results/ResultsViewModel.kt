@@ -1,5 +1,6 @@
 package com.darpal.foodlabrinthnew.ui.results
 
+import androidx.annotation.StringRes
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -26,7 +27,7 @@ enum class ResultsMode { SEARCH, CUISINE, DECIDE }
 
 data class ResultsUiState(
     val isLoading: Boolean = true,
-    val error: String? = null,
+    @StringRes val error: Int? = null,
     val needsLocation: Boolean = false,
     val results: List<Restaurant> = emptyList(),
     val favoriteIds: Set<String> = emptySet(),

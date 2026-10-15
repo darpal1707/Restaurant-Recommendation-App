@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -50,6 +51,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.createSavedStateHandle
@@ -180,26 +183,42 @@ private fun OptionCard(option: Option) {
     val colors = MaterialTheme.colorScheme
     Card(
         onClick = option.onClick,
-        modifier = Modifier.aspectRatio(1f),
+        // A min height (not a fixed square) leaves room for two-line titles and large font sizes,
+        // while keeping cards in a row the same height in the common case.
+        modifier = Modifier.fillMaxWidth().heightIn(min = 180.dp),
         shape = MaterialTheme.shapes.extraLarge,
         colors = CardDefaults.cardColors(
             containerColor = if (option.selected) colors.primaryContainer else colors.surfaceContainerHigh,
         ),
     ) {
         Column(
-            Modifier.fillMaxSize().padding(16.dp),
+            Modifier.fillMaxWidth().heightIn(min = 180.dp).padding(horizontal = 12.dp, vertical = 16.dp),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            Surface(shape = CircleShape, color = colors.primary.copy(alpha = 0.12f), modifier = Modifier.size(64.dp)) {
+            Surface(shape = CircleShape, color = colors.primary.copy(alpha = 0.12f), modifier = Modifier.size(56.dp)) {
                 Box(contentAlignment = Alignment.Center) {
-                    Icon(option.icon, contentDescription = null, tint = colors.primary, modifier = Modifier.size(32.dp))
+                    Icon(option.icon, contentDescription = null, tint = colors.primary, modifier = Modifier.size(28.dp))
                 }
             }
             Spacer(Modifier.height(12.dp))
-            Text(option.title, style = MaterialTheme.typography.titleMedium)
+            Text(
+                option.title,
+                style = MaterialTheme.typography.titleMedium,
+                textAlign = TextAlign.Center,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis,
+            )
             option.subtitle?.let {
-                Text(it, style = MaterialTheme.typography.bodySmall, color = colors.onSurfaceVariant)
+                Spacer(Modifier.height(2.dp))
+                Text(
+                    it,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = colors.onSurfaceVariant,
+                    textAlign = TextAlign.Center,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis,
+                )
             }
         }
     }

@@ -1,5 +1,7 @@
 package com.darpal.foodlabrinthnew.data
 
+import androidx.annotation.StringRes
+import com.darpal.foodlabrinthnew.R
 import com.darpal.foodlabrinthnew.data.model.Area
 import com.darpal.foodlabrinthnew.data.model.GeoPoint
 import com.darpal.foodlabrinthnew.data.model.Restaurant
@@ -15,6 +17,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
+import java.net.UnknownHostException
 
 sealed interface PlacesState {
     data object Loading : PlacesState
@@ -22,7 +25,7 @@ sealed interface PlacesState {
     /** "Near me" is selected but location permission hasn't been granted. */
     data object NeedsLocation : PlacesState
 
-    data class Error(val message: String?) : PlacesState
+    data class Error(@StringRes val message: Int) : PlacesState
 
     data class Ready(val area: Area, val center: GeoPoint, val restaurants: List<Restaurant>) : PlacesState
 }
@@ -77,7 +80,7 @@ class RestaurantRepository(
                     return
                 }
                 location.current() ?: run {
-                    _state.value = PlacesState.Error("Couldn't get your location. Try again or pick a city.")
+                    _state.value = PlacesState.Error(R.string.error_location)
                     return
                 }
             }
@@ -97,7 +100,8 @@ class RestaurantRepository(
                 _state.value = when {
                     cached != null -> PlacesState.Ready(area, cached.center, parse(cached.body, cached.center))
                     ready?.area == area -> ready
-                    else -> PlacesState.Error(e.message)
+                    e is UnknownHostException -> PlacesState.Error(R.string.error_offline)
+                    else -> PlacesState.Error(R.string.error_osm_busy)
                 }
             }
         } finally {

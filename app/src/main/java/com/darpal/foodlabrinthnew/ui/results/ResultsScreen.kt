@@ -95,7 +95,7 @@ fun ResultsScreen(
             }
             when {
                 state.isLoading -> items(6) { ListItemPlaceholder() }
-                state.error != null -> item { ErrorState(state.error, onRetry = viewModel::retry) }
+                state.error != null -> item { ErrorState(stringResource(state.error!!), onRetry = viewModel::retry) }
                 state.needsLocation -> item {
                     EmptyState(
                         icon = Icons.Rounded.MyLocation,

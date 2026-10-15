@@ -1,6 +1,9 @@
 package com.darpal.foodlabrinthnew.data.osm
 
+import com.darpal.foodlabrinthnew.data.model.GeoPoint
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class OverpassApiParseTest {
@@ -37,5 +40,21 @@ class OverpassApiParseTest {
     fun `empty or missing elements give an empty list`() {
         assertEquals(0, OverpassApi.parse("""{"elements": []}""").size)
         assertEquals(0, OverpassApi.parse("""{"remark": "runtime error"}""").size)
+    }
+
+    @Test
+    fun `error remarks with no elements are detected`() {
+        val timeout = """{"elements": [], "remark": "runtime error: Query timed out in \"query\" at line 1 after 26 seconds."}"""
+        assertTrue(OverpassApi.errorRemark(timeout)!!.contains("timed out"))
+        assertNull(OverpassApi.errorRemark(response))
+        assertNull(OverpassApi.errorRemark("""{"elements": []}"""))
+        // An HTML error page instead of JSON is also a failure.
+        assertEquals("Invalid response", OverpassApi.errorRemark("<html>504 Gateway Time-out</html>"))
+    }
+
+    @Test
+    fun `query uses a dot decimal separator and the requested radius`() {
+        val query = OverpassApi.buildQuery(GeoPoint(43.6532, -79.3832), 3000)
+        assertTrue(query, query.contains("(around:3000,43.653200,-79.383200)"))
     }
 }
