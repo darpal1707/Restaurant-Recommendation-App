@@ -1,36 +1,144 @@
 <resources>
     <string name="app_name">Food Labrinth</string>
-    <string name="title_home">Home</string>
-    <string name="title_dashboard">Dashboard</string>
-    <string name="title_notifications">Notifications</string>
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
-    <string name="title_activity_maps">Map</string>
-    <string name="search_hint"><font size="15">Search by cuisine, state(like NY, OH)</font></string>
-    <string-array name="cuisines">
-        <item>American</item>
-        <item>Asian</item>
-        <item>BBQ</item>
-        <item>Chinese</item>
-        <item>Coffee / Tea</item>
-        <item>Deli</item>
-        <item>Desserts</item>
-        <item>European</item>
-        <item>Fast Food</item>
-        <item>Greek</item>
-        <item>Halal</item>
-        <item>Indian</item>
-        <item>Italian</item>
-        <item>Jamaican</item>
-        <item>Japanese</item>
-        <item>Korean</item>
-        <item>Mediterranean</item>
-        <item>Mexican</item>
-        <item>Salads</item>
-        <item>Spanish</item>
-        <item>Sushi</item>
-        <item>Thai</item>
-        <item>Vegan</item>
-        <item>Vegetarian</item>
-    </string-array>
+
+    <!-- Navigation -->
+    <string name="nav_home">Home</string>
+    <string name="nav_explore">Explore</string>
+    <string name="nav_map">Map</string>
+    <string name="nav_saved">Saved</string>
+    <string name="nav_profile">Profile</string>
+
+    <!-- Common -->
+    <string name="back">Back</string>
+    <string name="retry">Try again</string>
+    <string name="clear">Clear</string>
+    <string name="search_hint">Search restaurants, cuisines, cities or states</string>
+    <string name="generic_error">Something went wrong. Please try again.</string>
+    <string name="sign_in">Sign in</string>
+
+    <!-- Home -->
+    <string name="home_greeting">Hungry, %1$s?</string>
+    <string name="home_greeting_guest">What are you craving?</string>
+    <string name="home_subtitle">Discover great places to eat around you</string>
+    <string name="home_decide_title">Can\'t decide?</string>
+    <string name="home_decide_body">Answer four quick questions and we\'ll pick restaurants for you.</string>
+    <string name="home_decide_action">Help me choose</string>
+    <string name="home_cuisines">Browse by cuisine</string>
+    <string name="home_trending">Trending now</string>
+    <string name="home_for_you">Picked for you</string>
+    <string name="home_for_you_hint">Tap ♥ on restaurants you like and we\'ll recommend similar places here.</string>
+    <string name="home_top_rated">Top rated</string>
+    <string name="see_all">See all</string>
+
+    <!-- Explore -->
+    <string name="explore_title">Explore</string>
+    <string name="explore_subtitle">What kind of food are you in the mood for?</string>
+
+    <!-- Results -->
+    <string name="results_count">%1$d places</string>
+    <string name="results_empty_title">No restaurants found</string>
+    <string name="results_empty_body">Try a different search or another cuisine.</string>
+    <string name="results_search_title">“%1$s”</string>
+    <string name="results_decide_title">Your picks</string>
+
+    <!-- Detail -->
+    <string name="detail_directions">Directions</string>
+    <string name="detail_share">Share</string>
+    <string name="detail_review">Review</string>
+    <string name="detail_save">Save</string>
+    <string name="detail_saved">Saved</string>
+    <string name="detail_location">Location</string>
+    <string name="detail_hours">Opening hours</string>
+    <string name="detail_hours_unknown">Opening hours not available</string>
+    <string name="detail_photos">Photos</string>
+    <string name="detail_photos_empty">No photos yet. Be the first to add one!</string>
+    <string name="detail_add_photo">Take photo</string>
+    <string name="detail_pick_photo">From gallery</string>
+    <string name="detail_reviews">Reviews</string>
+    <string name="detail_reviews_empty">No reviews yet. Share your experience!</string>
+    <string name="detail_write_review">Write a review</string>
+    <string name="detail_not_found">We couldn\'t find this restaurant.</string>
+    <string name="detail_reviews_count">%1$d reviews</string>
+    <string name="detail_share_text">Hey! I found %1$s on Food Labrinth. Check out the place: %2$s</string>
+    <string name="detail_share_chooser">Share restaurant</string>
+    <string name="detail_login_to_review">Sign in to write a review</string>
+    <string name="detail_login_to_upload">Sign in to add photos</string>
+    <string name="detail_uploading">Uploading photo…</string>
+    <string name="detail_upload_done">Photo uploaded. Thanks!</string>
+    <string name="detail_review_posted">Review posted. Thanks!</string>
+    <string name="detail_saved_message">Saved. We\'ll recommend similar places.</string>
+    <string name="detail_removed_message">Removed from saved</string>
+    <string name="detail_no_maps_app">No app found to open directions</string>
+
+    <!-- Review sheet -->
+    <string name="review_title">How was %1$s?</string>
+    <string name="review_hint">Tell others about the food, service and atmosphere</string>
+    <string name="review_submit">Post review</string>
+    <string name="review_rating_required">Please choose a star rating</string>
+    <string name="review_text_required">Please write a few words</string>
+
+    <!-- Decide -->
+    <string name="decide_title">Help me choose</string>
+    <string name="decide_step">Step %1$d of %2$d</string>
+    <string name="decide_meal_question">Which meal are you planning?</string>
+    <string name="decide_cuisine_question">What cuisines sound good?</string>
+    <string name="decide_cuisine_hint">Pick one or more</string>
+    <string name="decide_ambience_question">What kind of vibe?</string>
+    <string name="decide_budget_question">What\'s your budget?</string>
+    <string name="decide_next">Next</string>
+    <string name="decide_surprise">Surprise me</string>
+    <string name="decide_any">Any</string>
+    <string name="decide_any_body">Show me everything</string>
+
+    <!-- Map -->
+    <string name="map_permission_rationale">Allow location to see restaurants around you</string>
+    <string name="map_permission_action">Allow</string>
+    <string name="map_loading">Loading restaurants…</string>
+
+    <!-- Saved -->
+    <string name="saved_title">Saved</string>
+    <string name="saved_cuisines">Cuisines you like</string>
+    <string name="saved_cuisines_empty">Your picks shape the “Picked for you” section on Home. Saving a restaurant likes its cuisines automatically.</string>
+    <string name="saved_restaurants">Saved restaurants</string>
+    <string name="saved_empty_title">Nothing saved yet</string>
+    <string name="saved_empty_body">Tap the heart on any restaurant to keep it here.</string>
+
+    <!-- Auth -->
+    <string name="auth_welcome">Welcome back</string>
+    <string name="auth_welcome_body">Sign in to post reviews and share photos.</string>
+    <string name="auth_email">Email</string>
+    <string name="auth_password">Password</string>
+    <string name="auth_full_name">Full name</string>
+    <string name="auth_show_password">Show password</string>
+    <string name="auth_hide_password">Hide password</string>
+    <string name="auth_forgot">Forgot password?</string>
+    <string name="auth_or">or</string>
+    <string name="auth_google">Continue with Google</string>
+    <string name="auth_no_account">New here?</string>
+    <string name="auth_create_account">Create an account</string>
+    <string name="auth_have_account">Already have an account?</string>
+    <string name="auth_signup_title">Create your account</string>
+    <string name="auth_signup_body">Join to review and share your favourite places.</string>
+    <string name="auth_sign_up">Sign up</string>
+    <string name="auth_reset_title">Reset password</string>
+    <string name="auth_reset_body">Enter your registered email and we\'ll send you a reset link.</string>
+    <string name="auth_reset_send">Send reset link</string>
+    <string name="auth_reset_sent">Reset email sent. Check your inbox.</string>
+    <string name="auth_back_to_login">Back to sign in</string>
+    <string name="auth_error_email">Please enter a valid email address</string>
+    <string name="auth_error_password">Password should be at least 6 characters</string>
+    <string name="auth_error_name">Please enter your name</string>
+    <string name="auth_error_credentials">Incorrect email or password</string>
+    <string name="auth_error_no_user">No account found for this email</string>
+    <string name="auth_error_exists">An account already exists for this email</string>
+    <string name="auth_error_network">Network error. Check your connection.</string>
+    <string name="auth_error_google">Google sign-in failed</string>
+
+    <!-- Profile -->
+    <string name="profile_title">Profile</string>
+    <string name="profile_sign_out">Sign out</string>
+    <string name="profile_saved_count">Saved restaurants</string>
+    <string name="profile_liked_count">Liked cuisines</string>
+    <string name="profile_about">About</string>
+    <string name="profile_about_body">Food Labrinth recommends restaurants based on cuisines you like.</string>
 </resources>
