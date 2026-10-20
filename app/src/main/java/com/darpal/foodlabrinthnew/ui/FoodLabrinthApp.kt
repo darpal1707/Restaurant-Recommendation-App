@@ -5,7 +5,7 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
-import androidx.compose.animation.core.tween
+import androidx.compose.animation.core.VisibilityThreshold
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.padding
@@ -18,6 +18,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.IntOffset
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
@@ -35,15 +36,24 @@ import com.darpal.foodlabrinthnew.ui.home.HomeScreen
 import com.darpal.foodlabrinthnew.ui.map.MapScreen
 import com.darpal.foodlabrinthnew.ui.navigation.Routes
 import com.darpal.foodlabrinthnew.ui.navigation.TopLevelDestination
+import com.darpal.foodlabrinthnew.ui.navigation.screenEnter
+import com.darpal.foodlabrinthnew.ui.navigation.screenExit
+import com.darpal.foodlabrinthnew.ui.navigation.screenPopEnter
+import com.darpal.foodlabrinthnew.ui.navigation.screenPopExit
 import com.darpal.foodlabrinthnew.ui.profile.ProfileScreen
 import com.darpal.foodlabrinthnew.ui.results.ResultsScreen
 import com.darpal.foodlabrinthnew.ui.saved.SavedScreen
+import com.darpal.foodlabrinthnew.ui.theme.LocalReducedMotion
+import com.darpal.foodlabrinthnew.ui.theme.Motion
+
+private val barSpec = Motion.spring(visibilityThreshold = IntOffset.VisibilityThreshold)
 
 @Composable
 fun FoodLabrinthApp() {
     val navController = rememberNavController()
     val backStackEntry by navController.currentBackStackEntryAsState()
     val destination = backStackEntry?.destination
+    val reducedMotion = LocalReducedMotion.current
     val showBottomBar = TopLevelDestination.visible.any { tab ->
         destination?.hierarchy?.any { it.route == tab.route } == true
     }
@@ -52,8 +62,9 @@ fun FoodLabrinthApp() {
         bottomBar = {
             AnimatedVisibility(
                 visible = showBottomBar,
-                enter = slideInVertically { it } + fadeIn(),
-                exit = slideOutVertically { it } + fadeOut(),
+                // Leaves and returns along the same path: down out of the way, back up.
+                enter = if (reducedMotion) fadeIn(Motion.fade()) else slideInVertically(barSpec) { it } + fadeIn(Motion.spring()),
+                exit = if (reducedMotion) fadeOut(Motion.fade()) else slideOutVertically(barSpec) { it } + fadeOut(Motion.spring()),
             ) {
                 NavigationBar {
                     TopLevelDestination.visible.forEach { tab ->
@@ -77,8 +88,10 @@ fun FoodLabrinthApp() {
             navController = navController,
             startDestination = Routes.HOME,
             modifier = Modifier.padding(bottomPadding).consumeWindowInsets(bottomPadding),
-            enterTransition = { fadeIn(tween(220)) },
-            exitTransition = { fadeOut(tween(180)) },
+            enterTransition = { screenEnter(reducedMotion) },
+            exitTransition = { screenExit(reducedMotion) },
+            popEnterTransition = { screenPopEnter(reducedMotion) },
+            popExitTransition = { screenPopExit(reducedMotion) },
         ) {
             val openRestaurant: (String) -> Unit = { navController.navigate(Routes.detail(it)) }
             val back: () -> Unit = { navController.popBackStack() }

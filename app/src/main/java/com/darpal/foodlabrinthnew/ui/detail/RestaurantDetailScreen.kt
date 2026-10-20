@@ -7,9 +7,6 @@ import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -72,6 +69,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberModalBottomSheetState
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -88,9 +86,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -114,7 +114,9 @@ import com.darpal.foodlabrinthnew.ui.components.RestaurantImage
 import com.darpal.foodlabrinthnew.ui.components.StarRatingInput
 import com.darpal.foodlabrinthnew.ui.components.StarRow
 import com.darpal.foodlabrinthnew.ui.components.rememberOsmMapView
+import com.darpal.foodlabrinthnew.ui.components.rememberFavoriteToggle
 import com.darpal.foodlabrinthnew.ui.components.toOsm
+import com.darpal.foodlabrinthnew.ui.theme.pressScale
 import kotlinx.coroutines.launch
 import org.osmdroid.views.overlay.Marker
 
@@ -234,8 +236,20 @@ private fun DetailContent(
     onTakePhoto: () -> Unit,
     onPickPhoto: () -> Unit,
 ) {
+    val onToggleFavorite = rememberFavoriteToggle(state.isFavorite, onToggleFavorite)
     val listState = rememberLazyListState()
-    val collapsed by remember { derivedStateOf { listState.firstVisibleItemIndex > 0 } }
+    val heroHeightPx = with(LocalDensity.current) { HeroHeight.toPx() }
+    // Follows the scroll position continuously instead of popping in at a threshold: the compact
+    // bar starts appearing once most of the hero has scrolled away and is solid when it's gone.
+    val barProgress by remember(heroHeightPx) {
+        derivedStateOf {
+            if (listState.firstVisibleItemIndex > 0) {
+                1f
+            } else {
+                (listState.firstVisibleItemScrollOffset / heroHeightPx - BAR_FADE_START) / (1f - BAR_FADE_START)
+            }.coerceIn(0f, 1f)
+        }
+    }
 
     Box(Modifier.fillMaxSize()) {
         LazyColumn(state = listState, contentPadding = PaddingValues(bottom = bottomPadding + 32.dp)) {
@@ -349,9 +363,10 @@ private fun DetailContent(
             }
         }
 
-        // Compact app bar that fades in once the hero image has scrolled away.
-        AnimatedVisibility(visible = collapsed, enter = fadeIn(), exit = fadeOut()) {
+        // Compact app bar, only composed once it starts to show so it never blocks the hero buttons.
+        if (barProgress > 0f) {
             TopAppBar(
+                modifier = Modifier.graphicsLayer { alpha = barProgress },
                 title = { Text(restaurant.name, maxLines = 1, overflow = TextOverflow.Ellipsis) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
@@ -373,6 +388,9 @@ private fun DetailContent(
     }
 }
 
+private val HeroHeight = 300.dp
+private const val BAR_FADE_START = 0.6f
+
 @Composable
 private fun Hero(
     restaurant: Restaurant,
@@ -382,7 +400,7 @@ private fun Hero(
     onShare: () -> Unit,
     onToggleFavorite: () -> Unit,
 ) {
-    Box(Modifier.fillMaxWidth().height(300.dp)) {
+    Box(Modifier.fillMaxWidth().height(HeroHeight)) {
         if (photo != null) {
             AsyncImage(
                 model = photo.imageUrl,
@@ -423,19 +441,28 @@ private fun Hero(
 
 @Composable
 private fun CircleIconButton(icon: ImageVector, description: String, onClick: () -> Unit, tint: Color = MaterialTheme.colorScheme.onSurface) {
-    Surface(onClick = onClick, shape = CircleShape, color = MaterialTheme.colorScheme.surface.copy(alpha = 0.92f), modifier = Modifier.size(44.dp)) {
+    val interaction = remember { MutableInteractionSource() }
+    Surface(
+        onClick = onClick,
+        shape = CircleShape,
+        color = MaterialTheme.colorScheme.surface.copy(alpha = 0.92f),
+        interactionSource = interaction,
+        modifier = Modifier.size(44.dp).pressScale(interaction, pressedScale = 0.9f),
+    ) {
         Box(contentAlignment = Alignment.Center) { Icon(icon, contentDescription = description, tint = tint) }
     }
 }
 
 @Composable
 private fun ActionButton(icon: ImageVector, label: String, onClick: () -> Unit) {
+    val interaction = remember { MutableInteractionSource() }
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         Surface(
             onClick = onClick,
             shape = CircleShape,
             color = MaterialTheme.colorScheme.primaryContainer,
-            modifier = Modifier.size(56.dp),
+            interactionSource = interaction,
+            modifier = Modifier.size(56.dp).pressScale(interaction, pressedScale = 0.92f),
         ) {
             Box(contentAlignment = Alignment.Center) {
                 Icon(icon, contentDescription = null, tint = MaterialTheme.colorScheme.onPrimaryContainer)

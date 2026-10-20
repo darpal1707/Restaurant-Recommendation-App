@@ -7,20 +7,19 @@ import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.windowInsetsTopHeight
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -57,6 +56,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -68,7 +68,10 @@ import com.darpal.foodlabrinthnew.R
 import com.darpal.foodlabrinthnew.data.model.Cuisine
 import com.darpal.foodlabrinthnew.data.model.Restaurant
 import com.darpal.foodlabrinthnew.data.model.UnitSystem
+import com.darpal.foodlabrinthnew.ui.theme.LocalReducedMotion
 import com.darpal.foodlabrinthnew.ui.theme.StarGold
+import com.darpal.foodlabrinthnew.ui.theme.confirmHaptic
+import com.darpal.foodlabrinthnew.ui.theme.pressScale
 
 /** Distance units for the UI; provided from the device region in MainActivity. */
 val LocalUnitSystem = staticCompositionLocalOf { UnitSystem.METRIC }
@@ -128,13 +131,28 @@ fun StarRatingInput(rating: Int, onRatingChange: (Int) -> Unit, modifier: Modifi
     }
 }
 
+/**
+ * Wraps a save/unsave action with a confirming haptic tick when a place is saved, fired on the
+ * same frame as the heart filling in. Unsaving stays silent so the tick keeps its meaning.
+ */
+@Composable
+fun rememberFavoriteToggle(isFavorite: Boolean, onToggle: () -> Unit): () -> Unit {
+    val view = LocalView.current
+    return {
+        if (!isFavorite) view.confirmHaptic()
+        onToggle()
+    }
+}
+
 @Composable
 fun FavoriteButton(isFavorite: Boolean, onClick: () -> Unit, modifier: Modifier = Modifier) {
+    val interaction = remember { MutableInteractionSource() }
     Surface(
-        onClick = onClick,
+        onClick = rememberFavoriteToggle(isFavorite, onClick),
         shape = CircleShape,
         color = MaterialTheme.colorScheme.surface.copy(alpha = 0.9f),
-        modifier = modifier.size(36.dp),
+        interactionSource = interaction,
+        modifier = modifier.size(36.dp).pressScale(interaction, pressedScale = 0.9f),
     ) {
         Box(contentAlignment = Alignment.Center) {
             Icon(
@@ -156,11 +174,13 @@ fun RestaurantCard(
     onToggleFavorite: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val interaction = remember { MutableInteractionSource() }
     Card(
         onClick = onClick,
-        modifier = modifier.width(264.dp),
+        modifier = modifier.width(264.dp).pressScale(interaction),
         shape = MaterialTheme.shapes.large,
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerLow),
+        interactionSource = interaction,
     ) {
         Box(Modifier.height(156.dp).fillMaxWidth()) {
             RestaurantImage(restaurant, Modifier.fillMaxSize())
@@ -191,11 +211,13 @@ fun RestaurantListItem(
     onToggleFavorite: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val interaction = remember { MutableInteractionSource() }
     Card(
         onClick = onClick,
-        modifier = modifier.fillMaxWidth(),
+        modifier = modifier.fillMaxWidth().pressScale(interaction),
         shape = MaterialTheme.shapes.large,
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerLow),
+        interactionSource = interaction,
     ) {
         Row(Modifier.padding(10.dp), verticalAlignment = Alignment.CenterVertically) {
             RestaurantImage(restaurant, Modifier.size(84.dp).clip(MaterialTheme.shapes.medium))
@@ -221,7 +243,7 @@ fun RestaurantListItem(
                     )
                 }
             }
-            IconButton(onClick = onToggleFavorite) {
+            IconButton(onClick = rememberFavoriteToggle(isFavorite, onToggleFavorite)) {
                 Icon(
                     imageVector = if (isFavorite) Icons.Rounded.Favorite else Icons.Rounded.FavoriteBorder,
                     contentDescription = stringResource(if (isFavorite) R.string.detail_saved else R.string.detail_save),
@@ -240,10 +262,12 @@ fun CuisineTile(
     modifier: Modifier = Modifier,
     selected: Boolean = false,
 ) {
+    val interaction = remember { MutableInteractionSource() }
     Card(
         onClick = onClick,
-        modifier = modifier,
+        modifier = modifier.pressScale(interaction),
         shape = MaterialTheme.shapes.large,
+        interactionSource = interaction,
         border = if (selected) androidx.compose.foundation.BorderStroke(3.dp, MaterialTheme.colorScheme.primary) else null,
     ) {
         Box(Modifier.fillMaxSize()) {
@@ -369,6 +393,9 @@ fun ErrorState(message: String?, onRetry: () -> Unit, modifier: Modifier = Modif
 
 /** Animated placeholder used while data loads. */
 fun Modifier.shimmer(): Modifier = composed {
+    val base = MaterialTheme.colorScheme.surfaceContainerHighest
+    // With animations off, a still placeholder instead of a sweeping highlight.
+    if (LocalReducedMotion.current) return@composed background(base)
     val transition = rememberInfiniteTransition(label = "shimmer")
     val x by transition.animateFloat(
         initialValue = -400f,
@@ -376,7 +403,6 @@ fun Modifier.shimmer(): Modifier = composed {
         animationSpec = infiniteRepeatable(tween(1300, easing = LinearEasing)),
         label = "shimmerX",
     )
-    val base = MaterialTheme.colorScheme.surfaceContainerHighest
     val highlight = MaterialTheme.colorScheme.surfaceContainerLow
     background(Brush.linearGradient(listOf(base, highlight, base), start = Offset(x, 0f), end = Offset(x + 400f, 400f)))
 }
@@ -434,15 +460,24 @@ fun OsmAttribution(modifier: Modifier = Modifier) {
 }
 
 /**
- * Solid strip behind the transparent status bar, so content scrolling under it doesn't collide with
- * the clock and icons. Place it last in a Box that fills the screen.
+ * Scroll edge effect behind the transparent status bar: the background fades in over a short
+ * distance instead of ending in a hard edge, so content scrolling under the clock and icons
+ * dissolves rather than being cut off. Place it last in a Box that fills the screen.
  */
 @Composable
 fun StatusBarScrim(modifier: Modifier = Modifier) {
+    val background = MaterialTheme.colorScheme.background
     Box(
         modifier
             .fillMaxWidth()
-            .windowInsetsTopHeight(WindowInsets.statusBars)
-            .background(MaterialTheme.colorScheme.background.copy(alpha = 0.94f)),
+            .background(
+                Brush.verticalGradient(
+                    0f to background.copy(alpha = 0.96f),
+                    0.6f to background.copy(alpha = 0.85f),
+                    1f to background.copy(alpha = 0f),
+                ),
+            )
+            .statusBarsPadding()
+            .height(16.dp),
     )
 }

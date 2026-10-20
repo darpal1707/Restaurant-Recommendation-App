@@ -5,14 +5,22 @@ import android.content.pm.PackageManager
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.VisibilityThreshold
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
+import androidx.compose.foundation.gestures.Orientation
+import androidx.compose.foundation.gestures.draggable
+import androidx.compose.foundation.gestures.rememberDraggableState
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
@@ -31,15 +39,19 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
@@ -58,11 +70,15 @@ import com.darpal.foodlabrinthnew.ui.components.RestaurantListItem
 import com.darpal.foodlabrinthnew.ui.components.frame
 import com.darpal.foodlabrinthnew.ui.components.rememberOsmMapView
 import com.darpal.foodlabrinthnew.ui.components.toOsm
+import com.darpal.foodlabrinthnew.ui.theme.LocalReducedMotion
+import com.darpal.foodlabrinthnew.ui.theme.Motion
+import com.darpal.foodlabrinthnew.ui.theme.MotionMath
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import kotlin.math.roundToInt
 import org.osmdroid.events.MapEventsReceiver
 import org.osmdroid.views.overlay.MapEventsOverlay
 import org.osmdroid.views.overlay.Marker
@@ -245,20 +261,73 @@ fun MapScreen(
             }
         }
 
+        val reducedMotion = LocalReducedMotion.current
+        val cardSpec = Motion.spring(visibilityThreshold = IntOffset.VisibilityThreshold)
         AnimatedVisibility(
             visible = cardShowing,
-            enter = slideInVertically { it },
-            exit = slideOutVertically { it },
+            // Rises from the bottom edge and leaves the same way.
+            enter = if (reducedMotion) fadeIn(Motion.fade()) else slideInVertically(cardSpec) { it },
+            exit = if (reducedMotion) fadeOut(Motion.fade()) else slideOutVertically(cardSpec) { it },
             modifier = Modifier.align(Alignment.BottomCenter).padding(16.dp),
         ) {
             selected?.let { restaurant ->
-                RestaurantListItem(
-                    restaurant = restaurant,
-                    isFavorite = restaurant.id in state.favoriteIds,
-                    onClick = { onOpenRestaurant(restaurant.id) },
-                    onToggleFavorite = { viewModel.toggleFavorite(restaurant) },
-                )
+                SwipeDownToDismiss(visible = cardShowing, onDismiss = { showCard = false }) {
+                    RestaurantListItem(
+                        restaurant = restaurant,
+                        isFavorite = restaurant.id in state.favoriteIds,
+                        onClick = { onOpenRestaurant(restaurant.id) },
+                        onToggleFavorite = { viewModel.toggleFavorite(restaurant) },
+                    )
+                }
             }
         }
+    }
+}
+
+/**
+ * Lets the preview card be flicked down and away. The card tracks the finger 1:1 from wherever it
+ * was grabbed (including mid-animation), resists progressively when pulled up past its resting
+ * place, and on release projects the flick's momentum to decide whether to dismiss or settle back,
+ * handing the finger's velocity to the spring so there's no seam between drag and animation.
+ */
+@Composable
+private fun SwipeDownToDismiss(visible: Boolean, onDismiss: () -> Unit, content: @Composable () -> Unit) {
+    val scope = rememberCoroutineScope()
+    val cardOffset = remember { Animatable(0f) }
+    var height by remember { mutableFloatStateOf(0f) }
+    // Finger travel since the drag began; the shown offset is derived from it.
+    var dragged by remember { mutableFloatStateOf(0f) }
+    val currentOnDismiss by rememberUpdatedState(onDismiss)
+
+    // Shown again (e.g. another pin tapped while the card was leaving): return to rest.
+    LaunchedEffect(visible) {
+        if (visible && cardOffset.value != 0f) cardOffset.animateTo(0f, Motion.spring())
+    }
+
+    Box(
+        Modifier
+            .onSizeChanged { height = it.height.toFloat() }
+            .offset { IntOffset(0, cardOffset.value.roundToInt()) }
+            .draggable(
+                orientation = Orientation.Vertical,
+                state = rememberDraggableState { delta ->
+                    dragged += delta
+                    val shown = if (dragged < 0f) MotionMath.rubberBand(dragged, height) else dragged
+                    scope.launch { cardOffset.snapTo(shown) }
+                },
+                onDragStarted = { dragged = cardOffset.value },
+                onDragStopped = { velocity ->
+                    val restingPoint = cardOffset.value + MotionMath.project(velocity)
+                    if (restingPoint > height / 2) {
+                        cardOffset.animateTo(height * 1.5f, Motion.spring(), initialVelocity = velocity)
+                        currentOnDismiss()
+                    } else {
+                        // Settling back after a throw may overshoot a little; it carried momentum.
+                        cardOffset.animateTo(0f, Motion.spring(Motion.Momentum), initialVelocity = velocity)
+                    }
+                },
+            ),
+    ) {
+        content()
     }
 }

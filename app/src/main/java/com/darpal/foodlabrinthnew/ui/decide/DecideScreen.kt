@@ -2,9 +2,13 @@ package com.darpal.foodlabrinthnew.ui.decide
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.core.VisibilityThreshold
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.togetherWith
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -47,12 +51,15 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.createSavedStateHandle
@@ -64,6 +71,10 @@ import com.darpal.foodlabrinthnew.data.model.Meal
 import com.darpal.foodlabrinthnew.ui.appViewModelFactory
 import com.darpal.foodlabrinthnew.ui.components.CuisineTile
 import com.darpal.foodlabrinthnew.ui.components.LocalUnitSystem
+import com.darpal.foodlabrinthnew.ui.theme.LocalReducedMotion
+import com.darpal.foodlabrinthnew.ui.theme.Motion
+import com.darpal.foodlabrinthnew.ui.theme.confirmHaptic
+import com.darpal.foodlabrinthnew.ui.theme.pressScale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -77,6 +88,13 @@ fun DecideScreen(
     val selectedCuisines by viewModel.cuisines.collectAsStateWithLifecycle()
     val goBack = { if (!viewModel.back()) onBack() }
     val units = LocalUnitSystem.current
+    val reducedMotion = LocalReducedMotion.current
+    val view = LocalView.current
+    // A tick when an answer moves the questionnaire on, on the same frame as the step changing.
+    val choose = { action: () -> Unit ->
+        view.confirmHaptic()
+        action()
+    }
 
     BackHandler(enabled = step > 0) { viewModel.back() }
 
@@ -123,24 +141,31 @@ fun DecideScreen(
         AnimatedContent(
             targetState = step,
             modifier = Modifier.padding(padding),
+            // Forward steps come in from the trailing edge; going back reverses along the same path.
             transitionSpec = {
                 val forward = targetState > initialState
-                slideInHorizontally { if (forward) it else -it } togetherWith slideOutHorizontally { if (forward) -it else it }
+                if (reducedMotion) {
+                    fadeIn(Motion.fade()) togetherWith fadeOut(Motion.fade())
+                } else {
+                    val spec = Motion.spring(visibilityThreshold = IntOffset.VisibilityThreshold)
+                    slideInHorizontally(spec) { if (forward) it else -it } togetherWith
+                        slideOutHorizontally(spec) { if (forward) -it else it }
+                }
             },
             label = "decideStep",
         ) { current ->
             when (DecideStep.entries[current]) {
                 DecideStep.MEAL -> OptionGrid(
                     question = stringResource(R.string.decide_meal_question),
-                    options = Meal.entries.map { Option(it.label, null, mealIcon(it), it.name == selectedMeal) { viewModel.selectMeal(it) } },
+                    options = Meal.entries.map { Option(it.label, null, mealIcon(it), it.name == selectedMeal) { choose { viewModel.selectMeal(it) } } },
                 )
                 DecideStep.CUISINE -> CuisineStep(selectedCuisines, viewModel::toggleCuisine)
                 DecideStep.DISTANCE -> OptionGrid(
                     question = stringResource(R.string.decide_distance_question),
                     options = Distance.entries.map {
-                        Option(it.label, it.description(units), distanceIcon(it), false) { onShowResults(viewModel.resultsRoute(it)) }
+                        Option(it.label, it.description(units), distanceIcon(it), false) { choose { onShowResults(viewModel.resultsRoute(it)) } }
                     } + Option(stringResource(R.string.decide_any), stringResource(R.string.decide_any_body), Icons.Rounded.AutoAwesome, false) {
-                        onShowResults(viewModel.resultsRoute(null))
+                        choose { onShowResults(viewModel.resultsRoute(null)) }
                     },
                 )
             }
@@ -183,11 +208,13 @@ private fun OptionGrid(question: String, options: List<Option>) {
 @Composable
 private fun OptionCard(option: Option) {
     val colors = MaterialTheme.colorScheme
+    val interaction = remember { MutableInteractionSource() }
     Card(
         onClick = option.onClick,
+        interactionSource = interaction,
         // A min height (not a fixed square) leaves room for two-line titles and large font sizes,
         // while keeping cards in a row the same height in the common case.
-        modifier = Modifier.fillMaxWidth().heightIn(min = 180.dp),
+        modifier = Modifier.fillMaxWidth().heightIn(min = 180.dp).pressScale(interaction),
         shape = MaterialTheme.shapes.extraLarge,
         colors = CardDefaults.cardColors(
             containerColor = if (option.selected) colors.primaryContainer else colors.surfaceContainerHigh,

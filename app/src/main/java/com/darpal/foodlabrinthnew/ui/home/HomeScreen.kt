@@ -5,6 +5,7 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -77,6 +78,7 @@ import com.darpal.foodlabrinthnew.ui.components.RestaurantListItem
 import com.darpal.foodlabrinthnew.ui.components.SearchField
 import com.darpal.foodlabrinthnew.ui.components.SectionHeader
 import com.darpal.foodlabrinthnew.ui.components.StatusBarScrim
+import com.darpal.foodlabrinthnew.ui.theme.pressScale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -289,11 +291,13 @@ private fun LocationPrompt(onAllow: () -> Unit, onPickCity: (Area) -> Unit, modi
 @Composable
 private fun DecideCard(onDecide: () -> Unit, modifier: Modifier = Modifier) {
     val colors = MaterialTheme.colorScheme
+    val interaction = remember { MutableInteractionSource() }
     Card(
         onClick = onDecide,
-        modifier = modifier.fillMaxWidth(),
+        modifier = modifier.fillMaxWidth().pressScale(interaction),
         shape = MaterialTheme.shapes.extraLarge,
         colors = CardDefaults.cardColors(containerColor = colors.primary),
+        interactionSource = interaction,
     ) {
         Box(
             Modifier
@@ -327,8 +331,14 @@ private fun DecideCard(onDecide: () -> Unit, modifier: Modifier = Modifier) {
 
 @Composable
 private fun CuisineBubble(cuisine: Cuisine, onClick: () -> Unit) {
+    val interaction = remember { MutableInteractionSource() }
     Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.width(72.dp)) {
-        Surface(onClick = onClick, shape = CircleShape, modifier = Modifier.size(68.dp)) {
+        Surface(
+            onClick = onClick,
+            shape = CircleShape,
+            interactionSource = interaction,
+            modifier = Modifier.size(68.dp).pressScale(interaction, pressedScale = 0.92f),
+        ) {
             Image(
                 painter = painterResource(CuisineImages.forCuisine(cuisine)),
                 contentDescription = null,

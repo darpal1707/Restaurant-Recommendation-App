@@ -1,9 +1,11 @@
 package com.darpal.foodlabrinthnew.ui.theme
 
 import androidx.compose.material3.Typography
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.em
 import com.darpal.foodlabrinthnew.R
 
 val Montserrat = FontFamily(
@@ -15,20 +17,33 @@ val Montserrat = FontFamily(
 
 private val base = Typography()
 
+/**
+ * Tracking and leading change with size rather than using one value everywhere: large text is
+ * tightened (Montserrat is wide, and letters drift apart as they grow) with snug leading, body text
+ * keeps neutral tracking with comfortable leading, and small labels get a little extra space so
+ * they stay legible. Hierarchy comes from weight as well as size.
+ */
+private fun TextStyle.tuned(weight: FontWeight, tracking: Double, leading: Double) = copy(
+    fontFamily = Montserrat,
+    fontWeight = weight,
+    letterSpacing = tracking.em,
+    lineHeight = leading.em,
+)
+
 val AppTypography = Typography(
-    displayLarge = base.displayLarge.copy(fontFamily = Montserrat, fontWeight = FontWeight.Bold),
-    displayMedium = base.displayMedium.copy(fontFamily = Montserrat, fontWeight = FontWeight.Bold),
-    displaySmall = base.displaySmall.copy(fontFamily = Montserrat, fontWeight = FontWeight.Bold),
-    headlineLarge = base.headlineLarge.copy(fontFamily = Montserrat, fontWeight = FontWeight.Bold),
-    headlineMedium = base.headlineMedium.copy(fontFamily = Montserrat, fontWeight = FontWeight.Bold),
-    headlineSmall = base.headlineSmall.copy(fontFamily = Montserrat, fontWeight = FontWeight.SemiBold),
-    titleLarge = base.titleLarge.copy(fontFamily = Montserrat, fontWeight = FontWeight.SemiBold),
-    titleMedium = base.titleMedium.copy(fontFamily = Montserrat, fontWeight = FontWeight.SemiBold),
-    titleSmall = base.titleSmall.copy(fontFamily = Montserrat, fontWeight = FontWeight.SemiBold),
-    bodyLarge = base.bodyLarge.copy(fontFamily = Montserrat),
-    bodyMedium = base.bodyMedium.copy(fontFamily = Montserrat),
-    bodySmall = base.bodySmall.copy(fontFamily = Montserrat),
-    labelLarge = base.labelLarge.copy(fontFamily = Montserrat, fontWeight = FontWeight.SemiBold),
-    labelMedium = base.labelMedium.copy(fontFamily = Montserrat, fontWeight = FontWeight.Medium),
-    labelSmall = base.labelSmall.copy(fontFamily = Montserrat, fontWeight = FontWeight.Medium),
+    displayLarge = base.displayLarge.tuned(FontWeight.Bold, tracking = -0.03, leading = 1.1),
+    displayMedium = base.displayMedium.tuned(FontWeight.Bold, tracking = -0.03, leading = 1.1),
+    displaySmall = base.displaySmall.tuned(FontWeight.Bold, tracking = -0.025, leading = 1.15),
+    headlineLarge = base.headlineLarge.tuned(FontWeight.Bold, tracking = -0.02, leading = 1.2),
+    headlineMedium = base.headlineMedium.tuned(FontWeight.Bold, tracking = -0.02, leading = 1.2),
+    headlineSmall = base.headlineSmall.tuned(FontWeight.SemiBold, tracking = -0.015, leading = 1.25),
+    titleLarge = base.titleLarge.tuned(FontWeight.SemiBold, tracking = -0.01, leading = 1.25),
+    titleMedium = base.titleMedium.tuned(FontWeight.SemiBold, tracking = -0.005, leading = 1.3),
+    titleSmall = base.titleSmall.tuned(FontWeight.SemiBold, tracking = 0.0, leading = 1.35),
+    bodyLarge = base.bodyLarge.tuned(FontWeight.Normal, tracking = 0.0, leading = 1.5),
+    bodyMedium = base.bodyMedium.tuned(FontWeight.Normal, tracking = 0.005, leading = 1.45),
+    bodySmall = base.bodySmall.tuned(FontWeight.Normal, tracking = 0.01, leading = 1.4),
+    labelLarge = base.labelLarge.tuned(FontWeight.SemiBold, tracking = 0.005, leading = 1.3),
+    labelMedium = base.labelMedium.tuned(FontWeight.Medium, tracking = 0.015, leading = 1.3),
+    labelSmall = base.labelSmall.tuned(FontWeight.Medium, tracking = 0.025, leading = 1.3),
 )
